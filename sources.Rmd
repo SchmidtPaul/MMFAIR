@@ -1,0 +1,37 @@
+---
+title: "sources"
+---
+
+## packages
+
+### lme4
+* [Reference manual](https://cran.r-project.org/web/packages/lme4/lme4.pdf)
+* Vignettes 
+  + [lmer Performance Tips](https://cran.r-project.org/web/packages/lme4/vignettes/lmerperf.html)
+  + [Fitting Linear Mixed-Effects Models using lme4](https://cran.r-project.org/web/packages/lme4/vignettes/lmer.pdf)
+  + [PLS vs GLS for LMMs](https://cran.r-project.org/web/packages/lme4/vignettes/PLSvGLS.pdf)
+  + [Computational Methods](https://cran.r-project.org/web/packages/lme4/vignettes/Theory.pdf)
+
+### nlme
+* [Reference manual](https://cran.r-project.org/web/packages/nlme/nlme.pdf)
+* Vignettes: none
+
+### glmmTMB
+* [Reference manual](https://cran.r-project.org/web/packages/glmmTMB/glmmTMB.pdf)
+* Vignettes
+  + [random effect structures](https://cran.r-project.org/web/packages/glmmTMB/vignettes/covstruct.html)
+  + [post-hoc MCMC](https://cran.r-project.org/web/packages/glmmTMB/vignettes/mcmc.html)
+  + [miscellaneous examples](https://cran.r-project.org/web/packages/glmmTMB/vignettes/miscEx.html)
+  + [parallel optimization](https://cran.r-project.org/web/packages/glmmTMB/vignettes/parallel.html)
+  + [simulate](https://cran.r-project.org/web/packages/glmmTMB/vignettes/sim.html)
+  + [troubleshooting](https://cran.r-project.org/web/packages/glmmTMB/vignettes/troubleshooting.html)
+  + [basic examples of glmmTMB usage](https://cran.r-project.org/web/packages/glmmTMB/vignettes/glmmTMB.pdf)
+  + [model evaluation](https://cran.r-project.org/web/packages/glmmTMB/vignettes/model_evaluation.pdf)
+  
+### sommer
+* [Reference manual](https://cran.r-project.org/web/packages/sommer/sommer.pdf)
+* Vignettes
+  + [FAQ for the sommer package](https://cran.r-project.org/web/packages/sommer/vignettes/sommer.FAQ.pdf)
+  + [Quantitative genetics using the sommer package](https://cran.r-project.org/web/packages/sommer/vignettes/sommer.pdf)
+  + [Moving to newer versions of sommer](https://cran.r-project.org/web/packages/sommer/vignettes/sommer.changes.pdf)
+  + [Quick start for the sommer package](https://cran.r-project.org/web/packages/sommer/vignettes/sommer.start.pdf)
