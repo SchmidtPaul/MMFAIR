@@ -1,0 +1,6 @@
+"0","library(pacman)"
+"0","p_load(dplyr, nlme)"
+"0",""
+"0","dat <- agridat::mcconway.turnip %>%"
+"0","  as_tibble() %>% "
+"0","  mutate(densf = as.factor(density))"

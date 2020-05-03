@@ -1,0 +1,6 @@
+"0","mod2.nlme.VC <- mod2.nlme$modelStruct$varStruct %>% "
+"0","  coef(unconstrained=FALSE, allCoef=TRUE) %>% "
+"0","  tibble::enframe(name=""grp"", value=""varStruct"") %>% "
+"0","  mutate(sigma         = mod2.nlme$sigma) %>% "
+"0","  mutate(StandardError = sigma*varStruct) %>% "
+"0","  mutate(Variance      = StandardError^2)"

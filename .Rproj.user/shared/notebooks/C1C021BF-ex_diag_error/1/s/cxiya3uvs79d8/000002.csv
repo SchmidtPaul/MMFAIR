@@ -1,0 +1,4 @@
+"0","mod1.nlme.VC <- tibble(grp=""all"", varStruct=1) %>% "
+"0","  mutate(sigma         = mod1.nlme$sigma) %>% "
+"0","  mutate(StandardError = sigma*varStruct) %>% "
+"0","  mutate(Variance      = StandardError^2)"

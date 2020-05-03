@@ -1,0 +1,7 @@
+{
+    "installOptions" : {
+        "installDependencies" : true,
+        "installFromRepository" : true,
+        "libraryPath" : "C:/Users/schmi/Documents/R/win-library/4.0"
+    }
+}

@@ -1,0 +1,27 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1588342325682.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "4110548328",
+    "id" : "F6590224",
+    "lastKnownWriteTime" : 1588524500,
+    "last_content_update" : 1588524500306,
+    "path" : "D:/Coding/MMFAIR/ex_diag_error.Rmd",
+    "project_path" : "ex_diag_error.Rmd",
+    "properties" : {
+        "cursorPosition" : "138,37",
+        "disableDependencyDiscovery" : "1",
+        "scrollLine" : "131",
+        "tempName" : "Untitled1"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 5,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_markdown"
+}

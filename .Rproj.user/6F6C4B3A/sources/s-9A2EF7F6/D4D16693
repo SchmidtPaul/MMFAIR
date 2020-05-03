@@ -1,0 +1,26 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1588339227480.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "D4D16693",
+    "lastKnownWriteTime" : 1588345719,
+    "last_content_update" : 1588345719573,
+    "path" : "D:/Coding/MMFAIR/sources.Rmd",
+    "project_path" : "sources.Rmd",
+    "properties" : {
+        "cursorPosition" : "50,14",
+        "scrollLine" : "0",
+        "tempName" : "Untitled1"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 4,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_markdown"
+}
