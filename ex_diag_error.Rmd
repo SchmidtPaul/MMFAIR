@@ -27,7 +27,7 @@ boxplot(yield ~ date,    data=dat)
 boxplot(yield ~ density, data=dat)
 ```
 
-# 4 Models
+# 4 Models {.tabset .tabset-fade .tabset-pills}
 We therefore set up 4 models, which only differ in the variance structure of the errors. More specifically, we allow for heterogeneous error variances / heteroscedascity per group for the effct levels of Date and Density.
 ```{r, echo=FALSE}
 tibble(Model = paste0("mod", 1:4) %>% cell_spec(bold=T),
@@ -42,6 +42,8 @@ tibble(Model = paste0("mod", 1:4) %>% cell_spec(bold=T),
                 full_width = FALSE) %>% 
   add_header_above(c(" ", "Term in multiplicative variance structure"=4))
 ```
+
+## nlme
 To accomplish this, we need to use the *variance function* `varIdent()` in the `weights=` statement, which is *used to allow different variances according to thelevels of a classification factor*. This variance structures is sometimes also referred to as *diagonal*. In model number 4 we are allowing for heterogeneous error variances for both dates and densities, which is done by combining two variance functions via `varComb()`:
 
 ```{r}
@@ -62,7 +64,18 @@ mod4.nlme <- mod1.nlme %>%
 
 ```
 
-## Variance Components
+## lme4
+in progress
+
+## glmmTMB
+in progress
+
+## sommer
+in progress
+
+# Variance Components {.tabset .tabset-fade .tabset-pills}
+
+## nlme
 As far as we know, it is quite cumbersome to extract the variance component estimates from `nlme`/`gls` objects (in a table format we are used to), even with helper packages such as `broom.mixed`. Beneath is the the most elegant approach we have so far when trying to get similarly formatted output for all 4 models. The general approach is to first get a table with a column for 
 
 + all levels / level-combinations for which heterogeneous error variances were fit
@@ -148,8 +161,19 @@ mod4.nlme.VC %>%
                 full_width = FALSE)
 ```
 
-## Model Fit
+## lme4
+in progress
+
+## glmmTMB
+in progress
+
+## sommer
+in progress
+
+# Model Fit {.tabset .tabset-fade .tabset-pills}
 As is standard procedure, we can do a model selection based on goodness-of-fit statistics such as the AIC. In order to have a direct comparison to Table 1 in [(Piepho, 2009)](https://acsess.onlinelibrary.wiley.com/doi/abs/10.2134/agronj2008.0226x), we also calculated the deviance (*i.e.* -2*loglikelihood) for each model. The code is shown for mod1:
+
+## nlme
 
 <div class = "row"> <div class = "col-md-6">
 ```{r}
@@ -174,3 +198,11 @@ tibble(Model = paste0("mod", 1:4),
                 full_width = FALSE)
 ```
 
+## lme4
+in progress
+
+## glmmTMB
+in progress
+
+## sommer
+in progress
