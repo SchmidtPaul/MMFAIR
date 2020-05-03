@@ -7,14 +7,14 @@
     "folds" : "",
     "hash" : "0",
     "id" : "F6590224",
-    "lastKnownWriteTime" : 1588541688,
-    "last_content_update" : 1588541688362,
+    "lastKnownWriteTime" : 1588541962,
+    "last_content_update" : 1588541962646,
     "path" : "D:/Coding/MMFAIR/ex_diag_error.Rmd",
     "project_path" : "ex_diag_error.Rmd",
     "properties" : {
-        "cursorPosition" : "172,48",
+        "cursorPosition" : "75,22",
         "disableDependencyDiscovery" : "1",
-        "scrollLine" : "165",
+        "scrollLine" : "73",
         "tempName" : "Untitled1"
     },
     "read_only" : false,

@@ -12,7 +12,7 @@ library(formattable)
 
 ```{r}
 pacman::p_load(dplyr, tibble, # packages for data handling
-               nlme, glmmTMB) # packages for mixed models
+               nlme, lme4, glmmTMB, sommer) # packages for mixed models
 
 dat <- agridat::mcconway.turnip %>%
   as_tibble() %>% 

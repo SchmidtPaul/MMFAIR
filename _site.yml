@@ -14,7 +14,8 @@ navbar:
 output:
   html_document:
     theme: lumen
-    # highlight: textmate
+    code_folding: show
+    highlight: tango
     toc: true
     toc_float: true
     # number_sections: true

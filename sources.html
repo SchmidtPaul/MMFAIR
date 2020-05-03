@@ -23,6 +23,7 @@
 <link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
 <script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
+<script src="site_libs/navigation-1.1/codefolding.js"></script>
 <link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
 <script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
 
@@ -249,6 +250,9 @@ $(document).ready(function () {
 </style>
 
 <!-- code folding -->
+<style type="text/css">
+.code-folding-btn { margin-bottom: 4px; }
+</style>
 
 
 
@@ -367,16 +371,28 @@ div.tocify {
 
 <div class="fluid-row" id="header">
 
+<div class="btn-group pull-right">
+<button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span>Code</span> <span class="caret"></span></button>
+<ul class="dropdown-menu" style="min-width: 50px;">
+<li><a id="rmd-show-all-code" href="#">Show All Code</a></li>
+<li><a id="rmd-hide-all-code" href="#">Hide All Code</a></li>
+</ul>
+</div>
+
 
 
 
 </div>
 
 
-<div id="mixed-modelling" class="section level1">
-<h1>Mixed Modelling</h1>
-<div id="lme4" class="section level3">
-<h3>lme4</h3>
+<div id="links-references" class="section level1 tabset tabset-fade tabset-pills">
+<h1>Links &amp; References</h1>
+<div id="packages" class="section level2">
+<h2>Packages</h2>
+<div id="mixed-model" class="section level3">
+<h3>Mixed Model</h3>
+<div id="lme4" class="section level4">
+<h4>lme4</h4>
 <ul>
 <li><a href="https://cran.r-project.org/web/packages/lme4/lme4.pdf">Reference manual</a></li>
 <li>Vignettes
@@ -388,8 +404,8 @@ div.tocify {
 </ul></li>
 </ul>
 </div>
-<div id="glmmtmb" class="section level3">
-<h3>glmmTMB</h3>
+<div id="glmmtmb" class="section level4">
+<h4>glmmTMB</h4>
 <ul>
 <li><a href="https://cran.r-project.org/web/packages/glmmTMB/glmmTMB.pdf">Reference manual</a></li>
 <li>Vignettes
@@ -405,15 +421,15 @@ div.tocify {
 </ul></li>
 </ul>
 </div>
-<div id="nlme" class="section level3">
-<h3>nlme</h3>
+<div id="nlme" class="section level4">
+<h4>nlme</h4>
 <ul>
 <li><a href="https://cran.r-project.org/web/packages/nlme/nlme.pdf">Reference manual</a></li>
 <li>Vignettes: none</li>
 </ul>
 </div>
-<div id="sommer" class="section level3">
-<h3>sommer</h3>
+<div id="sommer" class="section level4">
+<h4>sommer</h4>
 <ul>
 <li><a href="https://cran.r-project.org/web/packages/sommer/sommer.pdf">Reference manual</a></li>
 <li>Vignettes
@@ -426,10 +442,10 @@ div.tocify {
 </ul>
 </div>
 </div>
-<div id="data" class="section level1">
-<h1>Data</h1>
-<div id="agridat" class="section level3">
-<h3>agridat</h3>
+<div id="data" class="section level3">
+<h3>Data</h3>
+<div id="agridat" class="section level4">
+<h4>agridat</h4>
 <ul>
 <li><a href="https://cran.r-project.org/web/packages/agridat/agridat.pdf">Reference manual</a></li>
 <li>Vignettes
@@ -440,8 +456,8 @@ div.tocify {
 </ul></li>
 </ul>
 </div>
-<div id="agritutorial" class="section level3">
-<h3>agritutorial</h3>
+<div id="agritutorial" class="section level4">
+<h4>agritutorial</h4>
 <ul>
 <li><a href="https://cran.r-project.org/web/packages/agriTutorial/agriTutorial.pdf">Reference manual</a></li>
 <li>Vignettes
@@ -451,9 +467,50 @@ div.tocify {
 </ul>
 </div>
 </div>
-<div id="publications" class="section level1">
-<h1>Publications</h1>
+</div>
+<div id="publications" class="section level2">
+<h2>Publications</h2>
 <p><a href="https://acsess.onlinelibrary.wiley.com/doi/abs/10.2134/agronj2008.0226x">Piepho, H. P. (2009). Data transformation in statistical analysis of field trials with changing treatment variance. Agronomy Journal, 101(4), 865-869.</a></p>
+</div>
+<div id="session-info" class="section level2">
+<h2>Session Info</h2>
+<pre><code>## R version 4.0.0 (2020-04-24)
+## Platform: x86_64-w64-mingw32/x64 (64-bit)
+## Running under: Windows 10 x64 (build 18362)
+## 
+## Matrix products: default
+## 
+## locale:
+## [1] LC_COLLATE=German_Germany.1252  LC_CTYPE=German_Germany.1252   
+## [3] LC_MONETARY=German_Germany.1252 LC_NUMERIC=C                   
+## [5] LC_TIME=German_Germany.1252    
+## 
+## attached base packages:
+## [1] stats     graphics  grDevices utils     datasets  methods   base     
+## 
+## other attached packages:
+##  [1] sommer_4.0.9        crayon_1.3.4        lattice_0.20-41     MASS_7.3-51.5      
+##  [5] lme4_1.1-23         Matrix_1.2-18       glmmTMB_1.0.1       nlme_3.1-147       
+##  [9] tibble_3.0.0        dplyr_0.8.5         formattable_0.2.0.1 kableExtra_1.1.0   
+## [13] rmarkdown_2.1      
+## 
+## loaded via a namespace (and not attached):
+##  [1] Rcpp_1.0.4.6      mvtnorm_1.1-0     zoo_1.8-7         assertthat_0.2.1 
+##  [5] digest_0.6.25     R6_2.4.1          evaluate_0.14     coda_0.19-3      
+##  [9] httr_1.4.1        pillar_1.4.3      rlang_0.4.5       multcomp_1.4-13  
+## [13] rstudioapi_0.11   minqa_1.2.4       nloptr_1.2.2.1    splines_4.0.0    
+## [17] agridat_1.16      webshot_0.5.2     statmod_1.4.34    readr_1.3.1      
+## [21] stringr_1.4.0     TMB_1.7.16        htmlwidgets_1.5.1 munsell_0.5.0    
+## [25] compiler_4.0.0    xfun_0.13         pkgconfig_2.0.3   htmltools_0.4.0  
+## [29] tidyselect_1.0.0  codetools_0.2-16  fansi_0.4.1       viridisLite_0.3.0
+## [33] grid_4.0.0        xtable_1.8-4      lifecycle_0.2.0   pacman_0.5.1     
+## [37] magrittr_1.5      scales_1.1.0      estimability_1.3  cli_2.0.2        
+## [41] stringi_1.4.6     xml2_1.3.1        ellipsis_0.3.0    vctrs_0.2.4      
+## [45] boot_1.3-24       sandwich_2.5-1    TH.data_1.0-10    tools_4.0.0      
+## [49] glue_1.4.0        purrr_0.3.4       hms_0.5.3         emmeans_1.4.6    
+## [53] survival_3.1-12   yaml_2.2.1        colorspace_1.4-1  rvest_0.3.5      
+## [57] knitr_1.28</code></pre>
+</div>
 </div>
 
 
@@ -491,6 +548,11 @@ $(document).ready(function () {
 </script>
 
 <!-- code folding -->
+<script>
+$(document).ready(function () {
+  window.initializeCodeFolding("hide" === "show");
+});
+</script>
 
 <script>
 $(document).ready(function ()  {
