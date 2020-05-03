@@ -35,7 +35,7 @@ title: ""
   + [Moving to newer versions of sommer](https://cran.r-project.org/web/packages/sommer/vignettes/sommer.changes.pdf)
   + [Quick start for the sommer package](https://cran.r-project.org/web/packages/sommer/vignettes/sommer.start.pdf)
   
-# Examples
+# Data
 ### agridat
 * [Reference manual](https://cran.r-project.org/web/packages/agridat/agridat.pdf)
 * Vignettes

@@ -376,8 +376,8 @@ div.tocify {
 
 
 <p><strong>packages &amp; data</strong></p>
-<pre class="r"><code>library(pacman)
-p_load(dplyr, nlme, tibble)
+<pre class="r"><code>pacman::p_load(dplyr, tibble, # packages for data handling
+               nlme, glmmTMB) # packages for mixed models
 
 dat &lt;- agridat::mcconway.turnip %&gt;%
   as_tibble() %&gt;% 
@@ -385,13 +385,114 @@ dat &lt;- agridat::mcconway.turnip %&gt;%
 <div id="motivation" class="section level1">
 <h1>Motivation</h1>
 <p>This is a randomized complete block design (4 blocks) with three treatment factors: genotype, date and density, leading to 16 treatment combinations (2 genotypes, 2 planting dates, 4 densities) <a href="https://acsess.onlinelibrary.wiley.com/doi/abs/10.2134/agronj2008.0226x">(Piepho, 2009)</a>. It can be argued that heterogeneous error variances (<em>i.e.</em> heteroscedasticity) for two of the treatments should be considered:</p>
-<pre class="r"><code>boxplot(yield ~ date,  data=dat)
-boxplot(yield ~ densf, data=dat)</code></pre>
-<p><img src="ex_diag_error_files/figure-html/unnamed-chunk-44-1.png" width="50%" /><img src="ex_diag_error_files/figure-html/unnamed-chunk-44-2.png" width="50%" /></p>
+<pre class="r"><code>boxplot(yield ~ date,    data=dat)
+boxplot(yield ~ density, data=dat)</code></pre>
+<p><img src="ex_diag_error_files/figure-html/unnamed-chunk-3-1.png" width="50%" /><img src="ex_diag_error_files/figure-html/unnamed-chunk-3-2.png" width="50%" /></p>
 </div>
 <div id="models" class="section level1">
 <h1>4 Models</h1>
-<p>We therefore set up 4 models, which only differ in heteroscedascity structure of the errors. To accomplish this, we need to use the <em>variance function</em> <code>varIdent()</code> in the <code>weights=</code> statement, which is <em>used to allow different variances according to thelevels of a classification factor</em>. In model number 4 we are allowing for heterogeneous error variances for both dates and densities, which is done by combining two variance functions via <code>varComb()</code>:</p>
+We therefore set up 4 models, which only differ in the variance structure of the errors. More specifically, we allow for heterogeneous error variances / heteroscedascity per group for the effct levels of Date and Density.
+<table class="table table-striped table-hover" style="width: auto !important; margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="border-bottom:hidden" colspan="1">
+</th>
+<th style="border-bottom:hidden; padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; " colspan="4">
+<div style="border-bottom: 1px solid #ddd; padding-bottom: 5px; ">
+Term in multiplicative variance structure
+</div>
+</th>
+</tr>
+<tr>
+<th style="text-align:left;">
+Model
+</th>
+<th style="text-align:left;">
+Block
+</th>
+<th style="text-align:left;">
+Genotype
+</th>
+<th style="text-align:left;">
+Density
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<span style=" font-weight: bold;    ">mod1</span>
+</td>
+<td style="text-align:left;">
+Identity
+</td>
+<td style="text-align:left;">
+Identity
+</td>
+<td style="text-align:left;">
+Identity
+</td>
+<td style="text-align:left;">
+Identity
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<span style=" font-weight: bold;    ">mod2</span>
+</td>
+<td style="text-align:left;">
+Identity
+</td>
+<td style="text-align:left;">
+Identity
+</td>
+<td style="text-align:left;">
+Identity
+</td>
+<td style="text-align:left;">
+<span style=" font-weight: bold;    ">Diagonal</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<span style=" font-weight: bold;    ">mod3</span>
+</td>
+<td style="text-align:left;">
+Identity
+</td>
+<td style="text-align:left;">
+Identity
+</td>
+<td style="text-align:left;">
+<span style=" font-weight: bold;    ">Diagonal</span>
+</td>
+<td style="text-align:left;">
+Identity
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<span style=" font-weight: bold;    ">mod4</span>
+</td>
+<td style="text-align:left;">
+Identity
+</td>
+<td style="text-align:left;">
+Identity
+</td>
+<td style="text-align:left;">
+<span style=" font-weight: bold;    ">Diagonal</span>
+</td>
+<td style="text-align:left;">
+<span style=" font-weight: bold;    ">Diagonal</span>
+</td>
+</tr>
+</tbody>
+</table>
+<p>To accomplish this, we need to use the <em>variance function</em> <code>varIdent()</code> in the <code>weights=</code> statement, which is <em>used to allow different variances according to thelevels of a classification factor</em>. This variance structures is sometimes also referred to as <em>diagonal</em>. In model number 4 we are allowing for heterogeneous error variances for both dates and densities, which is done by combining two variance functions via <code>varComb()</code>:</p>
 <pre class="r"><code>mod1.nlme &lt;- nlme::lme(fixed   = yield ~ gen * date * densf, 
                        random  = ~ 1|block,
                        weights = NULL, # default, i.e. homoscedastic errors
@@ -408,7 +509,13 @@ mod4.nlme &lt;- mod1.nlme %&gt;%
                            varIdent(form=~1|date))) # density-date combination</code></pre>
 <div id="variance-components" class="section level2">
 <h2>Variance Components</h2>
-<p>As far as we know, it is quite cumbersome to extract the variance component estimates from <code>nlme</code>/<code>gls</code> objects (in a table format), even with helper packages such as <code>broom.mixed</code>. This is the the most elegant approach we have so far when trying to get similarly formatted output for all 4 models:</p>
+<p>As far as we know, it is quite cumbersome to extract the variance component estimates from <code>nlme</code>/<code>gls</code> objects (in a table format we are used to), even with helper packages such as <code>broom.mixed</code>. Beneath is the the most elegant approach we have so far when trying to get similarly formatted output for all 4 models. The general approach is to first get a table with a column for</p>
+<ul>
+<li>all levels / level-combinations for which heterogeneous error variances were fit</li>
+<li>their respective value of the model-object’s <code>varStruct</code> and</li>
+<li>the overall value of the model-object’s <code>sigma</code>.</li>
+</ul>
+<p>By multiplying the latter two, we receive the respective standard error estimate, which needs to be squared in order to obtain the respective variance component estimate.</p>
 <div id="mod1" class="section level3">
 <h3>mod1</h3>
 <pre class="r"><code>mod1.nlme.VC &lt;- tibble(grp=&quot;all&quot;, varStruct=1) %&gt;% 
@@ -858,7 +965,7 @@ Variance
 </div>
 <div id="model-fit" class="section level2">
 <h2>Model Fit</h2>
-<p>As is standard procedure, we can do a model selection based on goodness-of-fit statistics such as the AIC. In order to have a direct comparison to Table 1 in (Piepho, 2009), we also calculated the deviance (<em>i.e.</em> -2*loglikelihood) for each model. The code is shown for mod1:</p>
+<p>As is standard procedure, we can do a model selection based on goodness-of-fit statistics such as the AIC. In order to have a direct comparison to Table 1 in <a href="https://acsess.onlinelibrary.wiley.com/doi/abs/10.2134/agronj2008.0226x">(Piepho, 2009)</a>, we also calculated the deviance (<em>i.e.</em> -2*loglikelihood) for each model. The code is shown for mod1:</p>
 <div class="row">
 <div class="col-md-6">
 <pre class="r"><code>mod1.nlme %&gt;% AIC # AIC </code></pre>

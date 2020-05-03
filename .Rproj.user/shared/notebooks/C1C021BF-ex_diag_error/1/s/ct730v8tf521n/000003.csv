@@ -1,0 +1,5 @@
+"0","mod1.nlme.VC %>%"
+"0","  mutate_if(is.double, round, 3) %>% "
+"0","  kable(escape = FALSE) %>% "
+"0","  kable_styling(bootstrap_options = c(""bordered"", ""hover""), "
+"0","                full_width = FALSE)"

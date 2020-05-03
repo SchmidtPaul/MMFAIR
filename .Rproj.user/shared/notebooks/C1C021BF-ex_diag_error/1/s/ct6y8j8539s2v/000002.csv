@@ -1,5 +1,5 @@
-"0","library(pacman)"
-"0","p_load(dplyr, nlme)"
+"0","pacman::p_load(dplyr, tibble, # packages for data handling"
+"0","               nlme, glmmTMB) # packages for mixed models"
 "0",""
 "0","dat <- agridat::mcconway.turnip %>%"
 "0","  as_tibble() %>% "
