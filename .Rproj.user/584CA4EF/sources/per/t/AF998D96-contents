@@ -1,0 +1,22 @@
+name: "MMFAIR-website"
+output_dir: "."    # in GitHub master folder instead of default "_site" so that GitHub Pages works
+
+navbar:
+  title: "MMFAIR"
+  left:
+    - text: "Home"
+      href: index.html
+    - text: "Examples"
+      href: ex_diag_error.html
+    - text: "Sources"
+      href: sources.html
+  
+output:
+  html_document:
+    theme: lumen
+    code_folding: show
+    highlight: tango
+    toc: true
+    toc_float: true
+    # number_sections: true
+    css: 'styles.css'

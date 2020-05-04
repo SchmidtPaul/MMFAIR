@@ -1,0 +1,25 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1588613717061.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "561387358",
+    "id" : "53DCAE0C",
+    "lastKnownWriteTime" : 1588614127,
+    "last_content_update" : 1588614127995,
+    "path" : "~/GitHub/MMFAIR/styles.css",
+    "project_path" : "styles.css",
+    "properties" : {
+        "cursorPosition" : "44,1",
+        "scrollLine" : "28"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 3,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "css"
+}

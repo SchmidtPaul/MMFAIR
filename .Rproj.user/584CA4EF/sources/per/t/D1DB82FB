@@ -1,0 +1,25 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1588613337766.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "3985410878",
+    "id" : "D1DB82FB",
+    "lastKnownWriteTime" : 1588614771,
+    "last_content_update" : 1588614771889,
+    "path" : "~/GitHub/MMFAIR/ex_diag_error.Rmd",
+    "project_path" : "ex_diag_error.Rmd",
+    "properties" : {
+        "cursorPosition" : "5,29",
+        "scrollLine" : "0"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 1,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_markdown"
+}
