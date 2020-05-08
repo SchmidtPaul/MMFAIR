@@ -1,0 +1,2 @@
+"0","dat.id <- dat %>% "
+"0","  mutate(id = 1:n() %>% as.factor) # running number 1 - 64"

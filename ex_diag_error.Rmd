@@ -3,7 +3,7 @@ title: "Heterogeneous error variance"
 output: 
   html_document:
     includes:
-      after_body: footer.html
+      after_body: footer.html						 
 ---
 
 **packages & data**
@@ -24,7 +24,7 @@ dat <- agridat::mcconway.turnip %>%
 ```
 
 # Motivation
-This is a randomized complete block design (4 blocks) with three treatment factors: genotype, date and density, leading to 16 treatment combinations (2 genotypes, 2 planting dates, 4 densities) [(Piepho, 2009)](https://acsess.onlinelibrary.wiley.com/doi/abs/10.2134/agronj2008.0226x). It can be argued that heterogeneous error variances (*i.e.* heteroscedasticity) for two of the treatments should be considered:
+This is a randomized complete block design (4 blocks) with three treatment factors: genotype, date and density, leading to 16 treatment level combinations (2 genotypes, 2 planting dates, 4 densities) [(Piepho, 2009)](https://acsess.onlinelibrary.wiley.com/doi/abs/10.2134/agronj2008.0226x). It can be argued that heterogeneous error variances (*i.e.* heteroscedasticity) for two of the treatments should be considered:
 
 ```{r, out.width=c('50%', '50%'), fig.show='hold'}
 boxplot(yield ~ date,    data=dat)
@@ -32,7 +32,10 @@ boxplot(yield ~ density, data=dat)
 ```
 
 # 4 Models {.tabset .tabset-fade .tabset-pills}
-We therefore set up 4 models, which only differ in the variance structure of the errors. More specifically, we allow for heterogeneous error variances / heteroscedascity per group for the effct levels of Date and Density.
+We therefore set up 4 models, which only differ in the variance structure of the errors. More specifically, we allow for heterogeneous error variances / heteroscedascity per group for the effect levels of Date and Density. This variance structure is sometimes also referred to as *diagonal*. 
+
+Regarding the effects in the model, we take the same approach as [Piepho (2009)](https://acsess.onlinelibrary.wiley.com/doi/abs/10.2134/agronj2008.0226x), which calls for fixed main effects for `gen`, `date` and `densf` as well as all their interaction effects, plus random `block` effects.
+
 ```{r, echo=FALSE}
 tibble(Model = paste0("mod", 1:4) %>% cell_spec(bold=T),
        Block    = "Identity",
@@ -48,7 +51,7 @@ tibble(Model = paste0("mod", 1:4) %>% cell_spec(bold=T),
 ```
 
 ## nlme
-To accomplish this, we need to use the *variance function* `varIdent()` in the `weights=` statement, which is *used to allow different variances according to thelevels of a classification factor*. This variance structures is sometimes also referred to as *diagonal*. In model number 4 we are allowing for heterogeneous error variances for both dates and densities, which is done by combining two variance functions via `varComb()`:
+To accomplish this in `nlme()`, we need to use the *variance function* `varIdent()` in the `weights=` statement, which is *used to allow for different variances according to the levels of a classification factor*. In model number 4, we are allowing for heterogeneous error variances for both dates and densities, which is done by combining two variance functions via `varComb()`:
 
 ```{r}
 mod1.nlme <- nlme::lme(fixed   = yield ~ gen * date * densf, 
@@ -72,7 +75,39 @@ mod4.nlme <- mod1.nlme %>%
 in progress
 
 ## glmmTMB
-in progress
+In `glmmTMB()` it is -to our knowledge- not possible to adjust the variance structure of the error.
+
+>Just like in `nlme`, there is a `weights=` option in `glmmTMB()`. However, to our understanding, they have different functions: 
+> 
+>In `nlme`, it requires *"an optional `varFunc` object or one-sided formula describing the within-group heteroscedasticity structure"* [(nlme RefMan)](https://cran.r-project.org/web/packages/glmmTMB/glmmTMB.pdf#Rfn.glmmTMB.1) and we make use of this in the example at hand.   
+>
+>In `glmmTMB`, the [RefMan](https://cran.r-project.org/web/packages/glmmTMB/glmmTMB.pdf#Rfn.glmmTMB.1) only states *"weights, as in `glm`. Not automatically scaled to have sum 1"*. Following this trail, the `glm` documentation description for the `weights=` option is *"an optional vector of ‘prior weights’ to be used in the fitting process. Should be NULL or a numeric vector."*.
+
+We can, however, "*fix the residual variance  to  be  0  (actually  a  small  non-zero  value)*" and therefore "*force variance into the random effects*" [(glmmTMB RefMan)](https://cran.r-project.org/web/packages/glmmTMB/glmmTMB.pdf#Rfn.glmmTMB.1) via adding the `dispformula = ~0` option. 
+
+Thus, we need to make sure to add a random effect with respective variance structure to the model that leads to the estimation of the desired variance components. In the case of mimicing the error variance as a random effect, we can create an `id` column in the data with different entries for each data point:
+
+```{r}
+dat.id <- dat %>% 
+  mutate(id = 1:n() %>% as.factor) # running number 1 - 64
+```
+
+We should now be able to mimic the error variance via the random term `(1|id)`. We can verify this quickly:
+
+```{r}
+mod1.glmm.fixonly <- glmmTMB(formula =  yield ~ gen * date * densf,
+                             data    = dat.id, REML = TRUE)
+
+mod1.glmm.fixonly %>% 
+  update(formula = .~. + (1|block)) %>% VarCorr
+mod1.glmm.fixonly %>% 
+  update(formula = .~. + (1|block) + (1|id),
+         dispformula = ~0) %>% VarCorr
+
+
+```
+
+
 
 ## sommer
 in progress
@@ -80,7 +115,7 @@ in progress
 # Variance Components {.tabset .tabset-fade .tabset-pills}
 
 ## nlme
-As far as we know, it is quite cumbersome to extract the variance component estimates from `nlme`/`gls` objects (in a table format we are used to), even with helper packages such as `broom.mixed`. Beneath is the the most elegant approach we have so far when trying to get similarly formatted output for all 4 models. The general approach is to first get a table with a column for 
+As far as we know, it is quite cumbersome to extract variance component estimates from `nlme` objects (in a table format we are used to), even with helper packages such as `broom.mixed`. Beneath is the the most elegant approach we have so far when trying to get similarly formatted output for all 4 models. The general approach is to first get a table with a column for 
 
 + all levels / level-combinations for which heterogeneous error variances were fit
 + their respective value of the model-object's `varStruct` and
@@ -90,7 +125,7 @@ By multiplying the latter two, we receive the respective standard error estimate
 
 ### mod1
 ```{r}
-mod1.nlme.VC <- tibble(grp="all", varStruct=1) %>% 
+mod1.nlme.VC <- tibble(grp="homoscedastic", varStruct=1) %>% 
   mutate(sigma         = mod1.nlme$sigma) %>% 
   mutate(StandardError = sigma*varStruct) %>% 
   mutate(Variance      = StandardError^2)
