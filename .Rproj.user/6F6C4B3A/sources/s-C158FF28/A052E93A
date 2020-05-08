@@ -1,0 +1,25 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1588542060599.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "A052E93A",
+    "lastKnownWriteTime" : 1588938865,
+    "last_content_update" : 1588938865,
+    "path" : "D:/Coding/MMFAIR/styles.css",
+    "project_path" : "styles.css",
+    "properties" : {
+        "cursorPosition" : "42,1",
+        "scrollLine" : "0"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 6,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "css"
+}

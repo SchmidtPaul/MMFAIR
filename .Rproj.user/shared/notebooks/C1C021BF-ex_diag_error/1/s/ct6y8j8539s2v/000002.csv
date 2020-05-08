@@ -1,6 +1,0 @@
-"0","pacman::p_load(dplyr, tibble, # packages for data handling"
-"0","               nlme, lme4, glmmTMB, sommer) # packages for mixed models"
-"0",""
-"0","dat <- agridat::mcconway.turnip %>%"
-"0","  as_tibble() %>% "
-"0","  mutate(densf = as.factor(density))"
