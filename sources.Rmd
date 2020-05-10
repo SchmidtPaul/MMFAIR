@@ -1,5 +1,9 @@
 ---
 title: ""
+output: 
+  html_document:
+    includes:
+      after_body: footer.html		
 ---
 
 # Links & References {.tabset .tabset-fade .tabset-pills}

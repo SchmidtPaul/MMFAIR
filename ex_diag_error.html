@@ -470,7 +470,7 @@ div.tocify {
 
 
 <p><strong>packages &amp; data</strong></p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" title="1">pacman<span class="op">::</span><span class="kw">p_load</span>(dplyr, tibble, <span class="co"># packages for data handling</span></a>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" title="1">pacman<span class="op">::</span><span class="kw">p_load</span>(broom.mixed, dplyr, purrr, tibble, tidyr, <span class="co"># for data handling</span></a>
 <a class="sourceLine" id="cb1-2" title="2">               nlme, lme4, glmmTMB, sommer) <span class="co"># packages for mixed models</span></a>
 <a class="sourceLine" id="cb1-3" title="3"></a>
 <a class="sourceLine" id="cb1-4" title="4">dat &lt;-<span class="st"> </span>agridat<span class="op">::</span>mcconway.turnip <span class="op">%&gt;%</span></a>
@@ -607,7 +607,7 @@ Identity
 </div>
 <div id="lme4" class="section level2">
 <h2>lme4</h2>
-<p>in progress</p>
+<p><span style="color:red">in progress</span> <br/><br/><br/><br/></p>
 </div>
 <div id="glmmtmb" class="section level2">
 <h2>glmmTMB</h2>
@@ -615,37 +615,50 @@ Identity
 <blockquote>
 <p>Just like in <code>nlme</code>, there is a <code>weights=</code> option in <code>glmmTMB()</code>. However, to our understanding, they have different functions:</p>
 <p>In <code>nlme</code>, it requires <em>“an optional <code>varFunc</code> object or one-sided formula describing the within-group heteroscedasticity structure”</em> <a href="https://cran.r-project.org/web/packages/glmmTMB/glmmTMB.pdf#Rfn.glmmTMB.1">(nlme RefMan)</a> and we make use of this in the example at hand.</p>
-<p>In <code>glmmTMB</code>, the <a href="https://cran.r-project.org/web/packages/glmmTMB/glmmTMB.pdf#Rfn.glmmTMB.1">RefMan</a> only states <em>“weights, as in <code>glm</code>. Not automatically scaled to have sum 1”</em>. Following this trail, the <code>glm</code> documentation description for the <code>weights=</code> option is <em>“an optional vector of ‘prior weights’ to be used in the fitting process. Should be NULL or a numeric vector.”</em>.</p>
+<p>In <code>glmmTMB</code>, the <a href="https://cran.r-project.org/web/packages/glmmTMB/glmmTMB.pdf#Rfn.glmmTMB.1">RefMan</a> only states <em>“weights, as in <code>glm</code>. Not automatically scaled to have sum 1”</em>. Following this trail, the <code>glm</code> documentation description for the <code>weights=</code> option is <em>“an optional vector of ‘prior weights’ to be used in the fitting process. Should be NULL or a numeric vector.”</em>. Accordingly, it cannot be used to allow for heterogeneous error variances in this package.</p>
 </blockquote>
-<p>We can, however, “<em>fix the residual variance to be 0 (actually a small non-zero value)</em>” and therefore “<em>force variance into the random effects</em>” <a href="https://cran.r-project.org/web/packages/glmmTMB/glmmTMB.pdf#Rfn.glmmTMB.1">(glmmTMB RefMan)</a> via adding the <code>dispformula = ~0</code> option.</p>
-<p>Thus, we need to make sure to add a random effect with respective variance structure to the model that leads to the estimation of the desired variance components. In the case of mimicing the error variance as a random effect, we can create an <code>id</code> column in the data with different entries for each data point:</p>
+<p>We can, however, “<em>fix the residual variance to be 0 (actually a small non-zero value)</em>” and therefore “<em>force variance into the random effects</em>” <a href="https://cran.r-project.org/web/packages/glmmTMB/glmmTMB.pdf#Rfn.glmmTMB.1">(glmmTMB RefMan)</a> via adding the <code>dispformula = ~0</code> option. Thus, when doing so, we need to make sure to also add random term to the model with respective variance structure to the model that leads to the estimation of the desired variance components. In the case of mimicing the error variance as a random effect, we can create an <code>id</code> column in the data with different entries for each data point:</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" title="1">dat.id &lt;-<span class="st"> </span>dat <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb4-2" title="2"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">id =</span> <span class="dv">1</span><span class="op">:</span><span class="kw">n</span>() <span class="op">%&gt;%</span><span class="st"> </span>as.factor) <span class="co"># running number 1 - 64</span></a></code></pre></div>
-<p>We should now be able to mimic the error variance via the random term <code>(1|id)</code>. We can verify this quickly:</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" title="1">mod1.glmm.fixonly &lt;-<span class="st"> </span><span class="kw">glmmTMB</span>(<span class="dt">formula =</span>  yield <span class="op">~</span><span class="st"> </span>gen <span class="op">*</span><span class="st"> </span>date <span class="op">*</span><span class="st"> </span>densf,</a>
-<a class="sourceLine" id="cb5-2" title="2">                             <span class="dt">data    =</span> dat.id, <span class="dt">REML =</span> <span class="ot">TRUE</span>)</a>
-<a class="sourceLine" id="cb5-3" title="3"></a>
-<a class="sourceLine" id="cb5-4" title="4">mod1.glmm.fixonly <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb5-5" title="5"><span class="st">  </span><span class="kw">update</span>(<span class="dt">formula =</span> .<span class="op">~</span>. <span class="op">+</span><span class="st"> </span>(<span class="dv">1</span><span class="op">|</span>block)) <span class="op">%&gt;%</span><span class="st"> </span>VarCorr</a></code></pre></div>
+<a class="sourceLine" id="cb4-2" title="2"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">id =</span> <span class="dv">1</span><span class="op">:</span><span class="kw">n</span>() <span class="op">%&gt;%</span><span class="st"> </span>as.factor) <span class="co"># new column with running number</span></a></code></pre></div>
+<p>We should now be able to mimic the error variance via the random term <code>(1|id)</code>. We can verify this quickly, by modelling a <em>mod1</em> with a homoscedastic error variance in two different ways (<code>mod1</code>, <code>mod1b</code>). As can be seen below, both result in comparable variances. For <code>mod2</code>, <code>mod3</code> and <code>mod4</code>, we make use of the <code>diag()</code> function:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" title="1">mod1.glmm &lt;-<span class="st"> </span><span class="kw">glmmTMB</span>(<span class="dt">formula =</span>  yield <span class="op">~</span><span class="st"> </span>gen <span class="op">*</span><span class="st"> </span>date <span class="op">*</span><span class="st"> </span>densf <span class="op">+</span><span class="st"> </span>(<span class="dv">1</span><span class="op">|</span>block),</a>
+<a class="sourceLine" id="cb5-2" title="2">                     <span class="dt">REML    =</span> <span class="ot">TRUE</span>,</a>
+<a class="sourceLine" id="cb5-3" title="3">                     <span class="dt">data    =</span> dat.id) <span class="co"># default = homoscedastic error variance</span></a>
+<a class="sourceLine" id="cb5-4" title="4"></a>
+<a class="sourceLine" id="cb5-5" title="5">mod1b.glmm &lt;-<span class="st"> </span>mod1.glmm <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb5-6" title="6"><span class="st">  </span><span class="kw">update</span>(.<span class="op">~</span>. <span class="op">+</span><span class="st"> </span>(<span class="dv">1</span><span class="op">|</span>id),   <span class="co"># add random term to mimic homoscedastic error variance</span></a>
+<a class="sourceLine" id="cb5-7" title="7">         <span class="dt">dispformula=</span><span class="op">~</span><span class="dv">0</span>) <span class="co"># fix original error variance to 0 </span></a>
+<a class="sourceLine" id="cb5-8" title="8"></a>
+<a class="sourceLine" id="cb5-9" title="9">mod2.glmm &lt;-<span class="st"> </span>mod1.glmm <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb5-10" title="10"><span class="st">  </span><span class="kw">update</span>(.<span class="op">~</span>. <span class="op">+</span><span class="st"> </span><span class="kw">diag</span>(date<span class="op">+</span><span class="dv">0</span><span class="op">|</span>id), <span class="dt">dispformula=</span><span class="op">~</span><span class="dv">0</span>)</a>
+<a class="sourceLine" id="cb5-11" title="11"></a>
+<a class="sourceLine" id="cb5-12" title="12">mod3.glmm &lt;-<span class="st"> </span>mod1.glmm <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb5-13" title="13"><span class="st">  </span><span class="kw">update</span>(.<span class="op">~</span>. <span class="op">+</span><span class="st"> </span><span class="kw">diag</span>(densf<span class="op">+</span><span class="dv">0</span><span class="op">|</span>id), <span class="dt">dispformula=</span><span class="op">~</span><span class="dv">0</span>)</a>
+<a class="sourceLine" id="cb5-14" title="14"></a>
+<a class="sourceLine" id="cb5-15" title="15">mod4.glmm &lt;-<span class="st"> </span>mod1.glmm <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb5-16" title="16"><span class="st">  </span><span class="kw">update</span>(.<span class="op">~</span>. <span class="op">+</span><span class="st"> </span><span class="kw">diag</span>(densf<span class="op">:</span>date<span class="op">+</span><span class="dv">0</span><span class="op">|</span>id), <span class="dt">dispformula=</span><span class="op">~</span><span class="dv">0</span>)</a></code></pre></div>
+<div class="row">
+<div class="col-md-6">
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" title="1">mod1.glmm <span class="op">%&gt;%</span><span class="st"> </span>VarCorr</a></code></pre></div>
 <pre><code>## 
 ## Conditional model:
 ##  Groups   Name        Std.Dev.
 ##  block    (Intercept) 1.6768  
 ##  Residual             3.0970</code></pre>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" title="1">mod1.glmm.fixonly <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb7-2" title="2"><span class="st">  </span><span class="kw">update</span>(<span class="dt">formula =</span> .<span class="op">~</span>. <span class="op">+</span><span class="st"> </span>(<span class="dv">1</span><span class="op">|</span>block) <span class="op">+</span><span class="st"> </span>(<span class="dv">1</span><span class="op">|</span>id),</a>
-<a class="sourceLine" id="cb7-3" title="3">         <span class="dt">dispformula =</span> <span class="op">~</span><span class="dv">0</span>) <span class="op">%&gt;%</span><span class="st"> </span>VarCorr</a></code></pre></div>
-<pre><code>## Warning in fitTMB(TMBStruc): Model convergence problem; false convergence (8). See
-## vignette(&#39;troubleshooting&#39;)</code></pre>
+</div>
+<div class="col-md-6">
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" title="1">mod1b.glmm <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">VarCorr</span>()</a></code></pre></div>
 <pre><code>## 
 ## Conditional model:
 ##  Groups Name        Std.Dev.
 ##  block  (Intercept) 1.6764  
 ##  id     (Intercept) 3.0970</code></pre>
 </div>
+</div>
+</div>
 <div id="sommer" class="section level2">
 <h2>sommer</h2>
-<p>in progress</p>
+<p><span style="color:red">in progress</span> <br/><br/><br/><br/></p>
 </div>
 </div>
 <div id="variance-components" class="section level1 tabset tabset-fade tabset-pills">
@@ -659,8 +672,7 @@ Identity
 <li>the overall value of the model-object’s <code>sigma</code>.</li>
 </ul>
 <p>By multiplying the latter two, we receive the respective standard error estimate, which needs to be squared in order to obtain the respective variance component estimate.</p>
-<div id="mod1" class="section level3">
-<h3>mod1</h3>
+<p><strong>mod1</strong></p>
 <div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" title="1">mod1.nlme.VC &lt;-<span class="st"> </span><span class="kw">tibble</span>(<span class="dt">grp=</span><span class="st">&quot;homoscedastic&quot;</span>, <span class="dt">varStruct=</span><span class="dv">1</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
 <a class="sourceLine" id="cb10-2" title="2"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">sigma         =</span> mod1.nlme<span class="op">$</span>sigma) <span class="op">%&gt;%</span><span class="st"> </span></a>
 <a class="sourceLine" id="cb10-3" title="3"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">StandardError =</span> sigma<span class="op">*</span>varStruct) <span class="op">%&gt;%</span><span class="st"> </span></a>
@@ -705,9 +717,7 @@ homoscedastic
 </tr>
 </tbody>
 </table>
-</div>
-<div id="mod2" class="section level3">
-<h3>mod2</h3>
+<p><strong>mod2</strong></p>
 <div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" title="1">mod2.nlme.VC &lt;-<span class="st"> </span>mod2.nlme<span class="op">$</span>modelStruct<span class="op">$</span>varStruct <span class="op">%&gt;%</span><span class="st"> </span></a>
 <a class="sourceLine" id="cb11-2" title="2"><span class="st">  </span><span class="kw">coef</span>(<span class="dt">unconstrained=</span><span class="ot">FALSE</span>, <span class="dt">allCoef=</span><span class="ot">TRUE</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
 <a class="sourceLine" id="cb11-3" title="3"><span class="st">  </span><span class="kw">enframe</span>(<span class="dt">name=</span><span class="st">&quot;grp&quot;</span>, <span class="dt">value=</span><span class="st">&quot;varStruct&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
@@ -805,9 +815,7 @@ Variance
 </tr>
 </tbody>
 </table>
-</div>
-<div id="mod3" class="section level3">
-<h3>mod3</h3>
+<p><strong>mod3</strong></p>
 <div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb12-1" title="1">mod3.nlme.VC &lt;-<span class="st"> </span>mod3.nlme<span class="op">$</span>modelStruct<span class="op">$</span>varStruct <span class="op">%&gt;%</span><span class="st"> </span></a>
 <a class="sourceLine" id="cb12-2" title="2"><span class="st">  </span><span class="kw">coef</span>(<span class="dt">unconstrained=</span><span class="ot">FALSE</span>, <span class="dt">allCoef=</span><span class="ot">TRUE</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
 <a class="sourceLine" id="cb12-3" title="3"><span class="st">  </span><span class="kw">enframe</span>(<span class="dt">name=</span><span class="st">&quot;grp&quot;</span>, <span class="dt">value=</span><span class="st">&quot;varStruct&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
@@ -871,9 +879,7 @@ Variance
 </tr>
 </tbody>
 </table>
-</div>
-<div id="mod4" class="section level3">
-<h3>mod4</h3>
+<p><strong>mod4</strong></p>
 <div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb13-1" title="1">mod4.nlme.varStruct.A &lt;-<span class="st"> </span>mod4.nlme<span class="op">$</span>modelStruct<span class="op">$</span>varStruct<span class="op">$</span>A <span class="op">%&gt;%</span><span class="st"> </span></a>
 <a class="sourceLine" id="cb13-2" title="2"><span class="st">  </span><span class="kw">coef</span>(<span class="dt">unconstrained=</span><span class="ot">FALSE</span>, <span class="dt">allCoef=</span><span class="ot">TRUE</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
 <a class="sourceLine" id="cb13-3" title="3"><span class="st">  </span><span class="kw">enframe</span>(<span class="dt">name=</span><span class="st">&quot;grpA&quot;</span>, <span class="dt">value=</span><span class="st">&quot;varStructA&quot;</span>)</a>
@@ -1105,18 +1111,469 @@ Variance
 </tbody>
 </table>
 </div>
-</div>
 <div id="lme4-1" class="section level2">
 <h2>lme4</h2>
-<p>in progress</p>
+<p><span style="color:red">in progress</span> <br/><br/><br/><br/></p>
 </div>
 <div id="glmmtmb-1" class="section level2">
 <h2>glmmTMB</h2>
-<p>in progress</p>
+<p>In order to extract variance component estimates from <code>glmmTMB</code> objects (in a table format we are used to), we here use the function <code>tidy()</code> from the helper package <code>broom.mixed</code>.</p>
+<p><strong>mod1</strong></p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb14-1" title="1">mod1.glmm.VC &lt;-<span class="st"> </span>mod1.glmm <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb14-2" title="2"><span class="st">  </span><span class="kw">tidy</span>(<span class="dt">effects=</span><span class="st">&quot;ran_pars&quot;</span>, <span class="dt">scales=</span><span class="st">&quot;vcov&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb14-3" title="3"><span class="st">  </span><span class="kw">separate</span>(term, <span class="dt">sep=</span><span class="st">&quot;__&quot;</span>, <span class="dt">into=</span><span class="kw">c</span>(<span class="st">&quot;term&quot;</span>,<span class="st">&quot;grp&quot;</span>)) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb14-4" title="4"><span class="st">  </span><span class="kw">filter</span>(group<span class="op">==</span><span class="st">&quot;Residual&quot;</span>)</a></code></pre></div>
+<table class="table table-bordered table-hover" style="width: auto !important; margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+effect
+</th>
+<th style="text-align:left;">
+component
+</th>
+<th style="text-align:left;">
+group
+</th>
+<th style="text-align:left;">
+term
+</th>
+<th style="text-align:left;">
+grp
+</th>
+<th style="text-align:right;">
+estimate
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+ran_pars
+</td>
+<td style="text-align:left;">
+cond
+</td>
+<td style="text-align:left;">
+Residual
+</td>
+<td style="text-align:left;">
+var
+</td>
+<td style="text-align:left;">
+Observation
+</td>
+<td style="text-align:right;">
+9.591
+</td>
+</tr>
+</tbody>
+</table>
+<p><strong>mod2</strong></p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb15-1" title="1">mod2.glmm.VC &lt;-<span class="st"> </span>mod2.glmm <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb15-2" title="2"><span class="st">  </span><span class="kw">tidy</span>(<span class="dt">effects=</span><span class="st">&quot;ran_pars&quot;</span>, <span class="dt">scales=</span><span class="st">&quot;vcov&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb15-3" title="3"><span class="st">  </span><span class="kw">separate</span>(term, <span class="dt">sep=</span><span class="st">&quot;__&quot;</span>, <span class="dt">into=</span><span class="kw">c</span>(<span class="st">&quot;term&quot;</span>,<span class="st">&quot;grp&quot;</span>)) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb15-4" title="4"><span class="st">  </span><span class="kw">filter</span>(group<span class="op">==</span><span class="st">&quot;id&quot;</span>, term<span class="op">==</span><span class="st">&quot;var&quot;</span>)</a></code></pre></div>
+<table class="table table-bordered table-hover" style="width: auto !important; margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+effect
+</th>
+<th style="text-align:left;">
+component
+</th>
+<th style="text-align:left;">
+group
+</th>
+<th style="text-align:left;">
+term
+</th>
+<th style="text-align:left;">
+grp
+</th>
+<th style="text-align:right;">
+estimate
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+ran_pars
+</td>
+<td style="text-align:left;">
+cond
+</td>
+<td style="text-align:left;">
+id
+</td>
+<td style="text-align:left;">
+var
+</td>
+<td style="text-align:left;">
+date21Aug1990
+</td>
+<td style="text-align:right;">
+4.306
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ran_pars
+</td>
+<td style="text-align:left;">
+cond
+</td>
+<td style="text-align:left;">
+id
+</td>
+<td style="text-align:left;">
+var
+</td>
+<td style="text-align:left;">
+date28Aug1990
+</td>
+<td style="text-align:right;">
+15.505
+</td>
+</tr>
+</tbody>
+</table>
+<p><strong>mod3</strong></p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb16-1" title="1">mod3.glmm.VC &lt;-<span class="st"> </span>mod3.glmm <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb16-2" title="2"><span class="st">  </span><span class="kw">tidy</span>(<span class="dt">effects=</span><span class="st">&quot;ran_pars&quot;</span>, <span class="dt">scales=</span><span class="st">&quot;vcov&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb16-3" title="3"><span class="st">  </span><span class="kw">separate</span>(term, <span class="dt">sep=</span><span class="st">&quot;__&quot;</span>, <span class="dt">into=</span><span class="kw">c</span>(<span class="st">&quot;term&quot;</span>,<span class="st">&quot;grp&quot;</span>)) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb16-4" title="4"><span class="st">  </span><span class="kw">filter</span>(group<span class="op">==</span><span class="st">&quot;id&quot;</span>, term<span class="op">==</span><span class="st">&quot;var&quot;</span>)</a></code></pre></div>
+<table class="table table-bordered table-hover" style="width: auto !important; margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+effect
+</th>
+<th style="text-align:left;">
+component
+</th>
+<th style="text-align:left;">
+group
+</th>
+<th style="text-align:left;">
+term
+</th>
+<th style="text-align:left;">
+grp
+</th>
+<th style="text-align:right;">
+estimate
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+ran_pars
+</td>
+<td style="text-align:left;">
+cond
+</td>
+<td style="text-align:left;">
+id
+</td>
+<td style="text-align:left;">
+var
+</td>
+<td style="text-align:left;">
+densf1
+</td>
+<td style="text-align:right;">
+2.252
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ran_pars
+</td>
+<td style="text-align:left;">
+cond
+</td>
+<td style="text-align:left;">
+id
+</td>
+<td style="text-align:left;">
+var
+</td>
+<td style="text-align:left;">
+densf2
+</td>
+<td style="text-align:right;">
+3.669
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ran_pars
+</td>
+<td style="text-align:left;">
+cond
+</td>
+<td style="text-align:left;">
+id
+</td>
+<td style="text-align:left;">
+var
+</td>
+<td style="text-align:left;">
+densf4
+</td>
+<td style="text-align:right;">
+25.037
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ran_pars
+</td>
+<td style="text-align:left;">
+cond
+</td>
+<td style="text-align:left;">
+id
+</td>
+<td style="text-align:left;">
+var
+</td>
+<td style="text-align:left;">
+densf8
+</td>
+<td style="text-align:right;">
+13.338
+</td>
+</tr>
+</tbody>
+</table>
+<p><strong>mod4</strong></p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb17-1" title="1">mod4.glmm.VC &lt;-<span class="st"> </span>mod4.glmm <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb17-2" title="2"><span class="st">  </span><span class="kw">tidy</span>(<span class="dt">effects=</span><span class="st">&quot;ran_pars&quot;</span>, <span class="dt">scales=</span><span class="st">&quot;vcov&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb17-3" title="3"><span class="st">  </span><span class="kw">separate</span>(term, <span class="dt">sep=</span><span class="st">&quot;__&quot;</span>, <span class="dt">into=</span><span class="kw">c</span>(<span class="st">&quot;term&quot;</span>,<span class="st">&quot;grp&quot;</span>)) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb17-4" title="4"><span class="st">  </span><span class="kw">filter</span>(group<span class="op">==</span><span class="st">&quot;id&quot;</span>, term<span class="op">==</span><span class="st">&quot;var&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb17-5" title="5"><span class="st">  </span><span class="kw">separate</span>(grp, <span class="dt">sep=</span><span class="st">&quot;:&quot;</span>, <span class="dt">into=</span><span class="kw">c</span>(<span class="st">&quot;grp1&quot;</span>,<span class="st">&quot;grp2&quot;</span>))</a></code></pre></div>
+<table class="table table-bordered table-hover" style="width: auto !important; margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+effect
+</th>
+<th style="text-align:left;">
+component
+</th>
+<th style="text-align:left;">
+group
+</th>
+<th style="text-align:left;">
+term
+</th>
+<th style="text-align:left;">
+grp1
+</th>
+<th style="text-align:left;">
+grp2
+</th>
+<th style="text-align:right;">
+estimate
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+ran_pars
+</td>
+<td style="text-align:left;">
+cond
+</td>
+<td style="text-align:left;">
+id
+</td>
+<td style="text-align:left;">
+var
+</td>
+<td style="text-align:left;">
+densf1
+</td>
+<td style="text-align:left;">
+date21Aug1990
+</td>
+<td style="text-align:right;">
+0.880
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ran_pars
+</td>
+<td style="text-align:left;">
+cond
+</td>
+<td style="text-align:left;">
+id
+</td>
+<td style="text-align:left;">
+var
+</td>
+<td style="text-align:left;">
+densf2
+</td>
+<td style="text-align:left;">
+date21Aug1990
+</td>
+<td style="text-align:right;">
+3.081
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ran_pars
+</td>
+<td style="text-align:left;">
+cond
+</td>
+<td style="text-align:left;">
+id
+</td>
+<td style="text-align:left;">
+var
+</td>
+<td style="text-align:left;">
+densf4
+</td>
+<td style="text-align:left;">
+date21Aug1990
+</td>
+<td style="text-align:right;">
+6.262
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ran_pars
+</td>
+<td style="text-align:left;">
+cond
+</td>
+<td style="text-align:left;">
+id
+</td>
+<td style="text-align:left;">
+var
+</td>
+<td style="text-align:left;">
+densf8
+</td>
+<td style="text-align:left;">
+date21Aug1990
+</td>
+<td style="text-align:right;">
+9.759
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ran_pars
+</td>
+<td style="text-align:left;">
+cond
+</td>
+<td style="text-align:left;">
+id
+</td>
+<td style="text-align:left;">
+var
+</td>
+<td style="text-align:left;">
+densf1
+</td>
+<td style="text-align:left;">
+date28Aug1990
+</td>
+<td style="text-align:right;">
+3.446
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ran_pars
+</td>
+<td style="text-align:left;">
+cond
+</td>
+<td style="text-align:left;">
+id
+</td>
+<td style="text-align:left;">
+var
+</td>
+<td style="text-align:left;">
+densf2
+</td>
+<td style="text-align:left;">
+date28Aug1990
+</td>
+<td style="text-align:right;">
+4.997
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ran_pars
+</td>
+<td style="text-align:left;">
+cond
+</td>
+<td style="text-align:left;">
+id
+</td>
+<td style="text-align:left;">
+var
+</td>
+<td style="text-align:left;">
+densf4
+</td>
+<td style="text-align:left;">
+date28Aug1990
+</td>
+<td style="text-align:right;">
+48.092
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ran_pars
+</td>
+<td style="text-align:left;">
+cond
+</td>
+<td style="text-align:left;">
+id
+</td>
+<td style="text-align:left;">
+var
+</td>
+<td style="text-align:left;">
+densf8
+</td>
+<td style="text-align:left;">
+date28Aug1990
+</td>
+<td style="text-align:right;">
+19.937
+</td>
+</tr>
+</tbody>
+</table>
 </div>
 <div id="sommer-1" class="section level2">
 <h2>sommer</h2>
-<p>in progress</p>
+<p><span style="color:red">in progress</span> <br/><br/><br/><br/></p>
 </div>
 </div>
 <div id="model-fit" class="section level1 tabset tabset-fade tabset-pills">
@@ -1126,12 +1583,12 @@ Variance
 <h2>nlme</h2>
 <div class="row">
 <div class="col-md-6">
-<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb14-1" title="1">mod1.nlme <span class="op">%&gt;%</span><span class="st"> </span>AIC <span class="co"># AIC </span></a></code></pre></div>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb18-1" title="1">mod1.nlme <span class="op">%&gt;%</span><span class="st"> </span>AIC <span class="co"># AIC </span></a></code></pre></div>
 <pre><code>## [1] 308.1365</code></pre>
 </div>
 <div class="col-md-6">
-<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb16-1" title="1"><span class="dv">-2</span> <span class="op">*</span><span class="st"> </span><span class="kw">logLik</span>(mod1.nlme) <span class="op">%&gt;%</span><span class="st"> </span><span class="co"># Deviance</span></a>
-<a class="sourceLine" id="cb16-2" title="2"><span class="st">  </span>as.double </a></code></pre></div>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb20-1" title="1"><span class="dv">-2</span> <span class="op">*</span><span class="st"> </span><span class="kw">logLik</span>(mod1.nlme) <span class="op">%&gt;%</span><span class="st"> </span><span class="co"># Deviance</span></a>
+<a class="sourceLine" id="cb20-2" title="2"><span class="st">  </span>as.double </a></code></pre></div>
 <pre><code>## [1] 272.1365</code></pre>
 </div>
 </div>
@@ -1199,15 +1656,86 @@ mod4
 </div>
 <div id="lme4-2" class="section level2">
 <h2>lme4</h2>
-<p>in progress</p>
+<p><span style="color:red">in progress</span> <br/><br/><br/><br/></p>
 </div>
 <div id="glmmtmb-2" class="section level2">
 <h2>glmmTMB</h2>
-<p>in progress</p>
+<div class="row">
+<div class="col-md-6">
+<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb22-1" title="1">mod1.glmm <span class="op">%&gt;%</span><span class="st"> </span>AIC <span class="co"># AIC </span></a></code></pre></div>
+<pre><code>## [1] 308.1365</code></pre>
+</div>
+<div class="col-md-6">
+<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb24-1" title="1"><span class="dv">-2</span> <span class="op">*</span><span class="st"> </span><span class="kw">logLik</span>(mod1.glmm) <span class="op">%&gt;%</span><span class="st"> </span><span class="co"># Deviance</span></a>
+<a class="sourceLine" id="cb24-2" title="2"><span class="st">  </span>as.double </a></code></pre></div>
+<pre><code>## [1] 272.1365</code></pre>
+</div>
+</div>
+<table class="table table-bordered table-hover" style="width: auto !important; margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Model
+</th>
+<th style="text-align:right;">
+AIC
+</th>
+<th style="text-align:right;">
+Deviance
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+mod1
+</td>
+<td style="text-align:right;">
+308.1365
+</td>
+<td style="text-align:right;">
+272.1365
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+mod2
+</td>
+<td style="text-align:right;">
+301.9272
+</td>
+<td style="text-align:right;">
+263.9272
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+mod3
+</td>
+<td style="text-align:right;">
+298.3167
+</td>
+<td style="text-align:right;">
+256.3167
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+mod4
+</td>
+<td style="text-align:right;">
+298.2036
+</td>
+<td style="text-align:right;">
+248.2036
+</td>
+</tr>
+</tbody>
+</table>
 </div>
 <div id="sommer-2" class="section level2">
 <h2>sommer</h2>
-<p>in progress</p>
+<p><span style="color:red">in progress</span> <br/><br/><br/><br/></p>
 </div>
 </div>
 

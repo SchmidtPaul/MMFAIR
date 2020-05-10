@@ -7,15 +7,15 @@ output:
 ---
 
 **packages & data**
-```{r, echo=FALSE, message=FALSE, warning=FALSE}
+```{r echo=FALSE, message=FALSE, warning=FALSE}
 # packages for better formatting tables for html output
 library(kableExtra)
 library(formattable)
 ```
 
 
-```{r}
-pacman::p_load(dplyr, tibble, # packages for data handling
+```{r, message=FALSE, warning=FALSE}
+pacman::p_load(broom.mixed, dplyr, purrr, tibble, tidyr, # for data handling
                nlme, lme4, glmmTMB, sommer) # packages for mixed models
 
 dat <- agridat::mcconway.turnip %>%
@@ -72,7 +72,8 @@ mod4.nlme <- mod1.nlme %>%
 ```
 
 ## lme4
-in progress
+<span style="color:red">in progress</span>
+<br/><br/><br/><br/>
 
 ## glmmTMB
 In `glmmTMB()` it is -to our knowledge- not possible to adjust the variance structure of the error.
@@ -82,35 +83,49 @@ In `glmmTMB()` it is -to our knowledge- not possible to adjust the variance stru
 >In `nlme`, it requires *"an optional `varFunc` object or one-sided formula describing the within-group heteroscedasticity structure"* [(nlme RefMan)](https://cran.r-project.org/web/packages/glmmTMB/glmmTMB.pdf#Rfn.glmmTMB.1) and we make use of this in the example at hand.   
 >
 >In `glmmTMB`, the [RefMan](https://cran.r-project.org/web/packages/glmmTMB/glmmTMB.pdf#Rfn.glmmTMB.1) only states *"weights, as in `glm`. Not automatically scaled to have sum 1"*. Following this trail, the `glm` documentation description for the `weights=` option is *"an optional vector of ‘prior weights’ to be used in the fitting process. Should be NULL or a numeric vector."*.
+> Accordingly, it cannot be used to allow for heterogeneous error variances in this package.
 
-We can, however, "*fix the residual variance  to  be  0  (actually  a  small  non-zero  value)*" and therefore "*force variance into the random effects*" [(glmmTMB RefMan)](https://cran.r-project.org/web/packages/glmmTMB/glmmTMB.pdf#Rfn.glmmTMB.1) via adding the `dispformula = ~0` option. 
-
-Thus, we need to make sure to add a random effect with respective variance structure to the model that leads to the estimation of the desired variance components. In the case of mimicing the error variance as a random effect, we can create an `id` column in the data with different entries for each data point:
+We can, however, "*fix the residual variance  to  be  0  (actually  a  small  non-zero  value)*" and therefore "*force variance into the random effects*" [(glmmTMB RefMan)](https://cran.r-project.org/web/packages/glmmTMB/glmmTMB.pdf#Rfn.glmmTMB.1) via adding the `dispformula = ~0` option. Thus, when doing so, we need to make sure to also add random term to the model with respective variance structure to the model that leads to the estimation of the desired variance components. In the case of mimicing the error variance as a random effect, we can create an `id` column in the data with different entries for each data point:
 
 ```{r}
 dat.id <- dat %>% 
-  mutate(id = 1:n() %>% as.factor) # running number 1 - 64
+  mutate(id = 1:n() %>% as.factor) # new column with running number
 ```
 
-We should now be able to mimic the error variance via the random term `(1|id)`. We can verify this quickly:
+We should now be able to mimic the error variance via the random term `(1|id)`. We can verify this quickly, by modelling a *mod1* with a homoscedastic error variance in two different ways (`mod1`, `mod1b`). As can be seen below, both result in comparable variances. For `mod2`, `mod3` and `mod4`, we make use of the `diag()` function:
 
+```{r, warning=FALSE}
+mod1.glmm <- glmmTMB(formula =  yield ~ gen * date * densf + (1|block),
+                     REML    = TRUE,
+                     data    = dat.id) # default = homoscedastic error variance
+
+mod1b.glmm <- mod1.glmm %>% 
+  update(.~. + (1|id),   # add random term to mimic homoscedastic error variance
+         dispformula=~0) # fix original error variance to 0 
+
+mod2.glmm <- mod1.glmm %>% 
+  update(.~. + diag(date+0|id), dispformula=~0)
+
+mod3.glmm <- mod1.glmm %>% 
+  update(.~. + diag(densf+0|id), dispformula=~0)
+
+mod4.glmm <- mod1.glmm %>% 
+  update(.~. + diag(densf:date+0|id), dispformula=~0)
+```
+
+<div class = "row"> <div class = "col-md-6">
 ```{r}
-mod1.glmm.fixonly <- glmmTMB(formula =  yield ~ gen * date * densf,
-                             data    = dat.id, REML = TRUE)
-
-mod1.glmm.fixonly %>% 
-  update(formula = .~. + (1|block)) %>% VarCorr
-mod1.glmm.fixonly %>% 
-  update(formula = .~. + (1|block) + (1|id),
-         dispformula = ~0) %>% VarCorr
-
-
+mod1.glmm %>% VarCorr
 ```
-
-
+</div> <div class = "col-md-6">
+```{r}
+mod1b.glmm %>% VarCorr()
+```
+</div> </div>
 
 ## sommer
-in progress
+<span style="color:red">in progress</span>
+<br/><br/><br/><br/>
 
 # Variance Components {.tabset .tabset-fade .tabset-pills}
 
@@ -123,7 +138,7 @@ As far as we know, it is quite cumbersome to extract variance component estimate
 
 By multiplying the latter two, we receive the respective standard error estimate, which needs to be squared in order to obtain the respective variance component estimate.
 
-### mod1
+**mod1**
 ```{r}
 mod1.nlme.VC <- tibble(grp="homoscedastic", varStruct=1) %>% 
   mutate(sigma         = mod1.nlme$sigma) %>% 
@@ -138,7 +153,7 @@ mod1.nlme.VC %>%
                 full_width = FALSE)
 ```
 
-### mod2
+**mod2**
 ```{r}
 mod2.nlme.VC <- mod2.nlme$modelStruct$varStruct %>% 
   coef(unconstrained=FALSE, allCoef=TRUE) %>% 
@@ -155,7 +170,7 @@ mod2.nlme.VC %>%
                 full_width = FALSE)
 ```
 
-### mod3
+**mod3**
 ```{r}
 mod3.nlme.VC <- mod3.nlme$modelStruct$varStruct %>% 
   coef(unconstrained=FALSE, allCoef=TRUE) %>% 
@@ -172,7 +187,7 @@ mod3.nlme.VC %>%
                 full_width = FALSE)
 ```
 
-### mod4
+**mod4**
 ```{r}
 mod4.nlme.varStruct.A <- mod4.nlme$modelStruct$varStruct$A %>% 
   coef(unconstrained=FALSE, allCoef=TRUE) %>% 
@@ -201,13 +216,77 @@ mod4.nlme.VC %>%
 ```
 
 ## lme4
-in progress
+<span style="color:red">in progress</span>
+<br/><br/><br/><br/>
 
 ## glmmTMB
-in progress
+
+In order to extract variance component estimates from `glmmTMB` objects (in a table format we are used to), we here use the function `tidy()` from the helper package `broom.mixed`. 
+
+**mod1**
+```{r}
+mod1.glmm.VC <- mod1.glmm %>% 
+  tidy(effects="ran_pars", scales="vcov") %>% 
+  separate(term, sep="__", into=c("term","grp")) %>% 
+  filter(group=="Residual")
+```
+```{r, echo=FALSE}
+mod1.glmm.VC %>%
+  mutate_if(is.double, round, 3) %>% 
+  kable(escape = FALSE) %>% 
+  kable_styling(bootstrap_options = c("bordered", "hover"), 
+                full_width = FALSE)
+```
+
+**mod2**
+```{r}
+mod2.glmm.VC <- mod2.glmm %>% 
+  tidy(effects="ran_pars", scales="vcov") %>% 
+  separate(term, sep="__", into=c("term","grp")) %>% 
+  filter(group=="id", term=="var")
+```
+```{r, echo=FALSE}
+mod2.glmm.VC %>%
+  mutate_if(is.double, round, 3) %>% 
+  kable(escape = FALSE) %>% 
+  kable_styling(bootstrap_options = c("bordered", "hover"), 
+                full_width = FALSE)
+```
+
+**mod3**
+```{r}
+mod3.glmm.VC <- mod3.glmm %>% 
+  tidy(effects="ran_pars", scales="vcov") %>% 
+  separate(term, sep="__", into=c("term","grp")) %>% 
+  filter(group=="id", term=="var")
+```
+```{r, echo=FALSE}
+mod3.glmm.VC %>%
+  mutate_if(is.double, round, 3) %>% 
+  kable(escape = FALSE) %>% 
+  kable_styling(bootstrap_options = c("bordered", "hover"), 
+                full_width = FALSE)
+```
+
+**mod4**
+```{r}
+mod4.glmm.VC <- mod4.glmm %>% 
+  tidy(effects="ran_pars", scales="vcov") %>% 
+  separate(term, sep="__", into=c("term","grp")) %>% 
+  filter(group=="id", term=="var") %>% 
+  separate(grp, sep=":", into=c("grp1","grp2"))
+```
+```{r, echo=FALSE}
+mod4.glmm.VC %>%
+  mutate_if(is.double, round, 3) %>% 
+  kable(escape = FALSE) %>% 
+  kable_styling(bootstrap_options = c("bordered", "hover"), 
+                full_width = FALSE)
+```
 
 ## sommer
-in progress
+<span style="color:red">in progress</span>
+<br/><br/><br/><br/>
 
 # Model Fit {.tabset .tabset-fade .tabset-pills}
 As is standard procedure, we can do a model selection based on goodness-of-fit statistics such as the AIC. In order to have a direct comparison to Table 1 in [(Piepho, 2009)](https://acsess.onlinelibrary.wiley.com/doi/abs/10.2134/agronj2008.0226x), we also calculated the deviance (*i.e.* -2*loglikelihood) for each model. The code is shown for mod1:
@@ -238,10 +317,33 @@ tibble(Model = paste0("mod", 1:4),
 ```
 
 ## lme4
-in progress
+<span style="color:red">in progress</span>
+<br/><br/><br/><br/>
 
 ## glmmTMB
-in progress
+<div class = "row"> <div class = "col-md-6">
+```{r}
+mod1.glmm %>% AIC # AIC 
+```
+</div> <div class = "col-md-6">
+```{r}
+-2 * logLik(mod1.glmm) %>% # Deviance
+  as.double 
+```
+</div> </div>
+
+```{r, echo=FALSE}
+tibble(Model = paste0("mod", 1:4),
+       AIC = AIC(mod1.glmm,mod2.glmm,mod3.glmm,mod4.glmm)$AIC,
+       Deviance = -2 * c(mod1.glmm %>% logLik, 
+                         mod2.glmm %>% logLik,
+                         mod3.glmm %>% logLik,
+                         mod4.glmm %>% logLik) %>% as.double) %>% 
+  kable(escape = FALSE) %>% 
+  kable_styling(bootstrap_options = c("bordered", "hover"), 
+                full_width = FALSE)
+```
 
 ## sommer
-in progress
+<span style="color:red">in progress</span>
+<br/><br/><br/><br/>

@@ -1,5 +1,9 @@
 ---
 title: "Mixed Models for Agriculture in R"
+output: 
+  html_document:
+    includes:
+      after_body: footer.html		
 ---
 
 Hi there!
