@@ -20,11 +20,11 @@ pacman::p_load(broom.mixed, dplyr, purrr, tibble, tidyr, # for data handling
 
 dat <- agridat::mcconway.turnip %>%
   as_tibble() %>% 
-  mutate(densf = as.factor(density))
+  mutate(densf = density %>% as.factor)
 ```
 
 # Motivation
-This is a randomized complete block design (4 blocks) with three treatment factors: genotype, date and density, leading to 16 treatment level combinations (2 genotypes, 2 planting dates, 4 densities) [(Piepho, 2009)](https://acsess.onlinelibrary.wiley.com/doi/abs/10.2134/agronj2008.0226x). It can be argued that heterogeneous error variances (*i.e.* heteroscedasticity) for two of the treatments should be considered:
+This is a randomized complete block design (4 blocks) with three treatment factors: genotype, date and density, leading to 16 treatment level combinations (2 genotypes, 2 planting dates, 4 densities) [(Piepho, 2009)](https://acsess.onlinelibrary.wiley.com/doi/abs/10.2134/agronj2008.0226x){target="_blank"}. It can be argued that heterogeneous error variances (*i.e.* heteroscedasticity) for two of the treatments should be considered:
 
 ```{r, out.width=c('50%', '50%'), fig.show='hold'}
 boxplot(yield ~ date,    data=dat)
@@ -34,7 +34,7 @@ boxplot(yield ~ density, data=dat)
 # 4 Models {.tabset .tabset-fade .tabset-pills}
 We therefore set up 4 models, which only differ in the variance structure of the errors. More specifically, we allow for heterogeneous error variances / heteroscedascity per group for the effect levels of Date and Density. This variance structure is sometimes also referred to as *diagonal*. 
 
-Regarding the effects in the model, we take the same approach as [Piepho (2009)](https://acsess.onlinelibrary.wiley.com/doi/abs/10.2134/agronj2008.0226x), which calls for fixed main effects for `gen`, `date` and `densf` as well as all their interaction effects, plus random `block` effects.
+Regarding the effects in the model, we take the same approach as [Piepho (2009)](https://acsess.onlinelibrary.wiley.com/doi/abs/10.2134/agronj2008.0226x){target="_blank"}, which calls for fixed main effects for `gen`, `date` and `densf` as well as all their interaction effects, plus random `block` effects.
 
 ```{r, echo=FALSE}
 tibble(Model = paste0("mod", 1:4) %>% cell_spec(bold=T),
@@ -45,13 +45,13 @@ tibble(Model = paste0("mod", 1:4) %>% cell_spec(bold=T),
   mutate(Density = ifelse(Density=="Diagonal", cell_spec(Density, bold=T), Density),
          Date    = ifelse(   Date=="Diagonal", cell_spec(Date,    bold=T), Date)) %>% 
   kable(escape = FALSE) %>% 
-  kable_styling(bootstrap_options = c("striped", "hover"), 
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"), 
                 full_width = FALSE) %>% 
   add_header_above(c(" ", "Term in multiplicative variance structure"=4))
 ```
 
 ## nlme
-To accomplish this in `nlme()`, we need to use the *variance function* `varIdent()` in the `weights=` statement, which is *used to allow for different variances according to the levels of a classification factor*. In model number 4, we are allowing for heterogeneous error variances for both dates and densities, which is done by combining two variance functions via `varComb()`:
+To accomplish this in `nlme`, we need to use the *variance function* [`varIdent()`](https://cran.r-project.org/web/packages/nlme/nlme.pdf#Rfn.varIdent.1){target="_blank"} in the [`weights=`](https://cran.r-project.org/web/packages/nlme/nlme.pdf#Rfn.lme.1){target="_blank"} statement, which is *used to allow for different variances according to the levels of a classification factor*. In model number 4, we are allowing for heterogeneous error variances for both dates and densities, which is done by combining two variance functions via [`varComb()`](https://cran.r-project.org/web/packages/nlme/nlme.pdf#Rfn.varComb.1){target="_blank"}:
 
 ```{r}
 mod1.nlme <- nlme::lme(fixed   = yield ~ gen * date * densf, 
@@ -80,19 +80,19 @@ In `glmmTMB()` it is -to our knowledge- not possible to adjust the variance stru
 
 >Just like in `nlme`, there is a `weights=` option in `glmmTMB()`. However, to our understanding, they have different functions: 
 > 
->In `nlme`, it requires *"an optional `varFunc` object or one-sided formula describing the within-group heteroscedasticity structure"* [(nlme RefMan)](https://cran.r-project.org/web/packages/glmmTMB/glmmTMB.pdf#Rfn.glmmTMB.1) and we make use of this in the example at hand.   
+>In `nlme`, it requires *"an optional `varFunc` object or one-sided formula describing the within-group heteroscedasticity structure"* [(nlme RefMan)](https://cran.r-project.org/web/packages/glmmTMB/glmmTMB.pdf#Rfn.glmmTMB.1){target="_blank"} and we make use of this in the example at hand.   
 >
->In `glmmTMB`, the [RefMan](https://cran.r-project.org/web/packages/glmmTMB/glmmTMB.pdf#Rfn.glmmTMB.1) only states *"weights, as in `glm`. Not automatically scaled to have sum 1"*. Following this trail, the `glm` documentation description for the `weights=` option is *"an optional vector of ‘prior weights’ to be used in the fitting process. Should be NULL or a numeric vector."*.
+>In `glmmTMB`, the [RefMan](https://cran.r-project.org/web/packages/glmmTMB/glmmTMB.pdf#Rfn.glmmTMB.1){target="_blank"} only states *"weights, as in `glm`. Not automatically scaled to have sum 1"*. Following this trail, the [`glm` documentation](https://stat.ethz.ch/R-manual/R-devel/library/stats/html/glm.html){target="_blank"} description for the `weights=` option is *"an optional vector of ‘prior weights’ to be used in the fitting process. Should be NULL or a numeric vector."*.
 > Accordingly, it cannot be used to allow for heterogeneous error variances in this package.
 
-We can, however, "*fix the residual variance  to  be  0  (actually  a  small  non-zero  value)*" and therefore "*force variance into the random effects*" [(glmmTMB RefMan)](https://cran.r-project.org/web/packages/glmmTMB/glmmTMB.pdf#Rfn.glmmTMB.1) via adding the `dispformula = ~0` option. Thus, when doing so, we need to make sure to also add random term to the model with respective variance structure to the model that leads to the estimation of the desired variance components. In the case of mimicing the error variance as a random effect, we can create an `id` column in the data with different entries for each data point:
+We can, however, "*fix the residual variance  to  be  0  (actually  a  small  non-zero  value)*" and therefore "*force variance into the random effects*" [(glmmTMB RefMan)](https://cran.r-project.org/web/packages/glmmTMB/glmmTMB.pdf#Rfn.glmmTMB.1){target="_blank"} via adding the `dispformula = ~0` option. Thus, when doing so, we need to make sure to also add random term to the model with respective variance structure to the model that leads to the estimation of the desired variance components. In the case of mimicing the error variance as a random effect, we can create an `id` column in the data with different entries for each data point:
 
 ```{r}
 dat.id <- dat %>% 
   mutate(id = 1:n() %>% as.factor) # new column with running number
 ```
 
-We should now be able to mimic the error variance via the random term `(1|id)`. We can verify this quickly, by modelling a *mod1* with a homoscedastic error variance in two different ways (`mod1`, `mod1b`). As can be seen below, both result in comparable variances. For `mod2`, `mod3` and `mod4`, we make use of the `diag()` function:
+We should now be able to mimic the error variance via the random term `(1|id)`. We can verify this quickly, by modelling *mod1* with a homoscedastic error variance in two different ways (`mod1`, `mod1b`). As can be seen below, both result in comparable variances. 
 
 ```{r, warning=FALSE}
 mod1.glmm <- glmmTMB(formula =  yield ~ gen * date * densf + (1|block),
@@ -101,8 +101,12 @@ mod1.glmm <- glmmTMB(formula =  yield ~ gen * date * densf + (1|block),
 
 mod1b.glmm <- mod1.glmm %>% 
   update(.~. + (1|id),   # add random term to mimic homoscedastic error variance
-         dispformula=~0) # fix original error variance to 0 
+         dispformula=~0) # fix original error variance to 0
+```
 
+For `mod2`, `mod3` and `mod4`, we make use of the `diag()` function. Notice that we must write `diag(TERM + 0|id)`, since leaving out the `+ 0` would lead to estimateing not only the desired heterogeneous variances, but an additional overall variance.
+
+```{r, warning=FALSE}
 mod2.glmm <- mod1.glmm %>% 
   update(.~. + diag(date+0|id), dispformula=~0)
 
@@ -124,6 +128,10 @@ mod1b.glmm %>% VarCorr()
 </div> </div>
 
 ## sommer
+<span style="color:red">in progress</span>
+<br/><br/><br/><br/>
+
+## SAS
 <span style="color:red">in progress</span>
 <br/><br/><br/><br/>
 
@@ -149,7 +157,7 @@ mod1.nlme.VC <- tibble(grp="homoscedastic", varStruct=1) %>%
 mod1.nlme.VC %>%
   mutate_if(is.double, round, 3) %>% 
   kable(escape = FALSE) %>% 
-  kable_styling(bootstrap_options = c("bordered", "hover"), 
+  kable_styling(bootstrap_options = c("bordered", "hover", "condensed", "responsive"), 
                 full_width = FALSE)
 ```
 
@@ -166,7 +174,7 @@ mod2.nlme.VC <- mod2.nlme$modelStruct$varStruct %>%
 mod2.nlme.VC %>%
   mutate_if(is.double, round, 3) %>% 
   kable(escape = FALSE) %>% 
-  kable_styling(bootstrap_options = c("bordered", "hover"), 
+  kable_styling(bootstrap_options = c("bordered", "hover", "condensed", "responsive"), 
                 full_width = FALSE)
 ```
 
@@ -183,7 +191,7 @@ mod3.nlme.VC <- mod3.nlme$modelStruct$varStruct %>%
 mod3.nlme.VC %>%
   mutate_if(is.double, round, 3) %>% 
   kable(escape = FALSE) %>% 
-  kable_styling(bootstrap_options = c("bordered", "hover"), 
+  kable_styling(bootstrap_options = c("bordered", "hover", "condensed", "responsive"), 
                 full_width = FALSE)
 ```
 
@@ -211,9 +219,11 @@ mod4.nlme.VC <- expand.grid(mod4.nlme.varStruct.A$grpA,
 mod4.nlme.VC %>%
   mutate_if(is.double, round, 3) %>% 
   kable(escape = FALSE) %>% 
-  kable_styling(bootstrap_options = c("bordered", "hover"), 
+  kable_styling(bootstrap_options = c("bordered", "hover", "condensed", "responsive"), 
                 full_width = FALSE)
 ```
+
+> We want to acknowledge that the `tidy(effects="ran_pars")` function of the  `broom.mixed` package (which we used it in this example to obtain the variance component estimates from `glmmTMB()` models) [actually works](https://cran.r-project.org/web/packages/broom.mixed/vignettes/broom_mixed_intro.html){target="_blank"} on `lme()` models (while it does not on `gls()` and `nlme()`). We did not use it here, however, since it does not seem to provide the different estimates once we move away from the homoscedastic error variance. Instead, it always only provides one variance for the error term.
 
 ## lme4
 <span style="color:red">in progress</span>
@@ -221,7 +231,7 @@ mod4.nlme.VC %>%
 
 ## glmmTMB
 
-In order to extract variance component estimates from `glmmTMB` objects (in a table format we are used to), we here use the function `tidy()` from the helper package `broom.mixed`. 
+In order to extract variance component estimates from `glmmTMB` objects (in a table format we are used to), we here use the [`tidy()`](https://cran.r-project.org/web/packages/broom.mixed/broom.mixed.pdf#Rfn.glmmTMB.Rul.tidiers.1){target="_blank"} function from the helper package `broom.mixed`:
 
 **mod1**
 ```{r}
@@ -234,7 +244,7 @@ mod1.glmm.VC <- mod1.glmm %>%
 mod1.glmm.VC %>%
   mutate_if(is.double, round, 3) %>% 
   kable(escape = FALSE) %>% 
-  kable_styling(bootstrap_options = c("bordered", "hover"), 
+  kable_styling(bootstrap_options = c("bordered", "hover", "condensed", "responsive"), 
                 full_width = FALSE)
 ```
 
@@ -249,7 +259,7 @@ mod2.glmm.VC <- mod2.glmm %>%
 mod2.glmm.VC %>%
   mutate_if(is.double, round, 3) %>% 
   kable(escape = FALSE) %>% 
-  kable_styling(bootstrap_options = c("bordered", "hover"), 
+  kable_styling(bootstrap_options = c("bordered", "hover", "condensed", "responsive"), 
                 full_width = FALSE)
 ```
 
@@ -264,7 +274,7 @@ mod3.glmm.VC <- mod3.glmm %>%
 mod3.glmm.VC %>%
   mutate_if(is.double, round, 3) %>% 
   kable(escape = FALSE) %>% 
-  kable_styling(bootstrap_options = c("bordered", "hover"), 
+  kable_styling(bootstrap_options = c("bordered", "hover", "condensed", "responsive"), 
                 full_width = FALSE)
 ```
 
@@ -280,7 +290,7 @@ mod4.glmm.VC <- mod4.glmm %>%
 mod4.glmm.VC %>%
   mutate_if(is.double, round, 3) %>% 
   kable(escape = FALSE) %>% 
-  kable_styling(bootstrap_options = c("bordered", "hover"), 
+  kable_styling(bootstrap_options = c("bordered", "hover", "condensed", "responsive"), 
                 full_width = FALSE)
 ```
 
@@ -288,8 +298,12 @@ mod4.glmm.VC %>%
 <span style="color:red">in progress</span>
 <br/><br/><br/><br/>
 
+## SAS
+<span style="color:red">in progress</span>
+<br/><br/><br/><br/>
+
 # Model Fit {.tabset .tabset-fade .tabset-pills}
-As is standard procedure, we can do a model selection based on goodness-of-fit statistics such as the AIC. In order to have a direct comparison to Table 1 in [(Piepho, 2009)](https://acsess.onlinelibrary.wiley.com/doi/abs/10.2134/agronj2008.0226x), we also calculated the deviance (*i.e.* -2*loglikelihood) for each model. The code is shown for mod1:
+As is standard procedure, we can do a model selection based on goodness-of-fit statistics such as the AIC. In order to have a direct comparison to Table 1 in [(Piepho, 2009)](https://acsess.onlinelibrary.wiley.com/doi/abs/10.2134/agronj2008.0226x){target="_blank"}, we also calculated the deviance (*i.e.* -2*loglikelihood) for each model. The code is shown for mod1:
 
 ## nlme
 
@@ -312,7 +326,7 @@ tibble(Model = paste0("mod", 1:4),
                          mod3.nlme %>% logLik,
                          mod4.nlme %>% logLik) %>% as.double) %>% 
   kable(escape = FALSE) %>% 
-  kable_styling(bootstrap_options = c("bordered", "hover"), 
+  kable_styling(bootstrap_options = c("bordered", "hover", "condensed", "responsive"), 
                 full_width = FALSE)
 ```
 
@@ -340,10 +354,14 @@ tibble(Model = paste0("mod", 1:4),
                          mod3.glmm %>% logLik,
                          mod4.glmm %>% logLik) %>% as.double) %>% 
   kable(escape = FALSE) %>% 
-  kable_styling(bootstrap_options = c("bordered", "hover"), 
+  kable_styling(bootstrap_options = c("bordered", "hover", "condensed", "responsive"), 
                 full_width = FALSE)
 ```
 
 ## sommer
+<span style="color:red">in progress</span>
+<br/><br/><br/><br/>
+
+## SAS
 <span style="color:red">in progress</span>
 <br/><br/><br/><br/>

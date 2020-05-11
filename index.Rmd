@@ -6,10 +6,59 @@ output:
       after_body: footer.html		
 ---
 
-Hi there!
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+# packages for better formatting tables for html output
+library(kableExtra); library(formattable)
+library(dplyr); library(tibble); library(tidyr)
+```
 
-This is a project under constrcution. Our aim is to provide a cookbook for R using major packages for linear mixed models and compare them to each other, but also to SAS' `PROC MIXED`.
+# Hi there!
 
-Please contact us if you have any questions or input
+This is a project under constrcution. Our aim is to provide a cookbook with mixed model analyses of typical examples in life sciences (focus on agriculture/biology) and compare the possibilities or rather limitations of the R-packages
 
-schmidtpaul@hotmail.de
+* [`nlme`](https://CRAN.R-project.org/package=nlme){target="_blank"}
+* [`lme4`](https://CRAN.R-project.org/package=lme4){target="_blank"}
+* [`glmmTMB`](https://CRAN.R-project.org/package=glmmTMB){target="_blank"}
+* [`sommer`](https://CRAN.R-project.org/package=sommer){target="_blank"}
+
+to each other, but also to SAS' [`PROC MIXED`](https://documentation.sas.com/?docsetId=statug&docsetTarget=statug_mixed_syntax.htm&docsetVersion=14.3&locale=en){target="_blank"}.
+
+<br/>
+
+# Structure {.tabset .tabset-fade .tabset-pills}
+Find examples by navigating the menu at the top of the page. Each example focuses on a certain aspect of mixed modelling. Within each example, switch between tabs with codes from the different packages via these buttons:
+
+## nlme
+## lme4
+## glmmTMB
+## sommer
+## SAS
+
+  <br/><br/>  
+
+# Table of Contents
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+contents <- rbind(c("Heterogeneous error variance", "yes", "in progress", "yes", "in progress", "in progress")) %>% data.frame
+names(contents) <- c("Example", "nlme", "lme4", "glmmTMB", "sommer", "SAS")
+
+contents %>% 
+  mutate(Example = cell_spec(Example, bold=TRUE)) %>% 
+  mutate_at(vars(nlme:SAS), 
+            ~cell_spec(., 
+                       color=case_when(.=="in progress" ~ "orange", 
+                                       TRUE ~ "white"),
+                       background=case_when(.=="yes" ~ "green",
+                                            .=="not possible" ~ "red",
+                                            TRUE ~ "white"))) %>%
+  kable(escape = FALSE) %>% 
+  kable_styling(bootstrap_options = c("striped","hover","responsive"),
+                position = "left",
+                full_width = FALSE) %>% 
+  add_header_above(c(" ", "Code provided for"=5))
+```
+
+
+
+
+
+

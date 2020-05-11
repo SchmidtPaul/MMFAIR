@@ -44,6 +44,13 @@ output:
   + [Moving to newer versions of sommer](https://cran.r-project.org/web/packages/sommer/vignettes/sommer.changes.pdf)
   + [Quick start for the sommer package](https://cran.r-project.org/web/packages/sommer/vignettes/sommer.start.pdf)
 
+### Helper Packages
+
+#### broom.mixed
+* [Reference manual](https://cran.r-project.org/web/packages/broom.mixed/broom.mixed.pdf)
+* Vignettes
+  + [introduction to broom.mixed](https://cran.r-project.org/web/packages/broom.mixed/vignettes/broom_mixed_intro.html)
+
 ### Data
 
 #### agridat
@@ -57,6 +64,7 @@ output:
 * [Reference manual](https://cran.r-project.org/web/packages/agriTutorial/agriTutorial.pdf)
 * Vignettes
   + [Tutorial Analysis of Some Agricultural Experiments](https://cran.r-project.org/web/packages/agriTutorial/vignettes/agriTutorialVignette.pdf)
+
   
 ## Publications
 [Piepho, H. P. (2009). Data transformation in statistical analysis of field trials with changing treatment variance. Agronomy Journal, 101(4), 865-869.](https://acsess.onlinelibrary.wiley.com/doi/abs/10.2134/agronj2008.0226x)
