@@ -38,7 +38,7 @@ Find examples/chapters by navigating the menu at the top of the page. Each examp
 
 # Table of Contents
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
-contents <- rbind(c("Heterogeneous error variance", "yes", "in progress", "yes", "in progress", "in progress")) %>% data.frame
+contents <- rbind(c("Heterogeneous error variance", "yes", "no", "kind of", "in progress", "in progress")) %>% data.frame
 names(contents) <- c("Example", "nlme", "lme4", "glmmTMB", "sommer", "SAS")
 
 contents %>% 
@@ -48,13 +48,14 @@ contents %>%
                        color=case_when(.=="in progress" ~ "orange", 
                                        TRUE ~ "white"),
                        background=case_when(.=="yes" ~ "green",
-                                            .=="not possible" ~ "red",
+                                            .=="kind of" ~ "orange",
+                                            .=="no" ~ "red",
                                             TRUE ~ "white"))) %>%
   kable(escape = FALSE) %>% 
   kable_styling(bootstrap_options = c("striped","hover","responsive"),
                 position = "left",
                 full_width = FALSE) %>% 
-  add_header_above(c(" ", "Code provided for"=5))
+  add_header_above(c(" ", "Possible in"=5))
 ```
 
 
