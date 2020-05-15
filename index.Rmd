@@ -26,7 +26,7 @@ to each other, but also to SAS' [`PROC MIXED`](https://documentation.sas.com/?do
 <br/>
 
 # Structure {.tabset .tabset-fade .tabset-pills}
-Find examples by navigating the menu at the top of the page. Each example focuses on a certain aspect of mixed modelling. Within each example, switch between tabs with codes from the different packages via these buttons:
+Find examples/chapters by navigating the menu at the top of the page. Each example focuses on a certain aspect of mixed modelling. Within each example, switch between tabs with codes from the different packages via these buttons:
 
 ## nlme
 ## lme4
