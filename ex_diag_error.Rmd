@@ -59,7 +59,7 @@ tibble(Model = paste0("mod", 1:5) %>% cell_spec(bold=T),
 If it still does not make sense to you why one of the two models should need to estimate more variance parameters than the other, compare the respective tables with variance component estimates in the `nlme` part of the next section. More specifically, count the unique values in the *varStruct* and *sigma* columns that are not equal to 1.
 
 ## nlme
-To obtain heterogeneous variances in `nlme`, we need to use the *variance function* [`varIdent()`](https://cran.r-project.org/web/packages/nlme/nlme.pdf#Rfn.varIdent.1){target="_blank"} in the [`weights=`](https://cran.r-project.org/web/packages/nlme/nlme.pdf#Rfn.lme.1){target="_blank"} statement, which is *used to allow for different variances according to the levels of a classification factor*. For the multiplicative variance structure in *mod4*, we can combine two variance functions via [`varComb()`](https://cran.r-project.org/web/packages/nlme/nlme.pdf#Rfn.varComb.1){target="_blank"}. Since it is not possible to pass an interaction term to the `varIdent()` statement as `varIdent(form=~1|date:densf)`, we must manually create a column that combines the two columns in order to fit *mod5*:
+To obtain heterogeneous variances in `nlme`, we need to use the *variance function* [`varIdent()`](https://cran.r-project.org/web/packages/nlme/nlme.pdf#Rfn.varIdent.1){target="_blank"} in the [`weights=`](https://cran.r-project.org/web/packages/nlme/nlme.pdf#Rfn.lme.1){target="_blank"} argument, which is *used to allow for different variances according to the levels of a classification factor*. For the multiplicative variance structure in *mod4*, we can combine two variance functions via [`varComb()`](https://cran.r-project.org/web/packages/nlme/nlme.pdf#Rfn.varComb.1){target="_blank"}. Since it is not possible to pass an interaction term to the `varIdent()` function as `varIdent(form=~1|date:densf)`, we must manually create a column that combines the two columns in order to fit *mod5*:
 
 ```{r}
 dat <- dat %>% 
@@ -98,14 +98,14 @@ The short answer here is that with `lme4` it is **not possible** to fit any vari
 ## glmmTMB
 In `glmmTMB()` it is -to our knowledge- not possible to adjust the variance structure of the error.
 
->Just like in `nlme`, there is a `weights=` option in `glmmTMB()`. However, to our understanding, they have different functions: 
+>Just like in `nlme`, there is a `weights=` argument in `glmmTMB()`. However, to our understanding, they have different functions: 
 > 
 >In `nlme`, it requires *"an optional `varFunc` object or one-sided formula describing the within-group heteroscedasticity structure"* [(nlme RefMan)](https://cran.r-project.org/web/packages/glmmTMB/glmmTMB.pdf#Rfn.glmmTMB.1){target="_blank"} and we make use of this in the example at hand.   
 >
->In `glmmTMB`, the [RefMan](https://cran.r-project.org/web/packages/glmmTMB/glmmTMB.pdf#Rfn.glmmTMB.1){target="_blank"} only states *"weights, as in `glm`. Not automatically scaled to have sum 1"*. Following this trail, the [`glm` documentation](https://stat.ethz.ch/R-manual/R-devel/library/stats/html/glm.html){target="_blank"} description for the `weights=` option is *"an optional vector of ‘prior weights’ to be used in the fitting process. Should be NULL or a numeric vector."*.
+>In `glmmTMB`, the [RefMan](https://cran.r-project.org/web/packages/glmmTMB/glmmTMB.pdf#Rfn.glmmTMB.1){target="_blank"} only states *"weights, as in `glm`. Not automatically scaled to have sum 1"*. Following this trail, the [`glm` documentation](https://stat.ethz.ch/R-manual/R-devel/library/stats/html/glm.html){target="_blank"} description for the `weights=` argument is *"an optional vector of ‘prior weights’ to be used in the fitting process. Should be NULL or a numeric vector."*.
 > Accordingly, it cannot be used to allow for heterogeneous error variances in this package.
 
-We can, however, "*fix the residual variance  to  be  0  (actually  a  small  non-zero  value)*" and therefore "*force variance into the random effects*" [(glmmTMB RefMan)](https://cran.r-project.org/web/packages/glmmTMB/glmmTMB.pdf#Rfn.glmmTMB.1){target="_blank"} via adding the `dispformula = ~0` option. Thus, when doing so, we need to make sure to also add a random term to the model with the desired variance structure. By taking both of these actions, we are essentially mimicing the error (variance) as a random effect (variance). We achieve this by first creating a `unit` column in the data with different entries for each data point:
+We can, however, "*fix the residual variance  to  be  0  (actually  a  small  non-zero  value)*" and therefore "*force variance into the random effects*" [(glmmTMB RefMan)](https://cran.r-project.org/web/packages/glmmTMB/glmmTMB.pdf#Rfn.glmmTMB.1){target="_blank"} via adding the `dispformula = ~0` argument. Thus, when doing so, we need to make sure to also add a random term to the model with the desired variance structure. By taking both of these actions, we are essentially mimicing the error (variance) as a random effect (variance). We achieve this by first creating a `unit` column in the data with different entries for each data point:
 
 ```{r}
 dat <- dat %>% 
@@ -150,8 +150,36 @@ mod1b.glmm %>% VarCorr()
 </div> </div>
 
 ## sommer
-<span style="color:red">in progress</span>
-<br/><br/><br/><br/>
+To allow for different variance structures in the error term in `sommer`, we need to use the [`vs()`](https://cran.r-project.org/web/packages/sommer/sommer.pdf#Rfn.vs.1){target="_blank"} function in the [`rcov=`](https://cran.r-project.org/web/packages/sommer/sommer.pdf#Rfn.mmer.1){target="_blank"} argument. More specifically, we need the [`ds()`](https://cran.r-project.org/web/packages/sommer/sommer.pdf#Rfn.ds.1){target="_blank"} function to obtain heterogeneous variances.
+
+```{r, message=FALSE, warning=FALSE}
+mod1.somm <- mmer(fixed  = yield ~ gen*date*densf,
+                  random = ~ block,
+                  rcov   = ~ units, # default
+                  data   = dat, verbose=F)
+
+mod2.somm <- mmer(fixed  = yield ~ gen*date*densf,
+                  random = ~ block,
+                  rcov   = ~ vs(ds(date),units),
+                  data   = dat, verbose=F)
+
+mod3.somm <- mmer(fixed  = yield ~ gen*date*densf,
+                  random = ~ block,
+                  rcov   = ~ vs(ds(densf),units),
+                  data   = dat, verbose=F)
+
+mod4.somm <- mmer(fixed  = yield ~ gen*date*densf,
+                  random = ~ block,
+                  rcov   = ~ vs(ds(date),ds(densf),units),
+                  data   = dat, verbose=F)
+
+mod5.somm <- mmer(fixed  = yield ~ gen*date*densf,
+                  random = ~ block,
+                  rcov   = ~ vs(ds(date_densf),units),
+                  data   = dat, verbose=F)
+```
+
+<span style="color:red">mod4 and mod5 give the same VC?</span>
 
 ## SAS
 <span style="color:red">in progress</span>
@@ -342,8 +370,78 @@ mod5.glmm.VC %>%
 ```
 
 ## sommer
-<span style="color:red">in progress</span>
-<br/><br/><br/><br/>
+```{r}
+mod1.somm.VC <- summary(mod1.somm)$varcomp %>% 
+  as_tibble(rownames="grp") %>% 
+  mutate(grp = str_replace(grp, "\\..*", "")) %>% 
+  filter(grp!="block")
+```
+```{r, echo=FALSE}
+mod1.somm.VC %>% 
+  mutate_if(is.double, round, 3) %>% 
+  kable(escape = FALSE) %>% 
+  kable_styling(bootstrap_options = c("bordered", "hover", "condensed", "responsive"), 
+                full_width = FALSE)
+```
+
+```{r}
+mod2.somm.VC <- summary(mod2.somm)$varcomp %>% 
+  as_tibble(rownames="grp") %>% 
+  mutate(grp = str_replace(grp, "\\..*", "")) %>% 
+  filter(grp!="block")
+```
+```{r, echo=FALSE}
+mod2.somm.VC %>% 
+  mutate_if(is.double, round, 3) %>% 
+  kable(escape = FALSE) %>% 
+  kable_styling(bootstrap_options = c("bordered", "hover", "condensed", "responsive"), 
+                full_width = FALSE)
+```
+
+```{r}
+mod3.somm.VC <- summary(mod3.somm)$varcomp %>% 
+  as_tibble(rownames="grp") %>% 
+  mutate(grp = str_replace(grp, "\\..*", "")) %>% 
+  filter(grp!="block")
+```
+```{r, echo=FALSE}
+mod3.somm.VC %>% 
+  mutate_if(is.double, round, 3) %>% 
+  kable(escape = FALSE) %>% 
+  kable_styling(bootstrap_options = c("bordered", "hover", "condensed", "responsive"), 
+                full_width = FALSE)
+```
+
+```{r}
+mod4.somm.VC <- summary(mod4.somm)$varcomp %>% 
+  as_tibble(rownames="grp") %>% 
+  mutate(grp = str_replace(grp, "\\..*", "")) %>% 
+  filter(grp!="block")
+```
+```{r, echo=FALSE}
+mod4.somm.VC %>% 
+  mutate_if(is.double, round, 3) %>% 
+  kable(escape = FALSE) %>% 
+  kable_styling(bootstrap_options = c("bordered", "hover", "condensed", "responsive"), 
+                full_width = FALSE)
+```
+
+```{r}
+mod5.somm.VC <- summary(mod5.somm)$varcomp %>% 
+  as_tibble(rownames="grp") %>% 
+  mutate(grp = str_replace(grp, "\\.yield-yield", "")) %>% 
+  filter(grp!="block")
+```
+```{r, echo=FALSE}
+mod5.somm.VC %>% 
+  arrange(grp) %>%
+  mutate_if(is.double, round, 3) %>% 
+  kable(escape = FALSE) %>% 
+  kable_styling(bootstrap_options = c("bordered", "hover", "condensed", "responsive"), 
+                full_width = FALSE)
+```
+
+<span style="color:red">mod4 and mod5 give the same VC?</span>
 
 ## SAS
 <span style="color:red">in progress</span>
