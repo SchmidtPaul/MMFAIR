@@ -1,7 +1,7 @@
 # packages for better formatting tables for html output
 library(kableExtra)
 library(formattable)
-library(stringr); library(stringi)
+library(stringr)
 
 # packages
 pacman::p_load(dplyr, purrr, tibble, tidyr, # data handling
@@ -12,7 +12,8 @@ dat <- agridat::mcconway.turnip %>%
   as_tibble() %>% 
   mutate(densf = density %>% as.factor)
 
-boxplot(yield ~ date,    data=dat)
+boxplot(yield ~ date, data=dat)
+
 boxplot(yield ~ density, data=dat)
 
 tibble(Model = paste0("mod", 1:5) %>% cell_spec(bold=T),
@@ -75,6 +76,31 @@ mod5.glmm <- mod1.glmm %>%
 mod1.glmm %>% VarCorr()
 
 mod1b.glmm %>% VarCorr()
+
+mod1.somm <- mmer(fixed  = yield ~ gen*date*densf,
+                  random = ~ block,
+                  rcov   = ~ units, # default
+                  data   = dat, verbose=F)
+
+mod2.somm <- mmer(fixed  = yield ~ gen*date*densf,
+                  random = ~ block,
+                  rcov   = ~ vs(ds(date),units),
+                  data   = dat, verbose=F)
+
+mod3.somm <- mmer(fixed  = yield ~ gen*date*densf,
+                  random = ~ block,
+                  rcov   = ~ vs(ds(densf),units),
+                  data   = dat, verbose=F)
+
+mod4.somm <- mmer(fixed  = yield ~ gen*date*densf,
+                  random = ~ block,
+                  rcov   = ~ vs(ds(date),ds(densf),units),
+                  data   = dat, verbose=F)
+
+mod5.somm <- mmer(fixed  = yield ~ gen*date*densf,
+                  random = ~ block,
+                  rcov   = ~ vs(ds(date_densf),units),
+                  data   = dat, verbose=F)
 
 mod1.nlme.VC <- tibble(grp="homoscedastic", varStruct=1) %>% 
   mutate(sigma         = mod1.nlme$sigma) %>% 
@@ -188,57 +214,57 @@ mod5.glmm.VC %>%
   kable_styling(bootstrap_options = c("bordered", "hover", "condensed", "responsive"), 
                 full_width = FALSE)
 
-mod1.somm <- mmer(fixed  = yield ~ gen*date*densf,
-                  random = ~ block,
-                  rcov   = ~ units, # default
-                  data   = dat)
-
-mod2.somm <- mmer(fixed  = yield ~ gen*date*densf,
-                  random = ~ block,
-                  rcov   = ~ vs(ds(date),units),
-                  data   = dat)
-
-mod3.somm <- mmer(fixed  = yield ~ gen*date*densf,
-                  random = ~ block,
-                  rcov   = ~ vs(ds(densf),units),
-                  data   = dat)
-
-mod4.somm <- mmer(fixed  = yield ~ gen*date*densf,
-                  random = ~ block,
-                  rcov   = ~ vs(ds(date),ds(densf),units),
-                  data   = dat)
-
-mod5.somm <- mmer(fixed  = yield ~ gen*date*densf,
-                  random = ~ block,
-                  rcov   = ~ vs(ds(date_densf),units),
-                  data   = dat)
-
-mod1.somm.VC <- summary(mod1.somm)$varcomp %>% 
+mod1.somm.VC <- summary(mod1.somm)$varcomp 
+mod1.somm.VC <- mod1.somm.VC %>% 
   as_tibble(rownames="grp") %>% 
   mutate(grp = str_replace(grp, "\\..*", "")) %>% 
   filter(grp!="block")
+mod1.somm.VC %>% 
+  mutate_if(is.double, round, 3) %>% 
+  kable(escape = FALSE) %>% 
+  kable_styling(bootstrap_options = c("bordered", "hover", "condensed", "responsive"), 
+                full_width = FALSE)
 
-mod2.somm.VC <- summary(mod2.somm)$varcomp %>% 
+mod2.somm.VC <- summary(mod2.somm)$varcomp
+mod2.somm.VC %>% 
   as_tibble(rownames="grp") %>% 
   mutate(grp = str_replace(grp, "\\..*", "")) %>% 
-  filter(grp!="block")
+  filter(grp!="block") %>% 
+  mutate_if(is.double, round, 3) %>% 
+  kable(escape = FALSE) %>% 
+  kable_styling(bootstrap_options = c("bordered", "hover", "condensed", "responsive"), 
+                full_width = FALSE)
 
-mod3.somm.VC <- summary(mod3.somm)$varcomp %>% 
+mod3.somm.VC <- summary(mod3.somm)$varcomp
+mod3.somm.VC %>% 
   as_tibble(rownames="grp") %>% 
   mutate(grp = str_replace(grp, "\\..*", "")) %>% 
-  filter(grp!="block")
+  filter(grp!="block") %>% 
+  mutate_if(is.double, round, 3) %>% 
+  kable(escape = FALSE) %>% 
+  kable_styling(bootstrap_options = c("bordered", "hover", "condensed", "responsive"), 
+                full_width = FALSE)
 
-mod4.somm.VC <- summary(mod4.somm)$varcomp %>% 
+mod4.somm.VC <- summary(mod4.somm)$varcomp
+mod4.somm.VC %>% 
   as_tibble(rownames="grp") %>% 
   mutate(grp = str_replace(grp, "\\..*", "")) %>% 
-  filter(grp!="block")
+  filter(grp!="block") %>% 
+  mutate_if(is.double, round, 3) %>% 
+  kable(escape = FALSE) %>% 
+  kable_styling(bootstrap_options = c("bordered", "hover", "condensed", "responsive"), 
+                full_width = FALSE)
 
-mod5.somm.VC <- summary(mod5.somm)$varcomp %>% 
+mod5.somm.VC <- summary(mod5.somm)$varcomp
+mod5.somm.VC %>% 
   as_tibble(rownames="grp") %>% 
   mutate(grp = str_replace(grp, "\\.yield-yield", "")) %>% 
-  filter(grp!="block")
-
-row.names(summary(mod2.somm)$varcomp)
+  filter(grp!="block") %>% 
+  arrange(grp) %>%
+  mutate_if(is.double, round, 3) %>% 
+  kable(escape = FALSE) %>% 
+  kable_styling(bootstrap_options = c("bordered", "hover", "condensed", "responsive"), 
+                full_width = FALSE)
 
 AIC.nlme <- aictab(list(mod1.nlme, mod2.nlme, mod3.nlme, mod4.nlme, mod5.nlme)) %>%
   mutate(Deviance = -2*Res.LL) # compute deviance
@@ -314,7 +340,7 @@ plyr::join_all(list(mod5.nlme.VC %>% dplyr::select(grpA, grpB, Variance) %>% ren
 plyr::join_all(list(AIC.nlme %>% dplyr::select(Modnames, AICc) %>% rename(nlme=AICc),
                     AIC.nlme %>% dplyr::select(Modnames) %>% mutate(lme4=NA),
                     AIC.glmm %>% dplyr::select(Modnames, AICc) %>% rename(glmm=AICc),
-                    AIC.nlme %>% dplyr::select(Modnames) %>% mutate(lme4="in progress")
+                    AIC.nlme %>% dplyr::select(Modnames) %>% mutate(sommer="in progress")
                     ), by="Modnames", type="left") %>% 
   kable(escape = FALSE) %>% 
   kable_styling(bootstrap_options = c("bordered", "hover", "condensed", "responsive"), 

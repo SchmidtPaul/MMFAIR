@@ -26,7 +26,7 @@ to each other, but also to SAS' [`PROC MIXED`](https://documentation.sas.com/?do
 <br/>
 
 # Structure {.tabset .tabset-fade .tabset-pills}
-Find examples/chapters by navigating the menu at the top of the page. Each example focuses on a certain aspect of mixed modelling. Within each example, switch between tabs with codes from the different packages via these buttons:
+Find chapters by navigating the menu at the top of the page. Each chapter focuses on a certain aspect of mixed modelling. Within each chapter, switch between tabs with codes from the different packages via these buttons:
 
 ## nlme
 ## lme4
@@ -34,15 +34,20 @@ Find examples/chapters by navigating the menu at the top of the page. Each examp
 ## sommer
 ## SAS
 
-  <br/><br/>  
+# {.unlisted .unnumbered}
+
+In terms of R syntax, we generally try to follow the approach presented on the ["R for Data Science" website](https://r4ds.had.co.nz/){target="_blank"}, making use of [`dplyr`](https://dplyr.tidyverse.org/){target="_blank"}, [tibbles](https://r4ds.had.co.nz/tibbles.html){target="_blank"} and [`%>%`-pipes](https://r4ds.had.co.nz/pipes.html){target="_blank"}.
+
+<br/>
 
 # Table of Contents
+
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
 contents <- rbind(c("Heterogeneous error variance", "yes", "no", "kind of", "in progress", "in progress")) %>% data.frame
-names(contents) <- c("Example", "nlme", "lme4", "glmmTMB", "sommer", "SAS")
+names(contents) <- c("Chapter", "nlme", "lme4", "glmmTMB", "sommer", "SAS")
 
 contents %>% 
-  mutate(Example = cell_spec(Example, bold=TRUE)) %>% 
+  mutate(Chapter = cell_spec(Chapter, bold=TRUE)) %>% 
   mutate_at(vars(nlme:SAS), 
             ~cell_spec(., 
                        color=case_when(.=="in progress" ~ "orange", 

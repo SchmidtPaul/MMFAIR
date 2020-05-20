@@ -8,8 +8,8 @@ navbar:
       href: index.html
     - text: "Chapters"
       menu: 
-      - text: "Heteroscedascity"
-        href: ex_diag_error.html
+      - text: "Heterogeneous error variance"
+        href: heterogeneous_error_variance.html
     - text: "Sources"
       href: sources.html
   

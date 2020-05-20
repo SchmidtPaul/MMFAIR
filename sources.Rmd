@@ -13,63 +13,68 @@ output:
 ### Mixed Model
 
 #### lme4
-* [Reference manual](https://cran.r-project.org/web/packages/lme4/lme4.pdf)
+* [Reference manual](https://cran.r-project.org/web/packages/lme4/lme4.pdf){target="_blank"}
 * Vignettes 
-  + [lmer Performance Tips](https://cran.r-project.org/web/packages/lme4/vignettes/lmerperf.html)
-  + [Fitting Linear Mixed-Effects Models using lme4](https://cran.r-project.org/web/packages/lme4/vignettes/lmer.pdf)
-  + [PLS vs GLS for LMMs](https://cran.r-project.org/web/packages/lme4/vignettes/PLSvGLS.pdf)
-  + [Computational Methods](https://cran.r-project.org/web/packages/lme4/vignettes/Theory.pdf)
+  + [lmer Performance Tips](https://cran.r-project.org/web/packages/lme4/vignettes/lmerperf.html){target="_blank"}
+  + [Fitting Linear Mixed-Effects Models using lme4](https://cran.r-project.org/web/packages/lme4/vignettes/lmer.pdf){target="_blank"}
+  + [PLS vs GLS for LMMs](https://cran.r-project.org/web/packages/lme4/vignettes/PLSvGLS.pdf){target="_blank"}
+  + [Computational Methods](https://cran.r-project.org/web/packages/lme4/vignettes/Theory.pdf){target="_blank"}
 
 #### glmmTMB
-* [Reference manual](https://cran.r-project.org/web/packages/glmmTMB/glmmTMB.pdf)
+* [Reference manual](https://cran.r-project.org/web/packages/glmmTMB/glmmTMB.pdf){target="_blank"}
 * Vignettes
-  + [random effect structures](https://cran.r-project.org/web/packages/glmmTMB/vignettes/covstruct.html)
-  + [post-hoc MCMC](https://cran.r-project.org/web/packages/glmmTMB/vignettes/mcmc.html)
-  + [miscellaneous examples](https://cran.r-project.org/web/packages/glmmTMB/vignettes/miscEx.html)
-  + [parallel optimization](https://cran.r-project.org/web/packages/glmmTMB/vignettes/parallel.html)
-  + [simulate](https://cran.r-project.org/web/packages/glmmTMB/vignettes/sim.html)
-  + [troubleshooting](https://cran.r-project.org/web/packages/glmmTMB/vignettes/troubleshooting.html)
-  + [basic examples of glmmTMB usage](https://cran.r-project.org/web/packages/glmmTMB/vignettes/glmmTMB.pdf)
-  + [model evaluation](https://cran.r-project.org/web/packages/glmmTMB/vignettes/model_evaluation.pdf)
+  + [random effect structures](https://cran.r-project.org/web/packages/glmmTMB/vignettes/covstruct.html){target="_blank"}
+  + [post-hoc MCMC](https://cran.r-project.org/web/packages/glmmTMB/vignettes/mcmc.html){target="_blank"}
+  + [miscellaneous examples](https://cran.r-project.org/web/packages/glmmTMB/vignettes/miscEx.html){target="_blank"}
+  + [parallel optimization](https://cran.r-project.org/web/packages/glmmTMB/vignettes/parallel.html){target="_blank"}
+  + [simulate](https://cran.r-project.org/web/packages/glmmTMB/vignettes/sim.html){target="_blank"}
+  + [troubleshooting](https://cran.r-project.org/web/packages/glmmTMB/vignettes/troubleshooting.html){target="_blank"}
+  + [basic examples of glmmTMB usage](https://cran.r-project.org/web/packages/glmmTMB/vignettes/glmmTMB.pdf){target="_blank"}
+  + [model evaluation](https://cran.r-project.org/web/packages/glmmTMB/vignettes/model_evaluation.pdf){target="_blank"}
 
 #### nlme
-* [Reference manual](https://cran.r-project.org/web/packages/nlme/nlme.pdf)
+* [Reference manual](https://cran.r-project.org/web/packages/nlme/nlme.pdf){target="_blank"}
 * Vignettes: none
 
 #### sommer
-* [Reference manual](https://cran.r-project.org/web/packages/sommer/sommer.pdf)
+* [Reference manual](https://cran.r-project.org/web/packages/sommer/sommer.pdf){target="_blank"}
 * Vignettes
-  + [FAQ for the sommer package](https://cran.r-project.org/web/packages/sommer/vignettes/sommer.FAQ.pdf)
-  + [Quantitative genetics using the sommer package](https://cran.r-project.org/web/packages/sommer/vignettes/sommer.pdf)
-  + [Moving to newer versions of sommer](https://cran.r-project.org/web/packages/sommer/vignettes/sommer.changes.pdf)
-  + [Quick start for the sommer package](https://cran.r-project.org/web/packages/sommer/vignettes/sommer.start.pdf)
+  + [FAQ for the sommer package](https://cran.r-project.org/web/packages/sommer/vignettes/sommer.FAQ.pdf){target="_blank"}
+  + [Quantitative genetics using the sommer package](https://cran.r-project.org/web/packages/sommer/vignettes/sommer.pdf){target="_blank"}
+  + [Moving to newer versions of sommer](https://cran.r-project.org/web/packages/sommer/vignettes/sommer.changes.pdf){target="_blank"}
+  + [Quick start for the sommer package](https://cran.r-project.org/web/packages/sommer/vignettes/sommer.start.pdf){target="_blank"}
 
 ### Helper Packages
 
-#### broom.mixed
-* [Reference manual](https://cran.r-project.org/web/packages/broom.mixed/broom.mixed.pdf)
-* Vignettes
-  + [introduction to broom.mixed](https://cran.r-project.org/web/packages/broom.mixed/vignettes/broom_mixed_intro.html)
+#### AICcmodavg
+* [Reference manual](https://cran.r-project.org/web/packages/AICcmodavg/AICcmodavg.pdf){target="_blank"}
+* Vignettes: none
 
-### Data
+#### broom.mixed
+* [Reference manual](https://cran.r-project.org/web/packages/broom.mixed/broom.mixed.pdf){target="_blank"}
+* Vignettes
+  + [introduction to broom.mixed](https://cran.r-project.org/web/packages/broom.mixed/vignettes/broom_mixed_intro.html){target="_blank"}
+
+### Data/Examples
 
 #### agridat
-* [Reference manual](https://cran.r-project.org/web/packages/agridat/agridat.pdf)
+* [Reference manual](https://cran.r-project.org/web/packages/agridat/agridat.pdf){target="_blank"}
 * Vignettes
-  + [Additional agricultural data](https://cran.r-project.org/web/packages/agridat/vignettes/agridat_data.html)
-  + [Graphical Gems in the agridat Package](https://cran.r-project.org/web/packages/agridat/vignettes/agridat_examples.html)
-  + [Using Papadakis covariates for nearest neighbor analysis](https://cran.r-project.org/web/packages/agridat/vignettes/agridat_papadakis.html)
+  + [Additional agricultural data](https://cran.r-project.org/web/packages/agridat/vignettes/agridat_data.html){target="_blank"}
+  + [Graphical Gems in the agridat Package](https://cran.r-project.org/web/packages/agridat/vignettes/agridat_examples.html){target="_blank"}
+  + [Using Papadakis covariates for nearest neighbor analysis](https://cran.r-project.org/web/packages/agridat/vignettes/agridat_papadakis.html){target="_blank"}
   
 #### agritutorial
-* [Reference manual](https://cran.r-project.org/web/packages/agriTutorial/agriTutorial.pdf)
+* [Reference manual](https://cran.r-project.org/web/packages/agriTutorial/agriTutorial.pdf){target="_blank"}
 * Vignettes
-  + [Tutorial Analysis of Some Agricultural Experiments](https://cran.r-project.org/web/packages/agriTutorial/vignettes/agriTutorialVignette.pdf)
+  + [Tutorial Analysis of Some Agricultural Experiments](https://cran.r-project.org/web/packages/agriTutorial/vignettes/agriTutorialVignette.pdf){target="_blank"}
 
   
 ## Publications
-[Piepho, H. P. (2009). Data transformation in statistical analysis of field trials with changing treatment variance. Agronomy Journal, 101(4), 865-869.](https://acsess.onlinelibrary.wiley.com/doi/abs/10.2134/agronj2008.0226x)
+[Piepho, H. P. (2009). Data transformation in statistical analysis of field trials with changing treatment variance. Agronomy Journal, 101(4), 865-869.](https://acsess.onlinelibrary.wiley.com/doi/abs/10.2134/agronj2008.0226x){target="_blank"}
 
 ## Websites
+["GLMM FAQ" by Ben Bolker and others](http://bbolker.github.io/mixedmodels-misc/glmmFAQ.html){target="_blank"}
 ["Mixed Models with R" by Michael Clark](https://m-clark.github.io/mixed-models-with-R/introduction.html){target="_blank"} 
 
 ## Session Info
