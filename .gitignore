@@ -10,6 +10,7 @@
 
 # Example code in package build process
 *-Ex.R
+.R
 
 # Output files from R CMD build
 /*.tar.gz
@@ -18,7 +19,9 @@
 /*.Rcheck/
 
 # RStudio files
-/*.Rproj.user/*
+/*.Rproj.user/
+.Rproj.user/*
+.Rproj.user/
 .Rproj.user
 .Rproj
 
