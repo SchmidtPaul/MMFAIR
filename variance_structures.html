@@ -11,7 +11,7 @@
 
 
 
-<title>index.utf8</title>
+<title>Variance Structures</title>
 
 <script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -24,7 +24,6 @@
 <script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
 <script src="site_libs/navigation-1.1/codefolding.js"></script>
-<script src="site_libs/kePrint-0.0.1/kePrint.js"></script>
 
 
 
@@ -386,104 +385,35 @@ div.tocify {
 
 
 
+<h1 class="title toc-ignore">Variance Structures</h1>
 
 </div>
 
 
-<p><img src="img/banner_mmfair.jpg" style="width:100%"> <strong>Mixed Models for Agriculture in R</strong></p>
-<div id="hi-there" class="section level1">
-<h1>Hi there!</h1>
-<p>This is a project under constrcution. Our aim is to provide a cookbook with mixed model analyses of typical examples in life sciences (focus on agriculture/biology) and compare the possibilities or rather limitations of the R-packages</p>
-<ul>
-<li><a href="https://CRAN.R-project.org/package=nlme" target="_blank"><code>nlme</code></a></li>
-<li><a href="https://CRAN.R-project.org/package=lme4" target="_blank"><code>lme4</code></a></li>
-<li><a href="https://CRAN.R-project.org/package=glmmTMB" target="_blank"><code>glmmTMB</code></a></li>
-<li><a href="https://CRAN.R-project.org/package=sommer" target="_blank"><code>sommer</code></a></li>
-</ul>
-<p>to each other, but also to SAS’ <a href="https://documentation.sas.com/?docsetId=statug&amp;docsetTarget=statug_mixed_syntax.htm&amp;docsetVersion=14.3&amp;locale=en" target="_blank"><code>PROC MIXED</code></a>.</p>
-<p><br/></p>
+<div id="diagonal" class="section level1">
+<h1>Diagonal</h1>
+<p><strong>This covariance structure has heterogenous variances and zero correlation between elements.</strong></p>
+<p>In our <a href="heterogeneous_error_variances.html" target="_blank">chapter on heterogeneous error variances</a>, we fit models in which we allow for different error variances for two of the treatments. Thus, the off-diagonals are all 0, but there are multiple variances on the diagonal. More specifically, in <code>mod5</code> we allows for 8 different error variances - one for each factor-level-combination of the respective factor effects <code>date</code> and <code>density</code>. This is visualized in the plot below as 8 different colors. Speaking in the <a href="https://cran.r-project.org/web/packages/nlme/nlme.pdf#Rfn.nlmeStruct.1" target="_blank">syntax of <code>nlme</code></a>, we obtain 8 parameter estimates: 1 estimate for the <a href="https://cran.r-project.org/web/packages/nlme/nlme.pdf#Rfn.nlmeObject.1" target="_blank">model-object’s <code>sigma</code></a> (= standard deviation for error term) and 7 estimates (that are different from 1) in the <a href="https://cran.r-project.org/web/packages/nlme/nlme.pdf#Rfn.nlmeStruct.1" target="_blank">model-object’s <code>varStruct</code></a> as can be seen on the y-axis:</p>
+<p><img src="variance_structures_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
+<blockquote>
+<p>In order to give a clearer picture, the variance matrix presented here was reduced to data of a single block in order to have dimensions 16x16. Since there were <a href="heterogeneous_error_variances.html" target="_blank">4 complete blocks in the dataset</a>, the entire variance matrix of the error term has dimensions 64x64. However, given that data/errors are sorted accordingly, our presented matrix is simply 1 out of 4 blocks in a <a href="https://www.wikiwand.com/en/Block_matrix#/Block_diagonal_matrices" target="_blank">block diagonal matrix</a>.</p>
+</blockquote>
 </div>
-<div id="structure" class="section level1 tabset tabset-fade tabset-pills">
-<h1>Structure</h1>
-<p>Find chapters by navigating the menu at the top of the page. Each chapter focuses on a certain aspect of mixed modelling. Within each chapter, switch between tabs with codes from the different packages via these buttons:</p>
-<div id="nlme" class="section level2">
-<h2>nlme</h2>
-</div>
-<div id="lme4" class="section level2">
-<h2>lme4</h2>
-</div>
-<div id="glmmtmb" class="section level2">
-<h2>glmmTMB</h2>
-</div>
-<div id="sommer" class="section level2">
-<h2>sommer</h2>
-</div>
-<div id="sas" class="section level2">
-<h2>SAS</h2>
+<div id="multiplicative" class="section level1">
+<h1>Multiplicative</h1>
+<p><strong>It is possible to combine any two or more variance structures via direct multiplication</strong> <em>a.k.a.</em> the <a href="https://www.wikiwand.com/en/Kronecker_product" target="_blank">Kronecker product</a>. This operation on two matrices of arbitrary size resulting in a block matrix is sometimes denoted by ⊗.</p>
+<p>To give an example, we refer to to <code>mod4</code> in the <a href="heterogeneous_error_variances.html" target="_blank">chapter on heterogeneous error variances</a>. Here, a multiplicative variance structure results from the kronecker product of two diagonal variance structures. The first diagonal variance structure allows for different variances for the 2 levels of <code>date</code>, while the second diagonal variance structure allows for different variances for the 4 levels of <code>density</code>. Their Kronecker product therefore results in 8 different variances, visualized in the plot below as 8 different colors.</p>
+<p><img src="variance_structures_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
+<div id="advantage" class="section level2">
+<h2>Advantage</h2>
+<p>One may now ask where the difference lies between this multiplicative variance structure for <code>mod4</code> on the one hand, and the simple diagonal variance structure for all 8 <code>date</code>-<code>density</code>-combinations in <code>mod5</code> (see <a href="#Diagonal">diagonal section above</a>) on the other hand. The question comes intuitively, since both lead to obtaining 8 different variance estimates for the error term. However, while the combinations for which the 8 estimates are obtained are the same, the estimates themselves are different between <code>mod4</code> and <code>mod5</code>. In order to understand this, one must realize that fewer parameters need to be estimated here for <code>mod4</code> (= 6 parameters) compared to the simple diagonal variance structure for <a href="#Diagonal"><code>mod5</code></a> (= 8 parameters) - even though both result in 8 different variance estimates! One can retrace this manually by counting the number of <code>varStruct</code> values on the y-axes of the two plots. There should be 5 values for <code>mod4</code> and 7 values for <code>mod5</code> <strong>that are not equal to 1</strong> and in addition, <a href="https://cran.r-project.org/web/packages/nlme/nlme.pdf#Rfn.nlmeObject.1" target="_blank"><code>sigma</code></a> (= standard deviation for error term) itself is the <em>missing</em> parameter here.</p>
+<p>Therefore, <strong>direct multiplication can lead to the desired structure with fewer parameters needing to be estimated</strong>. Notice that the number of parameters penalizes the AIC and therefore has a direct impact on model selection decisions. In the underlying <a href="heterogeneous_error_variances.html" target="_blank">chapter on heterogeneous error variances</a>, <code>mod4</code> (= multiplicative) is indeed chosen over <code>mod5</code> based on the AIC.</p>
 </div>
 </div>
-<div id="section" class="section level1 unlisted unnumbered">
-<h1></h1>
-<p>In terms of R syntax, we generally try to follow the approach presented on the <a href="https://r4ds.had.co.nz/" target="_blank">“R for Data Science” website</a>, making use of <a href="https://dplyr.tidyverse.org/" target="_blank"><code>dplyr</code></a>, <a href="https://r4ds.had.co.nz/tibbles.html" target="_blank">tibbles</a> and <a href="https://r4ds.had.co.nz/pipes.html" target="_blank"><code>%&gt;%</code>-pipes</a>.</p>
-<p><br/></p>
-</div>
-<div id="table-of-contents" class="section level1">
-<h1>Table of Contents</h1>
-<table class="table table-striped table-hover table-responsive" style="width: auto !important; ">
-<thead>
-<tr>
-<th style="border-bottom:hidden" colspan="1">
-</th>
-<th style="border-bottom:hidden; padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; " colspan="5">
-<div style="border-bottom: 1px solid #ddd; padding-bottom: 5px; ">
-Possible in
-</div>
-</th>
-</tr>
-<tr>
-<th style="text-align:left;">
-Chapter
-</th>
-<th style="text-align:left;">
-nlme
-</th>
-<th style="text-align:left;">
-lme4
-</th>
-<th style="text-align:left;">
-glmmTMB
-</th>
-<th style="text-align:left;">
-sommer
-</th>
-<th style="text-align:left;">
-SAS
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left;">
-<span style=" font-weight: bold;    ">Heterogeneous error variance</span>
-</td>
-<td style="text-align:left;">
-<span style="     color: white !important;border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: green !important;">yes</span>
-</td>
-<td style="text-align:left;">
-<span style="     color: white !important;border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: red !important;">no</span>
-</td>
-<td style="text-align:left;">
-<span style="     color: white !important;border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: orange !important;">kind of</span>
-</td>
-<td style="text-align:left;">
-<span style="     color: orange !important;border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: white !important;">in progress</span>
-</td>
-<td style="text-align:left;">
-<span style="     color: orange !important;border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: white !important;">in progress</span>
-</td>
-</tr>
-</tbody>
-</table>
+<div id="more-on-this" class="section level1">
+<h1>More on this</h1>
+<p><span style="color:red">in progress</span> <br/></p>
+<p><a href="https://www.ibm.com/support/knowledgecenter/SSLVMB_23.0.0/spss/advanced/covariance_structures.html" target="_blank">Relevant section in SPSS documentation</a></p>
 </div>
 
 &nbsp;

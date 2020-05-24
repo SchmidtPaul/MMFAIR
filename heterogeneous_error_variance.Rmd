@@ -51,7 +51,7 @@ We therefore set up 5 models, which only differ in the variance structure in the
 
 Regarding the effects in the model, we take the same approach as [Piepho (2009)](https://acsess.onlinelibrary.wiley.com/doi/abs/10.2134/agronj2008.0226x){target="_blank"}, which calls for fixed main effects for `gen`, `date` and `densf` as well as all their interaction effects, plus random `block` effects.
 
-The different variance structures in the error term of the 5 models are summarised in the table below (only mods 1-4 can be found in [Piepho (2009)](https://acsess.onlinelibrary.wiley.com/doi/abs/10.2134/agronj2008.0226x){target="_blank"}). Notice that in the table, the single variance parameter for the random block effect is excluded for simplicity. Further notice the difference between *mod4* and *mod5*: *mod4* includes the direct product structure of the two diag-structures of *Date* and *Density*. *mod5* simply includes a diag-structure for the *Date*-*Density*-combinations. One may say that *mod4* allows for 2\*4 variances, whereas *mod5* allows for 8, if that makes sense.
+The different variance structures in the error term of the 5 models are summarised in the table below (only mods 1-4 can be found in [Piepho (2009)](https://acsess.onlinelibrary.wiley.com/doi/abs/10.2134/agronj2008.0226x){target="_blank"}). Notice that in the table, the single variance parameter for the random block effect is excluded for simplicity. Further notice the difference between *mod4* and *mod5*: *mod4* includes the direct product (*a.k.a.* Kronecker product) structure of the two diag-structures of *Date* and *Density*. *mod5* simply includes a diag-structure for the *Date*-*Density*-combinations (see our [summary on variance structures](https://schmidtpaul.github.io/MMFAIR/variance_structures.html){target="_blank"} for more info).
 
 ```{r, echo=FALSE}
 tibble(Model = paste0("mod", 1:5) %>% cell_spec(bold=T),
@@ -68,8 +68,6 @@ tibble(Model = paste0("mod", 1:5) %>% cell_spec(bold=T),
                 full_width = FALSE) %>% 
   add_header_above(c(" ", "Term in multiplicative variance structure"=4, "Number of error"=2))
 ```
-
-If it still does not make sense to you why one of the two models should need to estimate more variance parameters than the other, compare the respective tables with variance component estimates in the `nlme` part of the next section. More specifically, count the unique values in the *varStruct* and *sigma* columns that are not equal to 1.
 
 ## nlme
 To obtain heterogeneous variances in `nlme`, we need to use the *variance function* [`varIdent()`](https://cran.r-project.org/web/packages/nlme/nlme.pdf#Rfn.varIdent.1){target="_blank"} in the [`weights=`](https://cran.r-project.org/web/packages/nlme/nlme.pdf#Rfn.lme.1){target="_blank"} argument, which is *used to allow for different variances according to the levels of a classification factor*. For the multiplicative variance structure in *mod4*, we can combine two variance functions via [`varComb()`](https://cran.r-project.org/web/packages/nlme/nlme.pdf#Rfn.varComb.1){target="_blank"}. Since it is not possible to pass an interaction term to the `varIdent()` function as `varIdent(form=~1|date:densf)`, we must manually create a column that combines the two columns in order to fit *mod5*:
@@ -203,11 +201,13 @@ mod5.somm <- mmer(fixed  = yield ~ gen*date*densf,
 After fitting the models, we would now like to extract the variance component estimates.
 
 ## nlme
-As far as we know, it is quite cumbersome to extract variance component estimates from `nlme` objects (in a table format we are used to), even with helper packages such as `broom.mixed`. Beneath is the the most elegant approach we have so far when trying to get similarly formatted output for all 5 models. The general approach is to first get a table with a column for 
+As far as we know, it is quite cumbersome to extract variance component estimates from `nlme` objects (in a table format we are used to), even with helper packages such as `broom.mixed` (see [github issue](https://github.com/bbolker/broom.mixed/issues/96){target="_blank"} ). Beneath is the the most elegant approach we have so far when trying to get similarly formatted output for all 5 models. The general approach is to first get a table with a column for 
 
 + all levels / level-combinations for which heterogeneous error variances were fit
-+ their respective value of the model-object's `varStruct` and
-+ the overall value of the model-object's `sigma`.
++ their respective value of the [model-object's `varStruct`](https://cran.r-project.org/web/packages/nlme/nlme.pdf#Rfn.nlmeStruct.1){target="_blank"} and
++ the overall value of the [model-object's `sigma`](https://cran.r-project.org/web/packages/nlme/nlme.pdf#Rfn.nlmeObject.1){target="_blank"} (= standard deviation for error term).
+
+
 
 By multiplying the latter two, we receive the respective standard error estimate, which needs to be squared in order to obtain the respective variance component estimate.
 

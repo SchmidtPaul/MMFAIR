@@ -10,6 +10,10 @@ navbar:
       menu: 
       - text: "Heterogeneous error variance"
         href: heterogeneous_error_variance.html
+    - text: "Summaries"
+      menu: 
+      - text: "Variance Structures"
+        href: variance_structures.html
     - text: "Sources"
       href: sources.html
   

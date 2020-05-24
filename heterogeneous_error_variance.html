@@ -450,6 +450,18 @@ div.tocify {
     </li>
   </ul>
 </li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Summaries
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="variance_structures.html">Variance Structures</a>
+    </li>
+  </ul>
+</li>
 <li>
   <a href="sources.html">Sources</a>
 </li>
@@ -1812,7 +1824,7 @@ B4
 <h1>5 Models</h1>
 <p>We therefore set up 5 models, which only differ in the variance structure in the error term. More specifically, we allow for different heterogeneous error variances / heteroscedascity per group for the effect levels of Date and Density. This type of variance structure is sometimes also referred to as <em>diagonal</em>.</p>
 <p>Regarding the effects in the model, we take the same approach as <a href="https://acsess.onlinelibrary.wiley.com/doi/abs/10.2134/agronj2008.0226x" target="_blank">Piepho (2009)</a>, which calls for fixed main effects for <code>gen</code>, <code>date</code> and <code>densf</code> as well as all their interaction effects, plus random <code>block</code> effects.</p>
-<p>The different variance structures in the error term of the 5 models are summarised in the table below (only mods 1-4 can be found in <a href="https://acsess.onlinelibrary.wiley.com/doi/abs/10.2134/agronj2008.0226x" target="_blank">Piepho (2009)</a>). Notice that in the table, the single variance parameter for the random block effect is excluded for simplicity. Further notice the difference between <em>mod4</em> and <em>mod5</em>: <em>mod4</em> includes the direct product structure of the two diag-structures of <em>Date</em> and <em>Density</em>. <em>mod5</em> simply includes a diag-structure for the <em>Date</em>-<em>Density</em>-combinations. One may say that <em>mod4</em> allows for 2*4 variances, whereas <em>mod5</em> allows for 8, if that makes sense.</p>
+<p>The different variance structures in the error term of the 5 models are summarised in the table below (only mods 1-4 can be found in <a href="https://acsess.onlinelibrary.wiley.com/doi/abs/10.2134/agronj2008.0226x" target="_blank">Piepho (2009)</a>). Notice that in the table, the single variance parameter for the random block effect is excluded for simplicity. Further notice the difference between <em>mod4</em> and <em>mod5</em>: <em>mod4</em> includes the direct product (<em>a.k.a.</em> Kronecker product) structure of the two diag-structures of <em>Date</em> and <em>Density</em>. <em>mod5</em> simply includes a diag-structure for the <em>Date</em>-<em>Density</em>-combinations (see our <a href="https://schmidtpaul.github.io/MMFAIR/variance_structures.html" target="_blank">summary on variance structures</a> for more info).</p>
 <table class="table table-striped table-hover table-condensed table-responsive" style="width: auto !important; margin-left: auto; margin-right: auto;">
 <thead>
 <tr>
@@ -1971,7 +1983,6 @@ Identity
 </tr>
 </tbody>
 </table>
-<p>If it still does not make sense to you why one of the two models should need to estimate more variance parameters than the other, compare the respective tables with variance component estimates in the <code>nlme</code> part of the next section. More specifically, count the unique values in the <em>varStruct</em> and <em>sigma</em> columns that are not equal to 1.</p>
 <div id="nlme" class="section level2">
 <h2>nlme</h2>
 <p>To obtain heterogeneous variances in <code>nlme</code>, we need to use the <em>variance function</em> <a href="https://cran.r-project.org/web/packages/nlme/nlme.pdf#Rfn.varIdent.1" target="_blank"><code>varIdent()</code></a> in the <a href="https://cran.r-project.org/web/packages/nlme/nlme.pdf#Rfn.lme.1" target="_blank"><code>weights=</code></a> argument, which is <em>used to allow for different variances according to the levels of a classification factor</em>. For the multiplicative variance structure in <em>mod4</em>, we can combine two variance functions via <a href="https://cran.r-project.org/web/packages/nlme/nlme.pdf#Rfn.varComb.1" target="_blank"><code>varComb()</code></a>. Since it is not possible to pass an interaction term to the <code>varIdent()</code> function as <code>varIdent(form=~1|date:densf)</code>, we must manually create a column that combines the two columns in order to fit <em>mod5</em>:</p>
@@ -2093,11 +2104,11 @@ Identity
 <p>After fitting the models, we would now like to extract the variance component estimates.</p>
 <div id="nlme-1" class="section level2">
 <h2>nlme</h2>
-<p>As far as we know, it is quite cumbersome to extract variance component estimates from <code>nlme</code> objects (in a table format we are used to), even with helper packages such as <code>broom.mixed</code>. Beneath is the the most elegant approach we have so far when trying to get similarly formatted output for all 5 models. The general approach is to first get a table with a column for</p>
+<p>As far as we know, it is quite cumbersome to extract variance component estimates from <code>nlme</code> objects (in a table format we are used to), even with helper packages such as <code>broom.mixed</code> (see <a href="https://github.com/bbolker/broom.mixed/issues/96" target="_blank">github issue</a> ). Beneath is the the most elegant approach we have so far when trying to get similarly formatted output for all 5 models. The general approach is to first get a table with a column for</p>
 <ul>
 <li>all levels / level-combinations for which heterogeneous error variances were fit</li>
-<li>their respective value of the model-object’s <code>varStruct</code> and</li>
-<li>the overall value of the model-object’s <code>sigma</code>.</li>
+<li>their respective value of the <a href="https://cran.r-project.org/web/packages/nlme/nlme.pdf#Rfn.nlmeStruct.1" target="_blank">model-object’s <code>varStruct</code></a> and</li>
+<li>the overall value of the <a href="https://cran.r-project.org/web/packages/nlme/nlme.pdf#Rfn.nlmeObject.1" target="_blank">model-object’s <code>sigma</code></a> (= standard deviation for error term).</li>
 </ul>
 <p>By multiplying the latter two, we receive the respective standard error estimate, which needs to be squared in order to obtain the respective variance component estimate.</p>
 <p><strong>mod1</strong></p>

@@ -1,0 +1,223 @@
+---
+title: "Variance Structures"
+output: 
+  html_document:
+    includes:
+      after_body: footer.html						 
+---
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+pacman::p_load(dplyr, purrr, tibble, tidyr, # data handling
+               ggplot2, viridis,            # plot
+               nlme, lme4, glmmTMB, sommer, # mixed modelling
+               AICcmodavg, broom.mixed)     # mixed model extractions
+
+{
+dat <- agridat::mcconway.turnip %>%
+  as_tibble() %>% 
+  mutate(densf = density %>% as.factor) %>% 
+  mutate(date_densf = interaction(date, densf)) # needed for mod5
+
+mod1.nlme <- nlme::lme(fixed   = yield ~ gen * date * densf, 
+                       random  = ~ 1|block,
+                       weights = NULL, # default, i.e. homoscedastic errors
+                       data    = dat)
+
+# mod2.nlme <- mod1.nlme %>% 
+#   update(weights = varIdent(form=~1|date))
+# 
+# mod3.nlme <- mod1.nlme %>% 
+#   update(weights = varIdent(form=~1|densf))
+
+mod4.nlme <- mod1.nlme %>% 
+  update(weights = varComb(varIdent(form=~1|date), 
+                           varIdent(form=~1|densf))) 
+
+mod5.nlme <- mod1.nlme %>% 
+  update(weights = varIdent(form=~1|date_densf))
+
+mod1.nlme.VC <- tibble(grp="homoscedastic", varStruct=1) %>% 
+  mutate(sigma         = mod1.nlme$sigma) %>% 
+  mutate(StandardError = sigma*varStruct) %>% 
+  mutate(Variance      = StandardError^2)
+
+# mod2.nlme.VC <- mod2.nlme$modelStruct$varStruct %>% 
+#   coef(unconstrained=FALSE, allCoef=TRUE) %>% 
+#   enframe(name="grp", value="varStruct") %>% 
+#   mutate(sigma         = mod2.nlme$sigma) %>% 
+#   mutate(StandardError = sigma*varStruct) %>% 
+#   mutate(Variance      = StandardError^2)
+# 
+# mod3.nlme.VC <- mod3.nlme$modelStruct$varStruct %>% 
+#   coef(unconstrained=FALSE, allCoef=TRUE) %>% 
+#   enframe(name="grp", value="varStruct") %>% 
+#   mutate(sigma         = mod3.nlme$sigma) %>% 
+#   mutate(StandardError = sigma*varStruct) %>% 
+#   mutate(Variance      = StandardError^2)
+
+mod4.nlme.varStruct.A <- mod4.nlme$modelStruct$varStruct$A %>% 
+  coef(unconstrained=FALSE, allCoef=TRUE) %>% 
+  enframe(name="grpA", value="varStructA")
+
+mod4.nlme.varStruct.B <- mod4.nlme$modelStruct$varStruct$B %>% 
+  coef(unconstrained=FALSE, allCoef=TRUE) %>% 
+  enframe(name="grpB", value="varStructB")
+
+mod4.nlme.VC <- expand.grid(mod4.nlme.varStruct.A$grpA, 
+                            mod4.nlme.varStruct.B$grpB,
+                            stringsAsFactors=FALSE) %>% 
+  rename(grpA=Var1, grpB=Var2) %>% 
+  left_join(x=., y=mod4.nlme.varStruct.A, by="grpA") %>% 
+  left_join(x=., y=mod4.nlme.varStruct.B, by="grpB") %>% 
+  mutate(sigma         = mod4.nlme$sigma) %>% 
+  mutate(StandardError = sigma*varStructA*varStructB) %>% 
+  mutate(Variance      = StandardError^2)
+
+mod5.nlme.VC <- mod5.nlme$modelStruct$varStruct %>% 
+  coef(unconstrained=FALSE, allCoef=TRUE) %>% 
+  enframe(name="grp", value="varStruct") %>% 
+  separate(grp, sep="[.]", into=c("grpA","grpB")) %>% 
+  mutate(sigma         = mod5.nlme$sigma) %>% 
+  mutate(StandardError = sigma*varStruct) %>% 
+  mutate(Variance      = StandardError^2)
+} # get nlme VC from het diag example
+
+setup <- dat %>% 
+  filter(block=="B1") %>% 
+  arrange(date, density) %>% 
+  dplyr::select(-yield) %>% 
+  mutate(label=paste0(date_densf,".",block),
+         nID=1:n())
+
+{
+mat1 <- left_join(x  = setup %>% mutate(grp="homoscedastic"),
+                  y  = mod1.nlme.VC %>% dplyr::select(-StandardError) ,
+                  by = c("grp"="grp")) %>% 
+  left_join(x  = expand.grid(X=.$nID, Y=.$nID),
+            y  = .,
+            by = c("X"="nID")) %>% as_tibble() %>% 
+  mutate(Variance = case_when(X==Y~Variance, TRUE~NA_real_)) 
+
+# mat2 <- left_join(x  = setup,
+#                   y  = mod2.nlme.VC %>% dplyr::select(-StandardError),
+#                   by = c("date"="grp")) %>% 
+#   left_join(x  = expand.grid(X=.$nID, Y=.$nID),
+#             y  = .,
+#             by = c("X"="nID")) %>% as_tibble() %>% 
+#   mutate(Variance = case_when(X==Y~Variance, TRUE~NA_real_)) 
+# 
+# mat3 <- left_join(x  = setup,
+#                   y  = mod3.nlme.VC %>% dplyr::select(-StandardError),
+#                   by = c("densf"="grp")) %>% 
+#   left_join(x  = expand.grid(X=.$nID, Y=.$nID),
+#             y  = .,
+#             by = c("X"="nID")) %>% as_tibble() %>% 
+#   mutate(Variance = case_when(X==Y~Variance, TRUE~NA_real_)) 
+
+mat4 <- left_join(x  = setup,
+                  y  = mod4.nlme.VC %>% dplyr::select(-StandardError),
+                  by = c("date"="grpA", "densf"="grpB")) %>% 
+  left_join(x  = expand.grid(X=.$nID, Y=.$nID),
+            y  = .,
+            by = c("X"="nID")) %>% as_tibble() %>% 
+  mutate(Variance = case_when(X==Y~Variance, TRUE~NA_real_)) 
+
+mat5 <- left_join(x  = setup,
+                  y  = mod5.nlme.VC %>% dplyr::select(-StandardError),
+                  by = c("date"="grpA", "densf"="grpB")) %>% 
+  left_join(x  = expand.grid(X=.$nID, Y=.$nID),
+            y  = .,
+            by = c("X"="nID")) %>% as_tibble() %>% 
+  mutate(Variance = case_when(X==Y~Variance, TRUE~NA_real_)) 
+} # get mat1 - mat5
+```
+
+# Diagonal
+**This covariance structure has heterogenous variances and zero correlation between elements.**
+
+In our [chapter on heterogeneous error variances](heterogeneous_error_variances.html){target="_blank"}, we fit models in which we allow for different error variances for two of the treatments. Thus, the off-diagonals are all 0, but there are multiple variances on the diagonal. More specifically, in `mod5` we allows for 8 different error variances - one for each factor-level-combination of the respective factor effects `date` and `density`. This is visualized in the plot below as 8 different colors. Speaking in the [syntax of `nlme`](https://cran.r-project.org/web/packages/nlme/nlme.pdf#Rfn.nlmeStruct.1){target="_blank"}, we obtain 8 parameter estimates: 1 estimate for the [model-object's `sigma`](https://cran.r-project.org/web/packages/nlme/nlme.pdf#Rfn.nlmeObject.1){target="_blank"} (= standard deviation for error term) and 7 estimates (that are different from 1) in the [model-object's `varStruct`](https://cran.r-project.org/web/packages/nlme/nlme.pdf#Rfn.nlmeStruct.1){target="_blank"} as can be seen on the y-axis:
+
+```{r, echo=FALSE}
+MAT <- mat5
+labs <- MAT %>% 
+  dplyr::select(X, date_densf, gen, varStruct) %>% unique
+
+ggplot(data=MAT, aes(x=X, y=Y)) + coord_fixed() +
+  geom_tile(aes( fill=Variance), color="grey") +
+  scale_fill_viridis(option="D", na.value="white", 
+                     guide  ="legend", name="Variance\nEstimate", 
+                     breaks = MAT %>% pull(Variance) %>% unique %>% sort,
+                     labels = scales::number_format(accuracy = 0.01)) +
+  scale_x_continuous(name = "date-density-combination",
+                     expand = c(0,0),
+                     breaks = labs %>% pull(X),
+                     labels = labs %>% pull(date_densf),
+                     sec.axis = sec_axis(~ .,
+                        name = "genotpye",
+                        breaks = labs %>% pull(X),
+                        labels = labs %>% pull(gen))) +
+  scale_y_continuous(name = "VarStruct date-density-combination",
+                     trans = "reverse",
+                     expand = c(0,0),
+                     breaks = labs %>% pull(X),
+                     labels = labs %>% pull(varStruct) %>% round(2)) +
+  theme(legend.text.align = 1,
+        axis.ticks.x = element_line(color="grey"),
+        axis.title.x = element_text(color="grey"),
+        axis.text.x = element_text(angle=90, hjust=1, color="grey"),
+        legend.position = "right")
+```
+
+> In order to give a clearer picture, the variance matrix presented here was reduced to data of a single block in order to have dimensions 16x16. Since there were [4 complete blocks in the dataset](heterogeneous_error_variances.html){target="_blank"}, the entire variance matrix of the error term has dimensions 64x64. However, given that data/errors are sorted accordingly, our presented matrix is simply 1 out of 4 blocks in a [block diagonal matrix](https://www.wikiwand.com/en/Block_matrix#/Block_diagonal_matrices){target="_blank"}.
+
+# Multiplicative
+**It is possible to combine any two or more variance structures via direct multiplication** *a.k.a.* the [Kronecker product](https://www.wikiwand.com/en/Kronecker_product){target="_blank"}. This operation on two matrices of arbitrary size resulting in a block matrix is sometimes denoted by `r knitr::asis_output("\U2297")`. 
+
+To give an example, we refer to to `mod4` in the [chapter on heterogeneous error variances](heterogeneous_error_variances.html){target="_blank"}. Here, a multiplicative variance structure results from the kronecker product of two diagonal variance structures. The first diagonal variance structure allows for different variances for the 2 levels of `date`, while the second diagonal variance structure allows for different variances for the 4 levels of `density`. Their Kronecker product therefore results in 8 different variances, visualized in the plot below as 8 different colors. 
+
+```{r, echo=FALSE}
+MAT <- mat4
+labs <- MAT %>% 
+  dplyr::select(X, date_densf, gen, varStructA, varStructB) %>% unique
+
+ggplot(data=MAT, aes(x=X, y=Y)) + coord_fixed() +
+  geom_tile(aes( fill=Variance), color="grey") +
+  scale_fill_viridis(option="D", na.value="white", 
+                     guide  ="legend", name="Variance\nEstimate", 
+                     breaks = MAT %>% pull(Variance) %>% unique %>% sort,
+                     labels = scales::number_format(accuracy = 0.01)) +
+  scale_x_continuous(name = "date-density-combination",
+                     expand = c(0,0),
+                     breaks = labs %>% pull(X),
+                     labels = labs %>% pull(date_densf),
+                     sec.axis = sec_axis(~ .,
+                        name = "genotpye",
+                        breaks = labs %>% pull(X),
+                        labels = labs %>% pull(gen))) +
+  scale_y_continuous(name = "VarStruct density",
+                     trans = "reverse",
+                     expand = c(0,0),
+                     breaks = labs %>% pull(X),
+                     labels = labs %>% pull(varStructB) %>% round(2),
+                     sec.axis = sec_axis(~ ., 
+                        name = "VarStruct date",
+                        breaks = labs %>% pull(X),
+                        labels = labs %>% pull(varStructA) %>% round(2))) +
+  theme(legend.text.align = 1,
+        axis.ticks.x = element_line(color="grey"),
+        axis.title.x = element_text(color="grey"),
+        axis.text.x = element_text(angle=90, hjust=1, color="grey"),
+        legend.position = "right")
+```
+
+## Advantage
+
+One may now ask where the difference lies between this multiplicative variance structure for `mod4` on the one hand, and the simple diagonal variance structure for all 8 `date`-`density`-combinations in `mod5` (see [diagonal section above](#Diagonal)) on the other hand. The question comes intuitively, since both lead to obtaining 8 different variance estimates for the error term. However, while the combinations for which the 8 estimates are obtained are the same, the estimates themselves are different between `mod4` and `mod5`. In order to understand this, one must realize that fewer parameters need to be estimated here for `mod4` (= 6 parameters) compared to the simple diagonal variance structure for [`mod5`](#Diagonal) (= 8 parameters) - even though both result in 8 different variance estimates! One can retrace this manually by counting the number of `varStruct` values on the y-axes of the two plots. There should be 5 values for `mod4` and 7 values for `mod5` **that are not equal to 1** and in addition, [`sigma`](https://cran.r-project.org/web/packages/nlme/nlme.pdf#Rfn.nlmeObject.1){target="_blank"} (= standard deviation for error term) itself is the *missing* parameter here.
+
+Therefore, **direct multiplication can lead to the desired structure with fewer parameters needing to be estimated**. Notice that the number of parameters penalizes the AIC and therefore has a direct impact on model selection decisions. In the underlying [chapter on heterogeneous error variances](heterogeneous_error_variances.html){target="_blank"}, `mod4` (= multiplicative) is indeed chosen over `mod5` based on the AIC.
+
+# More on this
+<span style="color:red">in progress</span>
+<br/>
+
+[Relevant section in SPSS documentation](https://www.ibm.com/support/knowledgecenter/SSLVMB_23.0.0/spss/advanced/covariance_structures.html){target="_blank"} 
