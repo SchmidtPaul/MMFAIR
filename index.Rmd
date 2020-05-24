@@ -1,10 +1,11 @@
 ---
-title: "Mixed Models for Agriculture in R"
 output: 
   html_document:
     includes:
       after_body: footer.html		
 ---
+<img src="img/banner_mmfair.jpg" style="width:100%">
+**Mixed Models for Agriculture in R**
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
 # packages for better formatting tables for html output

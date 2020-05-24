@@ -11,6 +11,11 @@ pacman::p_load(dplyr, purrr, tibble, tidyr, # data handling
 dat <- agridat::mcconway.turnip %>%
   as_tibble() %>% 
   mutate(densf = density %>% as.factor)
+dat %>%
+  kable(escape = FALSE) %>% 
+  kable_styling(bootstrap_options = c("bordered", "hover", "condensed", "responsive"), 
+                full_width = FALSE) %>% 
+  scroll_box(height = "200px")
 
 boxplot(yield ~ date, data=dat)
 
