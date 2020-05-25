@@ -1,3 +1,4 @@
+options(knitr.kable.NA = ' ')
 # packages for better formatting tables for html output
 library(kableExtra)
 library(formattable)
@@ -56,12 +57,21 @@ mod4.nlme <- mod1.nlme %>%
 mod5.nlme <- mod1.nlme %>% 
   update(weights = varIdent(form=~1|date_densf))
 
+mod1.lme4 <- lmer(formula = yield ~ gen * date * densf + (1|block),
+                  data    = dat) 
+
+# mod2.lme4 - not possible
+# mod3.lme4 - not possible
+# mod4.lme4 - not possible
+# mod5.lme4 - not possible
+
 dat <- dat %>% 
   mutate(unit = 1:n() %>% as.factor) # new column with running number
 
 mod1.glmm <- glmmTMB(formula = yield ~ gen * date * densf + (1|block),
-                     REML    = TRUE,
-                     data    = dat) # default = homoscedastic error variance
+                     dispformula = ~1, # = default i.e. homoscedastic error variance
+                     REML    = TRUE,   # needs to be stated since default = ML
+                     data    = dat) 
 
 mod1b.glmm <- mod1.glmm %>% 
   update(.~. + (1|unit), # add random term to mimic homoscedastic error variance
@@ -97,10 +107,7 @@ mod3.somm <- mmer(fixed  = yield ~ gen*date*densf,
                   rcov   = ~ vs(ds(densf),units),
                   data   = dat, verbose=F)
 
-mod4.somm <- mmer(fixed  = yield ~ gen*date*densf,
-                  random = ~ block,
-                  rcov   = ~ vs(ds(date),ds(densf),units),
-                  data   = dat, verbose=F)
+# mod4.somm ?
 
 mod5.somm <- mmer(fixed  = yield ~ gen*date*densf,
                   random = ~ block,
@@ -178,6 +185,16 @@ mod5.nlme.VC %>%
   kable_styling(bootstrap_options = c("bordered", "hover", "condensed", "responsive"), 
                 full_width = FALSE)
 
+mod1.lme4.VC <- mod1.lme4 %>% 
+  tidy(effects="ran_pars", scales="vcov") %>% 
+  separate(term, sep="__", into=c("term","grp")) %>% 
+  filter(group=="Residual")
+mod1.lme4.VC %>%
+  mutate_if(is.double, round, 3) %>% 
+  kable(escape = FALSE) %>% 
+  kable_styling(bootstrap_options = c("bordered", "hover", "condensed", "responsive"), 
+                full_width = FALSE)
+
 mod1.glmm.VC <- mod1.glmm %>% 
   tidy(effects="ran_pars", scales="vcov") %>% 
   separate(term, sep="__", into=c("term","grp")) %>% 
@@ -231,40 +248,35 @@ mod1.somm.VC %>%
                 full_width = FALSE)
 
 mod2.somm.VC <- summary(mod2.somm)$varcomp
-mod2.somm.VC %>% 
+mod2.somm.VC <- mod2.somm.VC %>% 
   as_tibble(rownames="grp") %>% 
   mutate(grp = str_replace(grp, "\\..*", "")) %>% 
-  filter(grp!="block") %>% 
+  filter(grp!="block") 
+mod2.somm.VC %>% 
   mutate_if(is.double, round, 3) %>% 
   kable(escape = FALSE) %>% 
   kable_styling(bootstrap_options = c("bordered", "hover", "condensed", "responsive"), 
                 full_width = FALSE)
 
 mod3.somm.VC <- summary(mod3.somm)$varcomp
-mod3.somm.VC %>% 
+mod3.somm.VC <- mod3.somm.VC %>% 
   as_tibble(rownames="grp") %>% 
   mutate(grp = str_replace(grp, "\\..*", "")) %>% 
-  filter(grp!="block") %>% 
+  filter(grp!="block") 
+mod3.somm.VC %>% 
   mutate_if(is.double, round, 3) %>% 
   kable(escape = FALSE) %>% 
   kable_styling(bootstrap_options = c("bordered", "hover", "condensed", "responsive"), 
                 full_width = FALSE)
 
-mod4.somm.VC <- summary(mod4.somm)$varcomp
-mod4.somm.VC %>% 
-  as_tibble(rownames="grp") %>% 
-  mutate(grp = str_replace(grp, "\\..*", "")) %>% 
-  filter(grp!="block") %>% 
-  mutate_if(is.double, round, 3) %>% 
-  kable(escape = FALSE) %>% 
-  kable_styling(bootstrap_options = c("bordered", "hover", "condensed", "responsive"), 
-                full_width = FALSE)
+# mod4.somm ?
 
 mod5.somm.VC <- summary(mod5.somm)$varcomp
-mod5.somm.VC %>% 
+mod5.somm.VC <- mod5.somm.VC %>% 
   as_tibble(rownames="grp") %>% 
   mutate(grp = str_replace(grp, "\\.yield-yield", "")) %>% 
-  filter(grp!="block") %>% 
+  filter(grp!="block") 
+mod5.somm.VC %>% 
   arrange(grp) %>%
   mutate_if(is.double, round, 3) %>% 
   kable(escape = FALSE) %>% 
@@ -281,6 +293,9 @@ AIC.nlme %>%
   kable_styling(bootstrap_options = c("bordered", "hover", "condensed", "responsive"), 
                 full_width = FALSE)
 
+AIC.lme4 <- aictab(list(mod1.lme4)) %>% # Mods 2-5 are missing
+  mutate(Deviance = -2*Res.LL) # compute deviance
+
 AIC.glmm <- aictab(list(mod1.glmm, mod2.glmm, mod3.glmm, mod5.glmm), 
                    modnames=c("Mod1","Mod2","Mod3","Mod5")) %>% # Mod4 is missing
   mutate(Deviance = -2*LL) # compute deviance
@@ -293,11 +308,14 @@ AIC.glmm %>%
                 full_width = FALSE)
 
 plyr::join_all(list(mod1.nlme.VC %>% dplyr::select(grp, Variance) %>% rename(nlme=Variance),
-                    mod1.nlme.VC %>% dplyr::select(grp) %>% mutate(lme4=NA),
+                    mod1.lme4.VC %>% mutate(grp="homoscedastic") %>% 
+                      dplyr::select(grp, estimate) %>% rename(lme4=estimate),
                     mod1.glmm.VC %>% mutate(grp="homoscedastic") %>% 
                       dplyr::select(grp, estimate) %>% rename(glmmTMB=estimate),
-                    mod1.nlme.VC %>% dplyr::select(grp) %>% mutate(sommer="in progress")), 
-               by="grp", type="left") %>% 
+                    mod1.somm.VC %>% mutate(grp="homoscedastic") %>% 
+                      dplyr::select(grp, VarComp) %>% rename(sommer=VarComp),
+                    mod1.nlme.VC %>% dplyr::select(grp) %>% mutate(SAS="in progress")), 
+               by="grp", type="left") %>%
   kable(escape = FALSE) %>% 
   kable_styling(bootstrap_options = c("bordered", "hover", "condensed", "responsive"), 
                 full_width = FALSE)
@@ -306,7 +324,9 @@ plyr::join_all(list(mod2.nlme.VC %>% dplyr::select(grp, Variance) %>% rename(nlm
                     mod2.nlme.VC %>% dplyr::select(grp) %>% mutate(lme4=NA),
                     mod2.glmm.VC %>% dplyr::select(grp, estimate) %>% 
                       mutate(grp = str_remove(grp, "date")) %>% rename(glmmTMB=estimate),
-                    mod2.nlme.VC %>% dplyr::select(grp) %>% mutate(sommer="in progress")), 
+                    mod2.somm.VC %>% dplyr::select(grp, VarComp) %>% 
+                      mutate(grp = str_replace(grp, ":units", "")) %>% rename(sommer=VarComp),
+                    mod2.nlme.VC %>% dplyr::select(grp) %>% mutate(SAS="in progress")), 
                by="grp", type="left") %>% 
   kable(escape = FALSE) %>% 
   kable_styling(bootstrap_options = c("bordered", "hover", "condensed", "responsive"), 
@@ -316,7 +336,9 @@ plyr::join_all(list(mod3.nlme.VC %>% dplyr::select(grp, Variance) %>% rename(nlm
                     mod3.nlme.VC %>% dplyr::select(grp) %>% mutate(lme4=NA),
                     mod3.glmm.VC %>% dplyr::select(grp, estimate) %>% 
                       mutate(grp = str_remove(grp, "densf")) %>% rename(glmmTMB=estimate),
-                    mod3.nlme.VC %>% dplyr::select(grp) %>% mutate(sommer="in progress")), 
+                    mod3.somm.VC %>% dplyr::select(grp, VarComp) %>% 
+                      mutate(grp = str_replace(grp, ":units", "")) %>% rename(sommer=VarComp),
+                    mod3.nlme.VC %>% dplyr::select(grp) %>% mutate(SAS="in progress")), 
                by="grp", type="left") %>% 
   kable(escape = FALSE) %>% 
   kable_styling(bootstrap_options = c("bordered", "hover", "condensed", "responsive"), 
@@ -325,7 +347,8 @@ plyr::join_all(list(mod3.nlme.VC %>% dplyr::select(grp, Variance) %>% rename(nlm
 plyr::join_all(list(mod4.nlme.VC %>% dplyr::select(grpA, grpB, Variance) %>% rename(nlme=Variance),
                     mod4.nlme.VC %>% dplyr::select(grpA, grpB) %>% mutate(lme4=NA),
                     mod4.nlme.VC %>% dplyr::select(grpA, grpB) %>% mutate(glmmTMB=NA),
-                    mod4.nlme.VC %>% dplyr::select(grpA, grpB) %>% mutate(sommer="in progress")), 
+                    mod4.nlme.VC %>% dplyr::select(grpA, grpB) %>% mutate(sommer="in progress"),
+                    mod4.nlme.VC %>% dplyr::select(grpA, grpB) %>% mutate(SAS="in progress")), 
                by=c("grpA", "grpB"), type="left") %>% 
   kable(escape = FALSE) %>% 
   kable_styling(bootstrap_options = c("bordered", "hover", "condensed", "responsive"), 
@@ -336,16 +359,20 @@ plyr::join_all(list(mod5.nlme.VC %>% dplyr::select(grpA, grpB, Variance) %>% ren
                     mod5.glmm.VC %>% mutate(grpA = str_remove(grpA, "date"),
                                             grpB = str_remove(grpB, "densf")) %>% 
                       dplyr::select(grpA, grpB, estimate) %>% rename(glmm=estimate),
-                   mod5.nlme.VC %>% dplyr::select(grpA, grpB) %>% mutate(sommer="in progress")), 
+                    mod5.somm.VC %>% mutate(grp = str_replace(grp, ":units", "")) %>% 
+                     dplyr::select(grp, VarComp) %>% separate(grp, sep="\\.", into=c("grpA","grpB")) %>%
+                     rename(sommer=VarComp),
+                    mod5.nlme.VC %>% dplyr::select(grpA, grpB) %>% mutate(SAS="in progress")), 
                by=c("grpA", "grpB"), type="left") %>% 
   kable(escape = FALSE) %>% 
   kable_styling(bootstrap_options = c("bordered", "hover", "condensed", "responsive"), 
                 full_width = FALSE)
 
 plyr::join_all(list(AIC.nlme %>% dplyr::select(Modnames, AICc) %>% rename(nlme=AICc),
-                    AIC.nlme %>% dplyr::select(Modnames) %>% mutate(lme4=NA),
+                    AIC.lme4 %>% dplyr::select(Modnames, AICc) %>% rename(lme4=AICc),
                     AIC.glmm %>% dplyr::select(Modnames, AICc) %>% rename(glmm=AICc),
-                    AIC.nlme %>% dplyr::select(Modnames) %>% mutate(sommer="in progress")
+                    AIC.nlme %>% dplyr::select(Modnames) %>% mutate(sommer="in progress"),
+                    AIC.nlme %>% dplyr::select(Modnames) %>% mutate(SAS="in progress")
                     ), by="Modnames", type="left") %>% 
   kable(escape = FALSE) %>% 
   kable_styling(bootstrap_options = c("bordered", "hover", "condensed", "responsive"), 

@@ -43,3 +43,9 @@ blockquote p {
 nav-pills>li:nth-child(2) {
     background: green;
 }
+.center {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  width: 10%;
+}

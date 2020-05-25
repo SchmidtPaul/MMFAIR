@@ -6,7 +6,9 @@ output:
       after_body: footer.html						 
 ---
 
+
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
+options(knitr.kable.NA = ' ')
 # packages for better formatting tables for html output
 library(kableExtra)
 library(formattable)
@@ -96,13 +98,25 @@ mod5.nlme <- mod1.nlme %>%
 ```
 
 ## lme4
-The short answer here is that with `lme4` it is **not possible** to fit any variance structures, so that in this example only `mod1` could be modeled. More specifically, we can read in an [`lmer4` vigniette](https://cran.r-project.org/web/packages/lme4/vignettes/lmer.pdf){target="_blank"}: 
+The short answer here is that with `lme4` it is **not possible** to fit any variance structures, so that in this example only `mod1` could be modeled: 
+
+```{r}
+mod1.lme4 <- lmer(formula = yield ~ gen * date * densf + (1|block),
+                  data    = dat) 
+
+# mod2.lme4 - not possible
+# mod3.lme4 - not possible
+# mod4.lme4 - not possible
+# mod5.lme4 - not possible
+```
+
+More specifically, we can read in an [`lmer4` vigniette](https://cran.r-project.org/web/packages/lme4/vignettes/lmer.pdf){target="_blank"}: 
 
 *"The main advantage of `nlme` relative to `lme4` is a user interface for fitting models with structure in the residuals (various forms of heteroscedasticity and autocorrelation) and in the random-effects covariance matrices (e.g., compound symmetric models).  With some extra effort, the computational machinery of `lme4` can be used to fit structured models that the basic `lmer` function cannot handle (see [Appendix A](https://cran.r-project.org/web/packages/lme4/vignettes/lmer.pdf#%5B%7B%22num%22%3A15%2C%22gen%22%3A0%7D%2C%7B%22name%22%3A%22XYZ%22%7D%2C81%2C733.028%2Cnull%5D){target="_blank"})"*
 
-[Michael Clark puts it as](https://m-clark.github.io/mixed-models-with-R/extensions.html#heterogeneous-variance){target="_blank"} *"Unfortunately, lme4 does not provide the ability to model the residual covariance structure, at least [not in a straightforward fashion](https://bbolker.github.io/mixedmodels-misc/notes/corr_braindump.html){target="_blank"}"*
+Michael Clark [puts it as](https://m-clark.github.io/mixed-models-with-R/extensions.html#heterogeneous-variance){target="_blank"} *"Unfortunately, lme4 does not provide the ability to model the residual covariance structure, at least [not in a straightforward fashion](https://bbolker.github.io/mixedmodels-misc/notes/corr_braindump.html){target="_blank"}"*
 
-<span style="color:orange">Thus, there is no info on this package for this example beyond this point.</span>
+<span style="color:red">Thus, there is no info on this package for this example beyond this point, except for model 1.</span>
 <br/><br/><br/><br/>
 
 
@@ -129,8 +143,9 @@ Notice that so far we were not able to fit `mod4` with `glmmTMB`, as we do not k
 
 ```{r, warning=FALSE}
 mod1.glmm <- glmmTMB(formula = yield ~ gen * date * densf + (1|block),
-                     REML    = TRUE,
-                     data    = dat) # default = homoscedastic error variance
+                     dispformula = ~1, # = default i.e. homoscedastic error variance
+                     REML    = TRUE,   # needs to be stated since default = ML
+                     data    = dat) 
 
 mod1b.glmm <- mod1.glmm %>% 
   update(.~. + (1|unit), # add random term to mimic homoscedastic error variance
@@ -179,10 +194,7 @@ mod3.somm <- mmer(fixed  = yield ~ gen*date*densf,
                   rcov   = ~ vs(ds(densf),units),
                   data   = dat, verbose=F)
 
-mod4.somm <- mmer(fixed  = yield ~ gen*date*densf,
-                  random = ~ block,
-                  rcov   = ~ vs(ds(date),ds(densf),units),
-                  data   = dat, verbose=F)
+# mod4.somm ?
 
 mod5.somm <- mmer(fixed  = yield ~ gen*date*densf,
                   random = ~ block,
@@ -307,11 +319,24 @@ mod5.nlme.VC %>%
                 full_width = FALSE)
 ```
 
-> We want to point out that the `tidy(effects="ran_pars")` function of the  `broom.mixed` package (which we used it in this example to obtain the variance component estimates from `glmmTMB()` models) [actually works](https://cran.r-project.org/web/packages/broom.mixed/vignettes/broom_mixed_intro.html){target="_blank"} on `lme()` objects as well (but it does not on `gls()` and `nlme()`). We did not use it here, however, since it only seems to provide the sigma estimate - even when .
+> We want to point out that the `tidy(effects="ran_pars")` function of the  `broom.mixed` package (which we used it in this example to obtain the variance component estimates from `glmmTMB()` models) [actually works](https://cran.r-project.org/web/packages/broom.mixed/vignettes/broom_mixed_intro.html){target="_blank"} on `lme()` objects as well (but it does not on `gls()` and `nlme()`). We did not use it here, however, since it only seems to provide the sigma estimate and not the varStruct estimates (see [github issue](https://github.com/bbolker/broom.mixed/issues/96){target="_blank"}).
 
 ## lme4
-<span style="color:orange">not possible - see above</span>
-<br/><br/><br/><br/>
+In order to extract variance component estimates from `lme4` objects (in a table format we are used to), we here use the [`tidy()`](https://cran.r-project.org/web/packages/broom.mixed/broom.mixed.pdf#Rfn.glmmTMB.Rul.tidiers.1){target="_blank"} function from the helper package [`broom.mixed`]( https://CRAN.R-project.org/package=broom.mixed){target="_blank"}:
+
+```{r}
+mod1.lme4.VC <- mod1.lme4 %>% 
+  tidy(effects="ran_pars", scales="vcov") %>% 
+  separate(term, sep="__", into=c("term","grp")) %>% 
+  filter(group=="Residual")
+```
+```{r, echo=FALSE}
+mod1.lme4.VC %>%
+  mutate_if(is.double, round, 3) %>% 
+  kable(escape = FALSE) %>% 
+  kable_styling(bootstrap_options = c("bordered", "hover", "condensed", "responsive"), 
+                full_width = FALSE)
+```
 
 ## glmmTMB
 
@@ -402,10 +427,11 @@ mod1.somm.VC %>%
 mod2.somm.VC <- summary(mod2.somm)$varcomp
 ```
 ```{r, echo=FALSE}
-mod2.somm.VC %>% 
+mod2.somm.VC <- mod2.somm.VC %>% 
   as_tibble(rownames="grp") %>% 
   mutate(grp = str_replace(grp, "\\..*", "")) %>% 
-  filter(grp!="block") %>% 
+  filter(grp!="block") 
+mod2.somm.VC %>% 
   mutate_if(is.double, round, 3) %>% 
   kable(escape = FALSE) %>% 
   kable_styling(bootstrap_options = c("bordered", "hover", "condensed", "responsive"), 
@@ -416,10 +442,11 @@ mod2.somm.VC %>%
 mod3.somm.VC <- summary(mod3.somm)$varcomp
 ```
 ```{r, echo=FALSE}
-mod3.somm.VC %>% 
+mod3.somm.VC <- mod3.somm.VC %>% 
   as_tibble(rownames="grp") %>% 
   mutate(grp = str_replace(grp, "\\..*", "")) %>% 
-  filter(grp!="block") %>% 
+  filter(grp!="block") 
+mod3.somm.VC %>% 
   mutate_if(is.double, round, 3) %>% 
   kable(escape = FALSE) %>% 
   kable_styling(bootstrap_options = c("bordered", "hover", "condensed", "responsive"), 
@@ -427,27 +454,18 @@ mod3.somm.VC %>%
 ```
 
 ```{r}
-mod4.somm.VC <- summary(mod4.somm)$varcomp
-```
-```{r, echo=FALSE}
-mod4.somm.VC %>% 
-  as_tibble(rownames="grp") %>% 
-  mutate(grp = str_replace(grp, "\\..*", "")) %>% 
-  filter(grp!="block") %>% 
-  mutate_if(is.double, round, 3) %>% 
-  kable(escape = FALSE) %>% 
-  kable_styling(bootstrap_options = c("bordered", "hover", "condensed", "responsive"), 
-                full_width = FALSE)
+# mod4.somm ?
 ```
 
 ```{r}
 mod5.somm.VC <- summary(mod5.somm)$varcomp
 ```
 ```{r, echo=FALSE}
-mod5.somm.VC %>% 
+mod5.somm.VC <- mod5.somm.VC %>% 
   as_tibble(rownames="grp") %>% 
   mutate(grp = str_replace(grp, "\\.yield-yield", "")) %>% 
-  filter(grp!="block") %>% 
+  filter(grp!="block") 
+mod5.somm.VC %>% 
   arrange(grp) %>%
   mutate_if(is.double, round, 3) %>% 
   kable(escape = FALSE) %>% 
@@ -455,15 +473,14 @@ mod5.somm.VC %>%
                 full_width = FALSE)
 ```
 
-<span style="color:red">mod4 and mod5 give the same VC?</span>
-
 ## SAS
 <span style="color:red">in progress</span>
 <br/><br/><br/><br/>
 
 # Model Fit {.tabset .tabset-fade .tabset-pills}
-As is standard procedure, we can do a model selection based on goodness-of-fit statistics such as the AIC. In order to have a direct comparison to Table 1 in [(Piepho, 2009)](https://acsess.onlinelibrary.wiley.com/doi/abs/10.2134/agronj2008.0226x){target="_blank"}, we also calculated the deviance (*i.e.* -2*loglikelihood) for each model. The code is shown for mod1:
+As is standard procedure, we can do a model selection based on goodness-of-fit statistics such as the AIC. In order to have a direct comparison to Table 1 in [(Piepho, 2009)](https://acsess.onlinelibrary.wiley.com/doi/abs/10.2134/agronj2008.0226x){target="_blank"}, we also calculated the deviance (*i.e.* -2*loglikelihood) for each model.
 
+For `nlme`, `lme4` and `glmmTMB`, we make use of the [`aictab()` function](https://cran.r-project.org/web/packages/AICcmodavg/AICcmodavg.pdf#Rfn.aictab.1){target="_blank"} from the helper package [AICcmodavg](https://CRAN.R-project.org/package=AICcmodavg){target="_blank"}.
 ## nlme
 
 ```{r, warning=FALSE}
@@ -481,8 +498,10 @@ AIC.nlme %>%
 ```
 
 ## lme4
-<span style="color:orange">not possible - see above</span>
-<br/><br/><br/><br/>
+```{r, warning=FALSE}
+AIC.lme4 <- aictab(list(mod1.lme4)) %>% # Mods 2-5 are missing
+  mutate(Deviance = -2*Res.LL) # compute deviance
+```
 
 ## glmmTMB
 ```{r, warning=FALSE}
@@ -515,7 +534,7 @@ AIC.glmm %>%
 package | model syntax
 ---|---
 `nlme` | `weights = varIdent(form=~1|TERM)`
-`lme4` | <span style="color:orange">not possible</span>
+`lme4` | <span style="color:red">not possible</span>
 `glmmTMB` | `random=~diag(TERM+0|unit), dispformula=~0`
 `sommer` | in progress
 `SAS` | in progress
@@ -525,11 +544,14 @@ package | model syntax
 **mod1**
 ```{r, echo=FALSE}
 plyr::join_all(list(mod1.nlme.VC %>% dplyr::select(grp, Variance) %>% rename(nlme=Variance),
-                    mod1.nlme.VC %>% dplyr::select(grp) %>% mutate(lme4=NA),
+                    mod1.lme4.VC %>% mutate(grp="homoscedastic") %>% 
+                      dplyr::select(grp, estimate) %>% rename(lme4=estimate),
                     mod1.glmm.VC %>% mutate(grp="homoscedastic") %>% 
                       dplyr::select(grp, estimate) %>% rename(glmmTMB=estimate),
-                    mod1.nlme.VC %>% dplyr::select(grp) %>% mutate(sommer="in progress")), 
-               by="grp", type="left") %>% 
+                    mod1.somm.VC %>% mutate(grp="homoscedastic") %>% 
+                      dplyr::select(grp, VarComp) %>% rename(sommer=VarComp),
+                    mod1.nlme.VC %>% dplyr::select(grp) %>% mutate(SAS="in progress")), 
+               by="grp", type="left") %>%
   kable(escape = FALSE) %>% 
   kable_styling(bootstrap_options = c("bordered", "hover", "condensed", "responsive"), 
                 full_width = FALSE)
@@ -541,7 +563,9 @@ plyr::join_all(list(mod2.nlme.VC %>% dplyr::select(grp, Variance) %>% rename(nlm
                     mod2.nlme.VC %>% dplyr::select(grp) %>% mutate(lme4=NA),
                     mod2.glmm.VC %>% dplyr::select(grp, estimate) %>% 
                       mutate(grp = str_remove(grp, "date")) %>% rename(glmmTMB=estimate),
-                    mod2.nlme.VC %>% dplyr::select(grp) %>% mutate(sommer="in progress")), 
+                    mod2.somm.VC %>% dplyr::select(grp, VarComp) %>% 
+                      mutate(grp = str_replace(grp, ":units", "")) %>% rename(sommer=VarComp),
+                    mod2.nlme.VC %>% dplyr::select(grp) %>% mutate(SAS="in progress")), 
                by="grp", type="left") %>% 
   kable(escape = FALSE) %>% 
   kable_styling(bootstrap_options = c("bordered", "hover", "condensed", "responsive"), 
@@ -554,7 +578,9 @@ plyr::join_all(list(mod3.nlme.VC %>% dplyr::select(grp, Variance) %>% rename(nlm
                     mod3.nlme.VC %>% dplyr::select(grp) %>% mutate(lme4=NA),
                     mod3.glmm.VC %>% dplyr::select(grp, estimate) %>% 
                       mutate(grp = str_remove(grp, "densf")) %>% rename(glmmTMB=estimate),
-                    mod3.nlme.VC %>% dplyr::select(grp) %>% mutate(sommer="in progress")), 
+                    mod3.somm.VC %>% dplyr::select(grp, VarComp) %>% 
+                      mutate(grp = str_replace(grp, ":units", "")) %>% rename(sommer=VarComp),
+                    mod3.nlme.VC %>% dplyr::select(grp) %>% mutate(SAS="in progress")), 
                by="grp", type="left") %>% 
   kable(escape = FALSE) %>% 
   kable_styling(bootstrap_options = c("bordered", "hover", "condensed", "responsive"), 
@@ -566,7 +592,8 @@ plyr::join_all(list(mod3.nlme.VC %>% dplyr::select(grp, Variance) %>% rename(nlm
 plyr::join_all(list(mod4.nlme.VC %>% dplyr::select(grpA, grpB, Variance) %>% rename(nlme=Variance),
                     mod4.nlme.VC %>% dplyr::select(grpA, grpB) %>% mutate(lme4=NA),
                     mod4.nlme.VC %>% dplyr::select(grpA, grpB) %>% mutate(glmmTMB=NA),
-                    mod4.nlme.VC %>% dplyr::select(grpA, grpB) %>% mutate(sommer="in progress")), 
+                    mod4.nlme.VC %>% dplyr::select(grpA, grpB) %>% mutate(sommer="in progress"),
+                    mod4.nlme.VC %>% dplyr::select(grpA, grpB) %>% mutate(SAS="in progress")), 
                by=c("grpA", "grpB"), type="left") %>% 
   kable(escape = FALSE) %>% 
   kable_styling(bootstrap_options = c("bordered", "hover", "condensed", "responsive"), 
@@ -580,7 +607,10 @@ plyr::join_all(list(mod5.nlme.VC %>% dplyr::select(grpA, grpB, Variance) %>% ren
                     mod5.glmm.VC %>% mutate(grpA = str_remove(grpA, "date"),
                                             grpB = str_remove(grpB, "densf")) %>% 
                       dplyr::select(grpA, grpB, estimate) %>% rename(glmm=estimate),
-                   mod5.nlme.VC %>% dplyr::select(grpA, grpB) %>% mutate(sommer="in progress")), 
+                    mod5.somm.VC %>% mutate(grp = str_replace(grp, ":units", "")) %>% 
+                     dplyr::select(grp, VarComp) %>% separate(grp, sep="\\.", into=c("grpA","grpB")) %>%
+                     rename(sommer=VarComp),
+                    mod5.nlme.VC %>% dplyr::select(grpA, grpB) %>% mutate(SAS="in progress")), 
                by=c("grpA", "grpB"), type="left") %>% 
   kable(escape = FALSE) %>% 
   kable_styling(bootstrap_options = c("bordered", "hover", "condensed", "responsive"), 
@@ -591,9 +621,10 @@ plyr::join_all(list(mod5.nlme.VC %>% dplyr::select(grpA, grpB, Variance) %>% ren
 
 ```{r, echo=FALSE}
 plyr::join_all(list(AIC.nlme %>% dplyr::select(Modnames, AICc) %>% rename(nlme=AICc),
-                    AIC.nlme %>% dplyr::select(Modnames) %>% mutate(lme4=NA),
+                    AIC.lme4 %>% dplyr::select(Modnames, AICc) %>% rename(lme4=AICc),
                     AIC.glmm %>% dplyr::select(Modnames, AICc) %>% rename(glmm=AICc),
-                    AIC.nlme %>% dplyr::select(Modnames) %>% mutate(sommer="in progress")
+                    AIC.nlme %>% dplyr::select(Modnames) %>% mutate(sommer="in progress"),
+                    AIC.nlme %>% dplyr::select(Modnames) %>% mutate(SAS="in progress")
                     ), by="Modnames", type="left") %>% 
   kable(escape = FALSE) %>% 
   kable_styling(bootstrap_options = c("bordered", "hover", "condensed", "responsive"), 

@@ -1824,7 +1824,7 @@ B4
 <h1>5 Models</h1>
 <p>We therefore set up 5 models, which only differ in the variance structure in the error term. More specifically, we allow for different heterogeneous error variances / heteroscedascity per group for the effect levels of Date and Density. This type of variance structure is sometimes also referred to as <em>diagonal</em>.</p>
 <p>Regarding the effects in the model, we take the same approach as <a href="https://acsess.onlinelibrary.wiley.com/doi/abs/10.2134/agronj2008.0226x" target="_blank">Piepho (2009)</a>, which calls for fixed main effects for <code>gen</code>, <code>date</code> and <code>densf</code> as well as all their interaction effects, plus random <code>block</code> effects.</p>
-<p>The different variance structures in the error term of the 5 models are summarised in the table below (only mods 1-4 can be found in <a href="https://acsess.onlinelibrary.wiley.com/doi/abs/10.2134/agronj2008.0226x" target="_blank">Piepho (2009)</a>). Notice that in the table, the single variance parameter for the random block effect is excluded for simplicity. Further notice the difference between <em>mod4</em> and <em>mod5</em>: <em>mod4</em> includes the direct product (<em>a.k.a.</em> Kronecker product) structure of the two diag-structures of <em>Date</em> and <em>Density</em>. <em>mod5</em> simply includes a diag-structure for the <em>Date</em>-<em>Density</em>-combinations (see our <a href="https://schmidtpaul.github.io/MMFAIR/variance_structures.html" target="_blank">summary on variance structures</a> for more info).</p>
+<p>The different variance structures in the error term of the 5 models are summarised in the table below (only mods 1-4 can be found in <a href="https://acsess.onlinelibrary.wiley.com/doi/abs/10.2134/agronj2008.0226x" target="_blank">Piepho (2009)</a>). Notice that in the table, the single variance parameter for the random block effect is excluded for simplicity. Further notice the difference between <em>mod4</em> and <em>mod5</em>: <em>mod4</em> includes the direct product (<em>a.k.a.</em> Kronecker product) structure of the two diag-structures of <em>Date</em> and <em>Density</em>. <em>mod5</em> simply includes a diag-structure for the <em>Date</em>-<em>Density</em>-combinations (see our <a href="variance_structures.html" target="_blank">summary on variance structures</a> for more info).</p>
 <table class="table table-striped table-hover table-condensed table-responsive" style="width: auto !important; margin-left: auto; margin-right: auto;">
 <thead>
 <tr>
@@ -2009,10 +2009,18 @@ Identity
 </div>
 <div id="lme4" class="section level2">
 <h2>lme4</h2>
-<p>The short answer here is that with <code>lme4</code> it is <strong>not possible</strong> to fit any variance structures, so that in this example only <code>mod1</code> could be modeled. More specifically, we can read in an <a href="https://cran.r-project.org/web/packages/lme4/vignettes/lmer.pdf" target="_blank"><code>lmer4</code> vigniette</a>:</p>
+<p>The short answer here is that with <code>lme4</code> it is <strong>not possible</strong> to fit any variance structures, so that in this example only <code>mod1</code> could be modeled:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" title="1">mod1.lme4 &lt;-<span class="st"> </span><span class="kw">lmer</span>(<span class="dt">formula =</span> yield <span class="op">~</span><span class="st"> </span>gen <span class="op">*</span><span class="st"> </span>date <span class="op">*</span><span class="st"> </span>densf <span class="op">+</span><span class="st"> </span>(<span class="dv">1</span><span class="op">|</span>block),</a>
+<a class="sourceLine" id="cb5-2" title="2">                  <span class="dt">data    =</span> dat) </a>
+<a class="sourceLine" id="cb5-3" title="3"></a>
+<a class="sourceLine" id="cb5-4" title="4"><span class="co"># mod2.lme4 - not possible</span></a>
+<a class="sourceLine" id="cb5-5" title="5"><span class="co"># mod3.lme4 - not possible</span></a>
+<a class="sourceLine" id="cb5-6" title="6"><span class="co"># mod4.lme4 - not possible</span></a>
+<a class="sourceLine" id="cb5-7" title="7"><span class="co"># mod5.lme4 - not possible</span></a></code></pre></div>
+<p>More specifically, we can read in an <a href="https://cran.r-project.org/web/packages/lme4/vignettes/lmer.pdf" target="_blank"><code>lmer4</code> vigniette</a>:</p>
 <p><em>“The main advantage of <code>nlme</code> relative to <code>lme4</code> is a user interface for fitting models with structure in the residuals (various forms of heteroscedasticity and autocorrelation) and in the random-effects covariance matrices (e.g., compound symmetric models). With some extra effort, the computational machinery of <code>lme4</code> can be used to fit structured models that the basic <code>lmer</code> function cannot handle (see <a href="https://cran.r-project.org/web/packages/lme4/vignettes/lmer.pdf#%5B%7B%22num%22%3A15%2C%22gen%22%3A0%7D%2C%7B%22name%22%3A%22XYZ%22%7D%2C81%2C733.028%2Cnull%5D" target="_blank">Appendix A</a>)”</em></p>
-<p><a href="https://m-clark.github.io/mixed-models-with-R/extensions.html#heterogeneous-variance" target="_blank">Michael Clark puts it as</a> <em>“Unfortunately, lme4 does not provide the ability to model the residual covariance structure, at least <a href="https://bbolker.github.io/mixedmodels-misc/notes/corr_braindump.html" target="_blank">not in a straightforward fashion</a>”</em></p>
-<p><span style="color:orange">Thus, there is no info on this package for this example beyond this point.</span> <br/><br/><br/><br/></p>
+<p>Michael Clark <a href="https://m-clark.github.io/mixed-models-with-R/extensions.html#heterogeneous-variance" target="_blank">puts it as</a> <em>“Unfortunately, lme4 does not provide the ability to model the residual covariance structure, at least <a href="https://bbolker.github.io/mixedmodels-misc/notes/corr_braindump.html" target="_blank">not in a straightforward fashion</a>”</em></p>
+<p><span style="color:red">Thus, there is no info on this package for this example beyond this point, except for model 1.</span> <br/><br/><br/><br/></p>
 </div>
 <div id="glmmtmb" class="section level2">
 <h2>glmmTMB</h2>
@@ -2023,32 +2031,33 @@ Identity
 <p>In <code>glmmTMB</code>, the <a href="https://cran.r-project.org/web/packages/glmmTMB/glmmTMB.pdf#Rfn.glmmTMB.1" target="_blank">RefMan</a> only states <em>“weights, as in <code>glm</code>. Not automatically scaled to have sum 1”</em>. Following this trail, the <a href="https://stat.ethz.ch/R-manual/R-devel/library/stats/html/glm.html" target="_blank"><code>glm</code> documentation</a> description for the <code>weights=</code> argument is <em>“an optional vector of ‘prior weights’ to be used in the fitting process. Should be NULL or a numeric vector.”</em>. Accordingly, it cannot be used to allow for heterogeneous error variances in this package.</p>
 </blockquote>
 <p>We can, however, “<em>fix the residual variance to be 0 (actually a small non-zero value)</em>” and therefore “<em>force variance into the random effects</em>” <a href="https://cran.r-project.org/web/packages/glmmTMB/glmmTMB.pdf#Rfn.glmmTMB.1" target="_blank">(glmmTMB RefMan)</a> via adding the <code>dispformula = ~0</code> argument. Thus, when doing so, we need to make sure to also add a random term to the model with the desired variance structure. By taking both of these actions, we are essentially mimicing the error (variance) as a random effect (variance). We achieve this by first creating a <code>unit</code> column in the data with different entries for each data point:</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" title="1">dat &lt;-<span class="st"> </span>dat <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb5-2" title="2"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">unit =</span> <span class="dv">1</span><span class="op">:</span><span class="kw">n</span>() <span class="op">%&gt;%</span><span class="st"> </span>as.factor) <span class="co"># new column with running number</span></a></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" title="1">dat &lt;-<span class="st"> </span>dat <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb6-2" title="2"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">unit =</span> <span class="dv">1</span><span class="op">:</span><span class="kw">n</span>() <span class="op">%&gt;%</span><span class="st"> </span>as.factor) <span class="co"># new column with running number</span></a></code></pre></div>
 <p>We should now be able to mimic the error variance via the random term <code>(1|unit)</code>. We can verify this quickly, by modelling <em>mod1</em> with a homoscedastic error variance in the standard fashion (<code>mod1</code>) and via a mimicked error term (<code>mod1b</code>). For all other models we make use of the <code>diag()</code> function. Notice that we must write <code>diag(TERM + 0|unit)</code>, since leaving out the <code>+ 0</code> would by default lead to estimating not only the desired heterogeneous variances, but an additional overall variance.</p>
 <p>Notice that so far we were not able to fit <code>mod4</code> with <code>glmmTMB</code>, as we do not know how to get the direct product of two variance structures.</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" title="1">mod1.glmm &lt;-<span class="st"> </span><span class="kw">glmmTMB</span>(<span class="dt">formula =</span> yield <span class="op">~</span><span class="st"> </span>gen <span class="op">*</span><span class="st"> </span>date <span class="op">*</span><span class="st"> </span>densf <span class="op">+</span><span class="st"> </span>(<span class="dv">1</span><span class="op">|</span>block),</a>
-<a class="sourceLine" id="cb6-2" title="2">                     <span class="dt">REML    =</span> <span class="ot">TRUE</span>,</a>
-<a class="sourceLine" id="cb6-3" title="3">                     <span class="dt">data    =</span> dat) <span class="co"># default = homoscedastic error variance</span></a>
-<a class="sourceLine" id="cb6-4" title="4"></a>
-<a class="sourceLine" id="cb6-5" title="5">mod1b.glmm &lt;-<span class="st"> </span>mod1.glmm <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb6-6" title="6"><span class="st">  </span><span class="kw">update</span>(.<span class="op">~</span>. <span class="op">+</span><span class="st"> </span>(<span class="dv">1</span><span class="op">|</span>unit), <span class="co"># add random term to mimic homoscedastic error variance</span></a>
-<a class="sourceLine" id="cb6-7" title="7">         <span class="dt">dispformula=</span><span class="op">~</span><span class="dv">0</span>) <span class="co"># fix original error variance to 0</span></a>
-<a class="sourceLine" id="cb6-8" title="8"></a>
-<a class="sourceLine" id="cb6-9" title="9">mod2.glmm &lt;-<span class="st"> </span>mod1.glmm <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb6-10" title="10"><span class="st">  </span><span class="kw">update</span>(.<span class="op">~</span>. <span class="op">+</span><span class="st"> </span><span class="kw">diag</span>(date<span class="op">+</span><span class="dv">0</span><span class="op">|</span>unit), <span class="dt">dispformula=</span><span class="op">~</span><span class="dv">0</span>)</a>
-<a class="sourceLine" id="cb6-11" title="11"></a>
-<a class="sourceLine" id="cb6-12" title="12">mod3.glmm &lt;-<span class="st"> </span>mod1.glmm <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb6-13" title="13"><span class="st">  </span><span class="kw">update</span>(.<span class="op">~</span>. <span class="op">+</span><span class="st"> </span><span class="kw">diag</span>(densf<span class="op">+</span><span class="dv">0</span><span class="op">|</span>unit), <span class="dt">dispformula=</span><span class="op">~</span><span class="dv">0</span>)</a>
-<a class="sourceLine" id="cb6-14" title="14"></a>
-<a class="sourceLine" id="cb6-15" title="15"><span class="co"># mod4.glmm ?</span></a>
-<a class="sourceLine" id="cb6-16" title="16"></a>
-<a class="sourceLine" id="cb6-17" title="17">mod5.glmm &lt;-<span class="st"> </span>mod1.glmm <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb6-18" title="18"><span class="st">  </span><span class="kw">update</span>(.<span class="op">~</span>. <span class="op">+</span><span class="st"> </span><span class="kw">diag</span>(date<span class="op">:</span>densf<span class="op">+</span><span class="dv">0</span><span class="op">|</span>unit), <span class="dt">dispformula=</span><span class="op">~</span><span class="dv">0</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" title="1">mod1.glmm &lt;-<span class="st"> </span><span class="kw">glmmTMB</span>(<span class="dt">formula =</span> yield <span class="op">~</span><span class="st"> </span>gen <span class="op">*</span><span class="st"> </span>date <span class="op">*</span><span class="st"> </span>densf <span class="op">+</span><span class="st"> </span>(<span class="dv">1</span><span class="op">|</span>block),</a>
+<a class="sourceLine" id="cb7-2" title="2">                     <span class="dt">dispformula =</span> <span class="op">~</span><span class="dv">1</span>, <span class="co"># = default i.e. homoscedastic error variance</span></a>
+<a class="sourceLine" id="cb7-3" title="3">                     <span class="dt">REML    =</span> <span class="ot">TRUE</span>,   <span class="co"># needs to be stated since default = ML</span></a>
+<a class="sourceLine" id="cb7-4" title="4">                     <span class="dt">data    =</span> dat) </a>
+<a class="sourceLine" id="cb7-5" title="5"></a>
+<a class="sourceLine" id="cb7-6" title="6">mod1b.glmm &lt;-<span class="st"> </span>mod1.glmm <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb7-7" title="7"><span class="st">  </span><span class="kw">update</span>(.<span class="op">~</span>. <span class="op">+</span><span class="st"> </span>(<span class="dv">1</span><span class="op">|</span>unit), <span class="co"># add random term to mimic homoscedastic error variance</span></a>
+<a class="sourceLine" id="cb7-8" title="8">         <span class="dt">dispformula=</span><span class="op">~</span><span class="dv">0</span>) <span class="co"># fix original error variance to 0</span></a>
+<a class="sourceLine" id="cb7-9" title="9"></a>
+<a class="sourceLine" id="cb7-10" title="10">mod2.glmm &lt;-<span class="st"> </span>mod1.glmm <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb7-11" title="11"><span class="st">  </span><span class="kw">update</span>(.<span class="op">~</span>. <span class="op">+</span><span class="st"> </span><span class="kw">diag</span>(date<span class="op">+</span><span class="dv">0</span><span class="op">|</span>unit), <span class="dt">dispformula=</span><span class="op">~</span><span class="dv">0</span>)</a>
+<a class="sourceLine" id="cb7-12" title="12"></a>
+<a class="sourceLine" id="cb7-13" title="13">mod3.glmm &lt;-<span class="st"> </span>mod1.glmm <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb7-14" title="14"><span class="st">  </span><span class="kw">update</span>(.<span class="op">~</span>. <span class="op">+</span><span class="st"> </span><span class="kw">diag</span>(densf<span class="op">+</span><span class="dv">0</span><span class="op">|</span>unit), <span class="dt">dispformula=</span><span class="op">~</span><span class="dv">0</span>)</a>
+<a class="sourceLine" id="cb7-15" title="15"></a>
+<a class="sourceLine" id="cb7-16" title="16"><span class="co"># mod4.glmm ?</span></a>
+<a class="sourceLine" id="cb7-17" title="17"></a>
+<a class="sourceLine" id="cb7-18" title="18">mod5.glmm &lt;-<span class="st"> </span>mod1.glmm <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb7-19" title="19"><span class="st">  </span><span class="kw">update</span>(.<span class="op">~</span>. <span class="op">+</span><span class="st"> </span><span class="kw">diag</span>(date<span class="op">:</span>densf<span class="op">+</span><span class="dv">0</span><span class="op">|</span>unit), <span class="dt">dispformula=</span><span class="op">~</span><span class="dv">0</span>)</a></code></pre></div>
 <p>As can be seen below, mimicing the error (variance) worked, as it leads to comparable variance component estimates:</p>
 <div class="row">
 <div class="col-md-6">
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" title="1">mod1.glmm <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">VarCorr</span>()</a></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" title="1">mod1.glmm <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">VarCorr</span>()</a></code></pre></div>
 <pre><code>## 
 ## Conditional model:
 ##  Groups   Name        Std.Dev.
@@ -2056,7 +2065,7 @@ Identity
 ##  Residual             3.0970</code></pre>
 </div>
 <div class="col-md-6">
-<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" title="1">mod1b.glmm <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">VarCorr</span>()</a></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" title="1">mod1b.glmm <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">VarCorr</span>()</a></code></pre></div>
 <pre><code>## 
 ## Conditional model:
 ##  Groups Name        Std.Dev.
@@ -2068,30 +2077,27 @@ Identity
 <div id="sommer" class="section level2">
 <h2>sommer</h2>
 <p>To allow for different variance structures in the error term in <code>sommer</code>, we need to use the <a href="https://cran.r-project.org/web/packages/sommer/sommer.pdf#Rfn.vs.1" target="_blank"><code>vs()</code></a> function in the <a href="https://cran.r-project.org/web/packages/sommer/sommer.pdf#Rfn.mmer.1" target="_blank"><code>rcov=</code></a> argument. More specifically, we need the <a href="https://cran.r-project.org/web/packages/sommer/sommer.pdf#Rfn.ds.1" target="_blank"><code>ds()</code></a> function to obtain heterogeneous variances.</p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" title="1">mod1.somm &lt;-<span class="st"> </span><span class="kw">mmer</span>(<span class="dt">fixed  =</span> yield <span class="op">~</span><span class="st"> </span>gen<span class="op">*</span>date<span class="op">*</span>densf,</a>
-<a class="sourceLine" id="cb11-2" title="2">                  <span class="dt">random =</span> <span class="op">~</span><span class="st"> </span>block,</a>
-<a class="sourceLine" id="cb11-3" title="3">                  <span class="dt">rcov   =</span> <span class="op">~</span><span class="st"> </span>units, <span class="co"># default</span></a>
-<a class="sourceLine" id="cb11-4" title="4">                  <span class="dt">data   =</span> dat, <span class="dt">verbose=</span>F)</a>
-<a class="sourceLine" id="cb11-5" title="5"></a>
-<a class="sourceLine" id="cb11-6" title="6">mod2.somm &lt;-<span class="st"> </span><span class="kw">mmer</span>(<span class="dt">fixed  =</span> yield <span class="op">~</span><span class="st"> </span>gen<span class="op">*</span>date<span class="op">*</span>densf,</a>
-<a class="sourceLine" id="cb11-7" title="7">                  <span class="dt">random =</span> <span class="op">~</span><span class="st"> </span>block,</a>
-<a class="sourceLine" id="cb11-8" title="8">                  <span class="dt">rcov   =</span> <span class="op">~</span><span class="st"> </span><span class="kw">vs</span>(<span class="kw">ds</span>(date),units),</a>
-<a class="sourceLine" id="cb11-9" title="9">                  <span class="dt">data   =</span> dat, <span class="dt">verbose=</span>F)</a>
-<a class="sourceLine" id="cb11-10" title="10"></a>
-<a class="sourceLine" id="cb11-11" title="11">mod3.somm &lt;-<span class="st"> </span><span class="kw">mmer</span>(<span class="dt">fixed  =</span> yield <span class="op">~</span><span class="st"> </span>gen<span class="op">*</span>date<span class="op">*</span>densf,</a>
-<a class="sourceLine" id="cb11-12" title="12">                  <span class="dt">random =</span> <span class="op">~</span><span class="st"> </span>block,</a>
-<a class="sourceLine" id="cb11-13" title="13">                  <span class="dt">rcov   =</span> <span class="op">~</span><span class="st"> </span><span class="kw">vs</span>(<span class="kw">ds</span>(densf),units),</a>
-<a class="sourceLine" id="cb11-14" title="14">                  <span class="dt">data   =</span> dat, <span class="dt">verbose=</span>F)</a>
-<a class="sourceLine" id="cb11-15" title="15"></a>
-<a class="sourceLine" id="cb11-16" title="16">mod4.somm &lt;-<span class="st"> </span><span class="kw">mmer</span>(<span class="dt">fixed  =</span> yield <span class="op">~</span><span class="st"> </span>gen<span class="op">*</span>date<span class="op">*</span>densf,</a>
-<a class="sourceLine" id="cb11-17" title="17">                  <span class="dt">random =</span> <span class="op">~</span><span class="st"> </span>block,</a>
-<a class="sourceLine" id="cb11-18" title="18">                  <span class="dt">rcov   =</span> <span class="op">~</span><span class="st"> </span><span class="kw">vs</span>(<span class="kw">ds</span>(date),<span class="kw">ds</span>(densf),units),</a>
-<a class="sourceLine" id="cb11-19" title="19">                  <span class="dt">data   =</span> dat, <span class="dt">verbose=</span>F)</a>
-<a class="sourceLine" id="cb11-20" title="20"></a>
-<a class="sourceLine" id="cb11-21" title="21">mod5.somm &lt;-<span class="st"> </span><span class="kw">mmer</span>(<span class="dt">fixed  =</span> yield <span class="op">~</span><span class="st"> </span>gen<span class="op">*</span>date<span class="op">*</span>densf,</a>
-<a class="sourceLine" id="cb11-22" title="22">                  <span class="dt">random =</span> <span class="op">~</span><span class="st"> </span>block,</a>
-<a class="sourceLine" id="cb11-23" title="23">                  <span class="dt">rcov   =</span> <span class="op">~</span><span class="st"> </span><span class="kw">vs</span>(<span class="kw">ds</span>(date_densf),units),</a>
-<a class="sourceLine" id="cb11-24" title="24">                  <span class="dt">data   =</span> dat, <span class="dt">verbose=</span>F)</a></code></pre></div>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb12-1" title="1">mod1.somm &lt;-<span class="st"> </span><span class="kw">mmer</span>(<span class="dt">fixed  =</span> yield <span class="op">~</span><span class="st"> </span>gen<span class="op">*</span>date<span class="op">*</span>densf,</a>
+<a class="sourceLine" id="cb12-2" title="2">                  <span class="dt">random =</span> <span class="op">~</span><span class="st"> </span>block,</a>
+<a class="sourceLine" id="cb12-3" title="3">                  <span class="dt">rcov   =</span> <span class="op">~</span><span class="st"> </span>units, <span class="co"># default</span></a>
+<a class="sourceLine" id="cb12-4" title="4">                  <span class="dt">data   =</span> dat, <span class="dt">verbose=</span>F)</a>
+<a class="sourceLine" id="cb12-5" title="5"></a>
+<a class="sourceLine" id="cb12-6" title="6">mod2.somm &lt;-<span class="st"> </span><span class="kw">mmer</span>(<span class="dt">fixed  =</span> yield <span class="op">~</span><span class="st"> </span>gen<span class="op">*</span>date<span class="op">*</span>densf,</a>
+<a class="sourceLine" id="cb12-7" title="7">                  <span class="dt">random =</span> <span class="op">~</span><span class="st"> </span>block,</a>
+<a class="sourceLine" id="cb12-8" title="8">                  <span class="dt">rcov   =</span> <span class="op">~</span><span class="st"> </span><span class="kw">vs</span>(<span class="kw">ds</span>(date),units),</a>
+<a class="sourceLine" id="cb12-9" title="9">                  <span class="dt">data   =</span> dat, <span class="dt">verbose=</span>F)</a>
+<a class="sourceLine" id="cb12-10" title="10"></a>
+<a class="sourceLine" id="cb12-11" title="11">mod3.somm &lt;-<span class="st"> </span><span class="kw">mmer</span>(<span class="dt">fixed  =</span> yield <span class="op">~</span><span class="st"> </span>gen<span class="op">*</span>date<span class="op">*</span>densf,</a>
+<a class="sourceLine" id="cb12-12" title="12">                  <span class="dt">random =</span> <span class="op">~</span><span class="st"> </span>block,</a>
+<a class="sourceLine" id="cb12-13" title="13">                  <span class="dt">rcov   =</span> <span class="op">~</span><span class="st"> </span><span class="kw">vs</span>(<span class="kw">ds</span>(densf),units),</a>
+<a class="sourceLine" id="cb12-14" title="14">                  <span class="dt">data   =</span> dat, <span class="dt">verbose=</span>F)</a>
+<a class="sourceLine" id="cb12-15" title="15"></a>
+<a class="sourceLine" id="cb12-16" title="16"><span class="co"># mod4.somm ?</span></a>
+<a class="sourceLine" id="cb12-17" title="17"></a>
+<a class="sourceLine" id="cb12-18" title="18">mod5.somm &lt;-<span class="st"> </span><span class="kw">mmer</span>(<span class="dt">fixed  =</span> yield <span class="op">~</span><span class="st"> </span>gen<span class="op">*</span>date<span class="op">*</span>densf,</a>
+<a class="sourceLine" id="cb12-19" title="19">                  <span class="dt">random =</span> <span class="op">~</span><span class="st"> </span>block,</a>
+<a class="sourceLine" id="cb12-20" title="20">                  <span class="dt">rcov   =</span> <span class="op">~</span><span class="st"> </span><span class="kw">vs</span>(<span class="kw">ds</span>(date_densf),units),</a>
+<a class="sourceLine" id="cb12-21" title="21">                  <span class="dt">data   =</span> dat, <span class="dt">verbose=</span>F)</a></code></pre></div>
 <p><span style="color:red">mod4 and mod5 give the same VC?</span></p>
 </div>
 <div id="sas" class="section level2">
@@ -2112,10 +2118,10 @@ Identity
 </ul>
 <p>By multiplying the latter two, we receive the respective standard error estimate, which needs to be squared in order to obtain the respective variance component estimate.</p>
 <p><strong>mod1</strong></p>
-<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb12-1" title="1">mod1.nlme.VC &lt;-<span class="st"> </span><span class="kw">tibble</span>(<span class="dt">grp=</span><span class="st">&quot;homoscedastic&quot;</span>, <span class="dt">varStruct=</span><span class="dv">1</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb12-2" title="2"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">sigma         =</span> mod1.nlme<span class="op">$</span>sigma) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb12-3" title="3"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">StandardError =</span> sigma<span class="op">*</span>varStruct) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb12-4" title="4"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">Variance      =</span> StandardError<span class="op">^</span><span class="dv">2</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb13-1" title="1">mod1.nlme.VC &lt;-<span class="st"> </span><span class="kw">tibble</span>(<span class="dt">grp=</span><span class="st">&quot;homoscedastic&quot;</span>, <span class="dt">varStruct=</span><span class="dv">1</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb13-2" title="2"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">sigma         =</span> mod1.nlme<span class="op">$</span>sigma) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb13-3" title="3"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">StandardError =</span> sigma<span class="op">*</span>varStruct) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb13-4" title="4"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">Variance      =</span> StandardError<span class="op">^</span><span class="dv">2</span>)</a></code></pre></div>
 <table class="table table-bordered table-hover table-condensed table-responsive" style="width: auto !important; margin-left: auto; margin-right: auto;">
 <thead>
 <tr>
@@ -2157,12 +2163,12 @@ homoscedastic
 </tbody>
 </table>
 <p><strong>mod2</strong></p>
-<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb13-1" title="1">mod2.nlme.VC &lt;-<span class="st"> </span>mod2.nlme<span class="op">$</span>modelStruct<span class="op">$</span>varStruct <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb13-2" title="2"><span class="st">  </span><span class="kw">coef</span>(<span class="dt">unconstrained=</span><span class="ot">FALSE</span>, <span class="dt">allCoef=</span><span class="ot">TRUE</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb13-3" title="3"><span class="st">  </span><span class="kw">enframe</span>(<span class="dt">name=</span><span class="st">&quot;grp&quot;</span>, <span class="dt">value=</span><span class="st">&quot;varStruct&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb13-4" title="4"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">sigma         =</span> mod2.nlme<span class="op">$</span>sigma) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb13-5" title="5"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">StandardError =</span> sigma<span class="op">*</span>varStruct) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb13-6" title="6"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">Variance      =</span> StandardError<span class="op">^</span><span class="dv">2</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb14-1" title="1">mod2.nlme.VC &lt;-<span class="st"> </span>mod2.nlme<span class="op">$</span>modelStruct<span class="op">$</span>varStruct <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb14-2" title="2"><span class="st">  </span><span class="kw">coef</span>(<span class="dt">unconstrained=</span><span class="ot">FALSE</span>, <span class="dt">allCoef=</span><span class="ot">TRUE</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb14-3" title="3"><span class="st">  </span><span class="kw">enframe</span>(<span class="dt">name=</span><span class="st">&quot;grp&quot;</span>, <span class="dt">value=</span><span class="st">&quot;varStruct&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb14-4" title="4"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">sigma         =</span> mod2.nlme<span class="op">$</span>sigma) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb14-5" title="5"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">StandardError =</span> sigma<span class="op">*</span>varStruct) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb14-6" title="6"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">Variance      =</span> StandardError<span class="op">^</span><span class="dv">2</span>)</a></code></pre></div>
 <table class="table table-bordered table-hover table-condensed table-responsive" style="width: auto !important; margin-left: auto; margin-right: auto;">
 <thead>
 <tr>
@@ -2221,12 +2227,12 @@ Variance
 </tbody>
 </table>
 <p><strong>mod3</strong></p>
-<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb14-1" title="1">mod3.nlme.VC &lt;-<span class="st"> </span>mod3.nlme<span class="op">$</span>modelStruct<span class="op">$</span>varStruct <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb14-2" title="2"><span class="st">  </span><span class="kw">coef</span>(<span class="dt">unconstrained=</span><span class="ot">FALSE</span>, <span class="dt">allCoef=</span><span class="ot">TRUE</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb14-3" title="3"><span class="st">  </span><span class="kw">enframe</span>(<span class="dt">name=</span><span class="st">&quot;grp&quot;</span>, <span class="dt">value=</span><span class="st">&quot;varStruct&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb14-4" title="4"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">sigma         =</span> mod3.nlme<span class="op">$</span>sigma) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb14-5" title="5"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">StandardError =</span> sigma<span class="op">*</span>varStruct) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb14-6" title="6"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">Variance      =</span> StandardError<span class="op">^</span><span class="dv">2</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb15-1" title="1">mod3.nlme.VC &lt;-<span class="st"> </span>mod3.nlme<span class="op">$</span>modelStruct<span class="op">$</span>varStruct <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb15-2" title="2"><span class="st">  </span><span class="kw">coef</span>(<span class="dt">unconstrained=</span><span class="ot">FALSE</span>, <span class="dt">allCoef=</span><span class="ot">TRUE</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb15-3" title="3"><span class="st">  </span><span class="kw">enframe</span>(<span class="dt">name=</span><span class="st">&quot;grp&quot;</span>, <span class="dt">value=</span><span class="st">&quot;varStruct&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb15-4" title="4"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">sigma         =</span> mod3.nlme<span class="op">$</span>sigma) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb15-5" title="5"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">StandardError =</span> sigma<span class="op">*</span>varStruct) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb15-6" title="6"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">Variance      =</span> StandardError<span class="op">^</span><span class="dv">2</span>)</a></code></pre></div>
 <table class="table table-bordered table-hover table-condensed table-responsive" style="width: auto !important; margin-left: auto; margin-right: auto;">
 <thead>
 <tr>
@@ -2319,23 +2325,23 @@ Variance
 </tbody>
 </table>
 <p><strong>mod4</strong></p>
-<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb15-1" title="1">mod4.nlme.varStruct.A &lt;-<span class="st"> </span>mod4.nlme<span class="op">$</span>modelStruct<span class="op">$</span>varStruct<span class="op">$</span>A <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb15-2" title="2"><span class="st">  </span><span class="kw">coef</span>(<span class="dt">unconstrained=</span><span class="ot">FALSE</span>, <span class="dt">allCoef=</span><span class="ot">TRUE</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb15-3" title="3"><span class="st">  </span><span class="kw">enframe</span>(<span class="dt">name=</span><span class="st">&quot;grpA&quot;</span>, <span class="dt">value=</span><span class="st">&quot;varStructA&quot;</span>)</a>
-<a class="sourceLine" id="cb15-4" title="4"></a>
-<a class="sourceLine" id="cb15-5" title="5">mod4.nlme.varStruct.B &lt;-<span class="st"> </span>mod4.nlme<span class="op">$</span>modelStruct<span class="op">$</span>varStruct<span class="op">$</span>B <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb15-6" title="6"><span class="st">  </span><span class="kw">coef</span>(<span class="dt">unconstrained=</span><span class="ot">FALSE</span>, <span class="dt">allCoef=</span><span class="ot">TRUE</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb15-7" title="7"><span class="st">  </span><span class="kw">enframe</span>(<span class="dt">name=</span><span class="st">&quot;grpB&quot;</span>, <span class="dt">value=</span><span class="st">&quot;varStructB&quot;</span>)</a>
-<a class="sourceLine" id="cb15-8" title="8"></a>
-<a class="sourceLine" id="cb15-9" title="9">mod4.nlme.VC &lt;-<span class="st"> </span><span class="kw">expand.grid</span>(mod4.nlme.varStruct.A<span class="op">$</span>grpA, </a>
-<a class="sourceLine" id="cb15-10" title="10">                            mod4.nlme.varStruct.B<span class="op">$</span>grpB,</a>
-<a class="sourceLine" id="cb15-11" title="11">                            <span class="dt">stringsAsFactors=</span><span class="ot">FALSE</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb15-12" title="12"><span class="st">  </span><span class="kw">rename</span>(<span class="dt">grpA=</span>Var1, <span class="dt">grpB=</span>Var2) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb15-13" title="13"><span class="st">  </span><span class="kw">left_join</span>(<span class="dt">x=</span>., <span class="dt">y=</span>mod4.nlme.varStruct.A, <span class="dt">by=</span><span class="st">&quot;grpA&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb15-14" title="14"><span class="st">  </span><span class="kw">left_join</span>(<span class="dt">x=</span>., <span class="dt">y=</span>mod4.nlme.varStruct.B, <span class="dt">by=</span><span class="st">&quot;grpB&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb15-15" title="15"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">sigma         =</span> mod4.nlme<span class="op">$</span>sigma) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb15-16" title="16"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">StandardError =</span> sigma<span class="op">*</span>varStructA<span class="op">*</span>varStructB) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb15-17" title="17"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">Variance      =</span> StandardError<span class="op">^</span><span class="dv">2</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb16-1" title="1">mod4.nlme.varStruct.A &lt;-<span class="st"> </span>mod4.nlme<span class="op">$</span>modelStruct<span class="op">$</span>varStruct<span class="op">$</span>A <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb16-2" title="2"><span class="st">  </span><span class="kw">coef</span>(<span class="dt">unconstrained=</span><span class="ot">FALSE</span>, <span class="dt">allCoef=</span><span class="ot">TRUE</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb16-3" title="3"><span class="st">  </span><span class="kw">enframe</span>(<span class="dt">name=</span><span class="st">&quot;grpA&quot;</span>, <span class="dt">value=</span><span class="st">&quot;varStructA&quot;</span>)</a>
+<a class="sourceLine" id="cb16-4" title="4"></a>
+<a class="sourceLine" id="cb16-5" title="5">mod4.nlme.varStruct.B &lt;-<span class="st"> </span>mod4.nlme<span class="op">$</span>modelStruct<span class="op">$</span>varStruct<span class="op">$</span>B <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb16-6" title="6"><span class="st">  </span><span class="kw">coef</span>(<span class="dt">unconstrained=</span><span class="ot">FALSE</span>, <span class="dt">allCoef=</span><span class="ot">TRUE</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb16-7" title="7"><span class="st">  </span><span class="kw">enframe</span>(<span class="dt">name=</span><span class="st">&quot;grpB&quot;</span>, <span class="dt">value=</span><span class="st">&quot;varStructB&quot;</span>)</a>
+<a class="sourceLine" id="cb16-8" title="8"></a>
+<a class="sourceLine" id="cb16-9" title="9">mod4.nlme.VC &lt;-<span class="st"> </span><span class="kw">expand.grid</span>(mod4.nlme.varStruct.A<span class="op">$</span>grpA, </a>
+<a class="sourceLine" id="cb16-10" title="10">                            mod4.nlme.varStruct.B<span class="op">$</span>grpB,</a>
+<a class="sourceLine" id="cb16-11" title="11">                            <span class="dt">stringsAsFactors=</span><span class="ot">FALSE</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb16-12" title="12"><span class="st">  </span><span class="kw">rename</span>(<span class="dt">grpA=</span>Var1, <span class="dt">grpB=</span>Var2) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb16-13" title="13"><span class="st">  </span><span class="kw">left_join</span>(<span class="dt">x=</span>., <span class="dt">y=</span>mod4.nlme.varStruct.A, <span class="dt">by=</span><span class="st">&quot;grpA&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb16-14" title="14"><span class="st">  </span><span class="kw">left_join</span>(<span class="dt">x=</span>., <span class="dt">y=</span>mod4.nlme.varStruct.B, <span class="dt">by=</span><span class="st">&quot;grpB&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb16-15" title="15"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">sigma         =</span> mod4.nlme<span class="op">$</span>sigma) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb16-16" title="16"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">StandardError =</span> sigma<span class="op">*</span>varStructA<span class="op">*</span>varStructB) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb16-17" title="17"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">Variance      =</span> StandardError<span class="op">^</span><span class="dv">2</span>)</a></code></pre></div>
 <table class="table table-bordered table-hover table-condensed table-responsive" style="width: auto !important; margin-left: auto; margin-right: auto;">
 <thead>
 <tr>
@@ -2550,13 +2556,13 @@ Variance
 </tbody>
 </table>
 <p><strong>mod5</strong></p>
-<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb16-1" title="1">mod5.nlme.VC &lt;-<span class="st"> </span>mod5.nlme<span class="op">$</span>modelStruct<span class="op">$</span>varStruct <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb16-2" title="2"><span class="st">  </span><span class="kw">coef</span>(<span class="dt">unconstrained=</span><span class="ot">FALSE</span>, <span class="dt">allCoef=</span><span class="ot">TRUE</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb16-3" title="3"><span class="st">  </span><span class="kw">enframe</span>(<span class="dt">name=</span><span class="st">&quot;grp&quot;</span>, <span class="dt">value=</span><span class="st">&quot;varStruct&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb16-4" title="4"><span class="st">  </span><span class="kw">separate</span>(grp, <span class="dt">sep=</span><span class="st">&quot;[.]&quot;</span>, <span class="dt">into=</span><span class="kw">c</span>(<span class="st">&quot;grpA&quot;</span>,<span class="st">&quot;grpB&quot;</span>)) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb16-5" title="5"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">sigma         =</span> mod5.nlme<span class="op">$</span>sigma) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb16-6" title="6"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">StandardError =</span> sigma<span class="op">*</span>varStruct) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb16-7" title="7"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">Variance      =</span> StandardError<span class="op">^</span><span class="dv">2</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb17-1" title="1">mod5.nlme.VC &lt;-<span class="st"> </span>mod5.nlme<span class="op">$</span>modelStruct<span class="op">$</span>varStruct <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb17-2" title="2"><span class="st">  </span><span class="kw">coef</span>(<span class="dt">unconstrained=</span><span class="ot">FALSE</span>, <span class="dt">allCoef=</span><span class="ot">TRUE</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb17-3" title="3"><span class="st">  </span><span class="kw">enframe</span>(<span class="dt">name=</span><span class="st">&quot;grp&quot;</span>, <span class="dt">value=</span><span class="st">&quot;varStruct&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb17-4" title="4"><span class="st">  </span><span class="kw">separate</span>(grp, <span class="dt">sep=</span><span class="st">&quot;[.]&quot;</span>, <span class="dt">into=</span><span class="kw">c</span>(<span class="st">&quot;grpA&quot;</span>,<span class="st">&quot;grpB&quot;</span>)) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb17-5" title="5"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">sigma         =</span> mod5.nlme<span class="op">$</span>sigma) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb17-6" title="6"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">StandardError =</span> sigma<span class="op">*</span>varStruct) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb17-7" title="7"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">Variance      =</span> StandardError<span class="op">^</span><span class="dv">2</span>)</a></code></pre></div>
 <table class="table table-bordered table-hover table-condensed table-responsive" style="width: auto !important; margin-left: auto; margin-right: auto;">
 <thead>
 <tr>
@@ -2744,21 +2750,65 @@ Variance
 </tbody>
 </table>
 <blockquote>
-<p>We want to point out that the <code>tidy(effects="ran_pars")</code> function of the <code>broom.mixed</code> package (which we used it in this example to obtain the variance component estimates from <code>glmmTMB()</code> models) <a href="https://cran.r-project.org/web/packages/broom.mixed/vignettes/broom_mixed_intro.html" target="_blank">actually works</a> on <code>lme()</code> objects as well (but it does not on <code>gls()</code> and <code>nlme()</code>). We did not use it here, however, since it only seems to provide the sigma estimate - even when .</p>
+<p>We want to point out that the <code>tidy(effects="ran_pars")</code> function of the <code>broom.mixed</code> package (which we used it in this example to obtain the variance component estimates from <code>glmmTMB()</code> models) <a href="https://cran.r-project.org/web/packages/broom.mixed/vignettes/broom_mixed_intro.html" target="_blank">actually works</a> on <code>lme()</code> objects as well (but it does not on <code>gls()</code> and <code>nlme()</code>). We did not use it here, however, since it only seems to provide the sigma estimate and not the varStruct estimates (see <a href="https://github.com/bbolker/broom.mixed/issues/96" target="_blank">github issue</a>).</p>
 </blockquote>
 </div>
 <div id="lme4-1" class="section level2">
 <h2>lme4</h2>
-<p><span style="color:orange">not possible - see above</span> <br/><br/><br/><br/></p>
+<p>In order to extract variance component estimates from <code>lme4</code> objects (in a table format we are used to), we here use the <a href="https://cran.r-project.org/web/packages/broom.mixed/broom.mixed.pdf#Rfn.glmmTMB.Rul.tidiers.1" target="_blank"><code>tidy()</code></a> function from the helper package <a href="https://CRAN.R-project.org/package=broom.mixed" target="_blank"><code>broom.mixed</code></a>:</p>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb18-1" title="1">mod1.lme4.VC &lt;-<span class="st"> </span>mod1.lme4 <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb18-2" title="2"><span class="st">  </span><span class="kw">tidy</span>(<span class="dt">effects=</span><span class="st">&quot;ran_pars&quot;</span>, <span class="dt">scales=</span><span class="st">&quot;vcov&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb18-3" title="3"><span class="st">  </span><span class="kw">separate</span>(term, <span class="dt">sep=</span><span class="st">&quot;__&quot;</span>, <span class="dt">into=</span><span class="kw">c</span>(<span class="st">&quot;term&quot;</span>,<span class="st">&quot;grp&quot;</span>)) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb18-4" title="4"><span class="st">  </span><span class="kw">filter</span>(group<span class="op">==</span><span class="st">&quot;Residual&quot;</span>)</a></code></pre></div>
+<table class="table table-bordered table-hover table-condensed table-responsive" style="width: auto !important; margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+effect
+</th>
+<th style="text-align:left;">
+group
+</th>
+<th style="text-align:left;">
+term
+</th>
+<th style="text-align:left;">
+grp
+</th>
+<th style="text-align:right;">
+estimate
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+ran_pars
+</td>
+<td style="text-align:left;">
+Residual
+</td>
+<td style="text-align:left;">
+var
+</td>
+<td style="text-align:left;">
+Observation
+</td>
+<td style="text-align:right;">
+9.591
+</td>
+</tr>
+</tbody>
+</table>
 </div>
 <div id="glmmtmb-1" class="section level2">
 <h2>glmmTMB</h2>
 <p>In order to extract variance component estimates from <code>glmmTMB</code> objects (in a table format we are used to), we here use the <a href="https://cran.r-project.org/web/packages/broom.mixed/broom.mixed.pdf#Rfn.glmmTMB.Rul.tidiers.1" target="_blank"><code>tidy()</code></a> function from the helper package <a href="https://CRAN.R-project.org/package=broom.mixed" target="_blank"><code>broom.mixed</code></a>:</p>
 <p><strong>mod1</strong></p>
-<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb17-1" title="1">mod1.glmm.VC &lt;-<span class="st"> </span>mod1.glmm <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb17-2" title="2"><span class="st">  </span><span class="kw">tidy</span>(<span class="dt">effects=</span><span class="st">&quot;ran_pars&quot;</span>, <span class="dt">scales=</span><span class="st">&quot;vcov&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb17-3" title="3"><span class="st">  </span><span class="kw">separate</span>(term, <span class="dt">sep=</span><span class="st">&quot;__&quot;</span>, <span class="dt">into=</span><span class="kw">c</span>(<span class="st">&quot;term&quot;</span>,<span class="st">&quot;grp&quot;</span>)) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb17-4" title="4"><span class="st">  </span><span class="kw">filter</span>(group<span class="op">==</span><span class="st">&quot;Residual&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb19-1" title="1">mod1.glmm.VC &lt;-<span class="st"> </span>mod1.glmm <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb19-2" title="2"><span class="st">  </span><span class="kw">tidy</span>(<span class="dt">effects=</span><span class="st">&quot;ran_pars&quot;</span>, <span class="dt">scales=</span><span class="st">&quot;vcov&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb19-3" title="3"><span class="st">  </span><span class="kw">separate</span>(term, <span class="dt">sep=</span><span class="st">&quot;__&quot;</span>, <span class="dt">into=</span><span class="kw">c</span>(<span class="st">&quot;term&quot;</span>,<span class="st">&quot;grp&quot;</span>)) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb19-4" title="4"><span class="st">  </span><span class="kw">filter</span>(group<span class="op">==</span><span class="st">&quot;Residual&quot;</span>)</a></code></pre></div>
 <table class="table table-bordered table-hover table-condensed table-responsive" style="width: auto !important; margin-left: auto; margin-right: auto;">
 <thead>
 <tr>
@@ -2806,10 +2856,10 @@ Observation
 </tbody>
 </table>
 <p><strong>mod2</strong></p>
-<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb18-1" title="1">mod2.glmm.VC &lt;-<span class="st"> </span>mod2.glmm <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb18-2" title="2"><span class="st">  </span><span class="kw">tidy</span>(<span class="dt">effects=</span><span class="st">&quot;ran_pars&quot;</span>, <span class="dt">scales=</span><span class="st">&quot;vcov&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb18-3" title="3"><span class="st">  </span><span class="kw">separate</span>(term, <span class="dt">sep=</span><span class="st">&quot;__&quot;</span>, <span class="dt">into=</span><span class="kw">c</span>(<span class="st">&quot;term&quot;</span>,<span class="st">&quot;grp&quot;</span>)) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb18-4" title="4"><span class="st">  </span><span class="kw">filter</span>(group<span class="op">==</span><span class="st">&quot;unit&quot;</span>, term<span class="op">==</span><span class="st">&quot;var&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb20-1" title="1">mod2.glmm.VC &lt;-<span class="st"> </span>mod2.glmm <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb20-2" title="2"><span class="st">  </span><span class="kw">tidy</span>(<span class="dt">effects=</span><span class="st">&quot;ran_pars&quot;</span>, <span class="dt">scales=</span><span class="st">&quot;vcov&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb20-3" title="3"><span class="st">  </span><span class="kw">separate</span>(term, <span class="dt">sep=</span><span class="st">&quot;__&quot;</span>, <span class="dt">into=</span><span class="kw">c</span>(<span class="st">&quot;term&quot;</span>,<span class="st">&quot;grp&quot;</span>)) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb20-4" title="4"><span class="st">  </span><span class="kw">filter</span>(group<span class="op">==</span><span class="st">&quot;unit&quot;</span>, term<span class="op">==</span><span class="st">&quot;var&quot;</span>)</a></code></pre></div>
 <table class="table table-bordered table-hover table-condensed table-responsive" style="width: auto !important; margin-left: auto; margin-right: auto;">
 <thead>
 <tr>
@@ -2877,10 +2927,10 @@ date28Aug1990
 </tbody>
 </table>
 <p><strong>mod3</strong></p>
-<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb19-1" title="1">mod3.glmm.VC &lt;-<span class="st"> </span>mod3.glmm <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb19-2" title="2"><span class="st">  </span><span class="kw">tidy</span>(<span class="dt">effects=</span><span class="st">&quot;ran_pars&quot;</span>, <span class="dt">scales=</span><span class="st">&quot;vcov&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb19-3" title="3"><span class="st">  </span><span class="kw">separate</span>(term, <span class="dt">sep=</span><span class="st">&quot;__&quot;</span>, <span class="dt">into=</span><span class="kw">c</span>(<span class="st">&quot;term&quot;</span>,<span class="st">&quot;grp&quot;</span>)) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb19-4" title="4"><span class="st">  </span><span class="kw">filter</span>(group<span class="op">==</span><span class="st">&quot;unit&quot;</span>, term<span class="op">==</span><span class="st">&quot;var&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb21-1" title="1">mod3.glmm.VC &lt;-<span class="st"> </span>mod3.glmm <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb21-2" title="2"><span class="st">  </span><span class="kw">tidy</span>(<span class="dt">effects=</span><span class="st">&quot;ran_pars&quot;</span>, <span class="dt">scales=</span><span class="st">&quot;vcov&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb21-3" title="3"><span class="st">  </span><span class="kw">separate</span>(term, <span class="dt">sep=</span><span class="st">&quot;__&quot;</span>, <span class="dt">into=</span><span class="kw">c</span>(<span class="st">&quot;term&quot;</span>,<span class="st">&quot;grp&quot;</span>)) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb21-4" title="4"><span class="st">  </span><span class="kw">filter</span>(group<span class="op">==</span><span class="st">&quot;unit&quot;</span>, term<span class="op">==</span><span class="st">&quot;var&quot;</span>)</a></code></pre></div>
 <table class="table table-bordered table-hover table-condensed table-responsive" style="width: auto !important; margin-left: auto; margin-right: auto;">
 <thead>
 <tr>
@@ -2990,11 +3040,11 @@ densf8
 <p><strong>mod4</strong></p>
 <p>?not possible - see above?</p>
 <p><strong>mod5</strong></p>
-<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb20-1" title="1">mod5.glmm.VC &lt;-<span class="st"> </span>mod5.glmm <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb20-2" title="2"><span class="st">  </span><span class="kw">tidy</span>(<span class="dt">effects=</span><span class="st">&quot;ran_pars&quot;</span>, <span class="dt">scales=</span><span class="st">&quot;vcov&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb20-3" title="3"><span class="st">  </span><span class="kw">separate</span>(term, <span class="dt">sep=</span><span class="st">&quot;__&quot;</span>, <span class="dt">into=</span><span class="kw">c</span>(<span class="st">&quot;term&quot;</span>,<span class="st">&quot;grp&quot;</span>)) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb20-4" title="4"><span class="st">  </span><span class="kw">filter</span>(group<span class="op">==</span><span class="st">&quot;unit&quot;</span>, term<span class="op">==</span><span class="st">&quot;var&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb20-5" title="5"><span class="st">  </span><span class="kw">separate</span>(grp, <span class="dt">sep=</span><span class="st">&quot;:&quot;</span>, <span class="dt">into=</span><span class="kw">c</span>(<span class="st">&quot;grpA&quot;</span>,<span class="st">&quot;grpB&quot;</span>))</a></code></pre></div>
+<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb22-1" title="1">mod5.glmm.VC &lt;-<span class="st"> </span>mod5.glmm <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb22-2" title="2"><span class="st">  </span><span class="kw">tidy</span>(<span class="dt">effects=</span><span class="st">&quot;ran_pars&quot;</span>, <span class="dt">scales=</span><span class="st">&quot;vcov&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb22-3" title="3"><span class="st">  </span><span class="kw">separate</span>(term, <span class="dt">sep=</span><span class="st">&quot;__&quot;</span>, <span class="dt">into=</span><span class="kw">c</span>(<span class="st">&quot;term&quot;</span>,<span class="st">&quot;grp&quot;</span>)) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb22-4" title="4"><span class="st">  </span><span class="kw">filter</span>(group<span class="op">==</span><span class="st">&quot;unit&quot;</span>, term<span class="op">==</span><span class="st">&quot;var&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb22-5" title="5"><span class="st">  </span><span class="kw">separate</span>(grp, <span class="dt">sep=</span><span class="st">&quot;:&quot;</span>, <span class="dt">into=</span><span class="kw">c</span>(<span class="st">&quot;grpA&quot;</span>,<span class="st">&quot;grpB&quot;</span>))</a></code></pre></div>
 <table class="table table-bordered table-hover table-condensed table-responsive" style="width: auto !important; margin-left: auto; margin-right: auto;">
 <thead>
 <tr>
@@ -3211,7 +3261,7 @@ densf8
 </div>
 <div id="sommer-1" class="section level2">
 <h2>sommer</h2>
-<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb21-1" title="1">mod1.somm.VC &lt;-<span class="st"> </span><span class="kw">summary</span>(mod1.somm)<span class="op">$</span>varcomp </a></code></pre></div>
+<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb23-1" title="1">mod1.somm.VC &lt;-<span class="st"> </span><span class="kw">summary</span>(mod1.somm)<span class="op">$</span>varcomp </a></code></pre></div>
 <table class="table table-bordered table-hover table-condensed table-responsive" style="width: auto !important; margin-left: auto; margin-right: auto;">
 <thead>
 <tr>
@@ -3252,7 +3302,7 @@ Positive
 </tr>
 </tbody>
 </table>
-<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb22-1" title="1">mod2.somm.VC &lt;-<span class="st"> </span><span class="kw">summary</span>(mod2.somm)<span class="op">$</span>varcomp</a></code></pre></div>
+<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb24-1" title="1">mod2.somm.VC &lt;-<span class="st"> </span><span class="kw">summary</span>(mod2.somm)<span class="op">$</span>varcomp</a></code></pre></div>
 <table class="table table-bordered table-hover table-condensed table-responsive" style="width: auto !important; margin-left: auto; margin-right: auto;">
 <thead>
 <tr>
@@ -3310,7 +3360,7 @@ Positive
 </tr>
 </tbody>
 </table>
-<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb23-1" title="1">mod3.somm.VC &lt;-<span class="st"> </span><span class="kw">summary</span>(mod3.somm)<span class="op">$</span>varcomp</a></code></pre></div>
+<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb25-1" title="1">mod3.somm.VC &lt;-<span class="st"> </span><span class="kw">summary</span>(mod3.somm)<span class="op">$</span>varcomp</a></code></pre></div>
 <table class="table table-bordered table-hover table-condensed table-responsive" style="width: auto !important; margin-left: auto; margin-right: auto;">
 <thead>
 <tr>
@@ -3402,167 +3452,8 @@ Positive
 </tr>
 </tbody>
 </table>
-<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb24-1" title="1">mod4.somm.VC &lt;-<span class="st"> </span><span class="kw">summary</span>(mod4.somm)<span class="op">$</span>varcomp</a></code></pre></div>
-<table class="table table-bordered table-hover table-condensed table-responsive" style="width: auto !important; margin-left: auto; margin-right: auto;">
-<thead>
-<tr>
-<th style="text-align:left;">
-grp
-</th>
-<th style="text-align:right;">
-VarComp
-</th>
-<th style="text-align:right;">
-VarCompSE
-</th>
-<th style="text-align:right;">
-Zratio
-</th>
-<th style="text-align:left;">
-Constraint
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left;">
-21Aug1990:1:units
-</td>
-<td style="text-align:right;">
-1.016
-</td>
-<td style="text-align:right;">
-0.665
-</td>
-<td style="text-align:right;">
-1.528
-</td>
-<td style="text-align:left;">
-Positive
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-21Aug1990:2:units
-</td>
-<td style="text-align:right;">
-2.941
-</td>
-<td style="text-align:right;">
-1.749
-</td>
-<td style="text-align:right;">
-1.681
-</td>
-<td style="text-align:left;">
-Positive
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-21Aug1990:4:units
-</td>
-<td style="text-align:right;">
-5.985
-</td>
-<td style="text-align:right;">
-3.496
-</td>
-<td style="text-align:right;">
-1.712
-</td>
-<td style="text-align:left;">
-Positive
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-21Aug1990:8:units
-</td>
-<td style="text-align:right;">
-9.384
-</td>
-<td style="text-align:right;">
-5.453
-</td>
-<td style="text-align:right;">
-1.721
-</td>
-<td style="text-align:left;">
-Positive
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-28Aug1990:1:units
-</td>
-<td style="text-align:right;">
-3.298
-</td>
-<td style="text-align:right;">
-1.955
-</td>
-<td style="text-align:right;">
-1.687
-</td>
-<td style="text-align:left;">
-Positive
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-28Aug1990:2:units
-</td>
-<td style="text-align:right;">
-4.874
-</td>
-<td style="text-align:right;">
-2.864
-</td>
-<td style="text-align:right;">
-1.702
-</td>
-<td style="text-align:left;">
-Positive
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-28Aug1990:4:units
-</td>
-<td style="text-align:right;">
-47.166
-</td>
-<td style="text-align:right;">
-27.233
-</td>
-<td style="text-align:right;">
-1.732
-</td>
-<td style="text-align:left;">
-Positive
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-28Aug1990:8:units
-</td>
-<td style="text-align:right;">
-19.466
-</td>
-<td style="text-align:right;">
-11.265
-</td>
-<td style="text-align:right;">
-1.728
-</td>
-<td style="text-align:left;">
-Positive
-</td>
-</tr>
-</tbody>
-</table>
-<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb25-1" title="1">mod5.somm.VC &lt;-<span class="st"> </span><span class="kw">summary</span>(mod5.somm)<span class="op">$</span>varcomp</a></code></pre></div>
+<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb26-1" title="1"><span class="co"># mod4.somm ?</span></a></code></pre></div>
+<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb27-1" title="1">mod5.somm.VC &lt;-<span class="st"> </span><span class="kw">summary</span>(mod5.somm)<span class="op">$</span>varcomp</a></code></pre></div>
 <table class="table table-bordered table-hover table-condensed table-responsive" style="width: auto !important; margin-left: auto; margin-right: auto;">
 <thead>
 <tr>
@@ -3722,7 +3613,6 @@ Positive
 </tr>
 </tbody>
 </table>
-<p><span style="color:red">mod4 and mod5 give the same VC?</span></p>
 </div>
 <div id="sas-1" class="section level2">
 <h2>SAS</h2>
@@ -3731,11 +3621,10 @@ Positive
 </div>
 <div id="model-fit" class="section level1 tabset tabset-fade tabset-pills">
 <h1>Model Fit</h1>
-<p>As is standard procedure, we can do a model selection based on goodness-of-fit statistics such as the AIC. In order to have a direct comparison to Table 1 in <a href="https://acsess.onlinelibrary.wiley.com/doi/abs/10.2134/agronj2008.0226x" target="_blank">(Piepho, 2009)</a>, we also calculated the deviance (<em>i.e.</em> -2*loglikelihood) for each model. The code is shown for mod1:</p>
-<div id="nlme-2" class="section level2">
-<h2>nlme</h2>
-<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb26-1" title="1">AIC.nlme &lt;-<span class="st"> </span><span class="kw">aictab</span>(<span class="kw">list</span>(mod1.nlme, mod2.nlme, mod3.nlme, mod4.nlme, mod5.nlme)) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb26-2" title="2"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">Deviance =</span> <span class="dv">-2</span><span class="op">*</span>Res.LL) <span class="co"># compute deviance</span></a></code></pre></div>
+<p>As is standard procedure, we can do a model selection based on goodness-of-fit statistics such as the AIC. In order to have a direct comparison to Table 1 in <a href="https://acsess.onlinelibrary.wiley.com/doi/abs/10.2134/agronj2008.0226x" target="_blank">(Piepho, 2009)</a>, we also calculated the deviance (<em>i.e.</em> -2*loglikelihood) for each model.</p>
+<p>For <code>nlme</code>, <code>lme4</code> and <code>glmmTMB</code>, we make use of the <a href="https://cran.r-project.org/web/packages/AICcmodavg/AICcmodavg.pdf#Rfn.aictab.1" target="_blank"><code>aictab()</code> function</a> from the helper package <a href="https://CRAN.R-project.org/package=AICcmodavg" target="_blank">AICcmodavg</a>. ## nlme</p>
+<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb28-1" title="1">AIC.nlme &lt;-<span class="st"> </span><span class="kw">aictab</span>(<span class="kw">list</span>(mod1.nlme, mod2.nlme, mod3.nlme, mod4.nlme, mod5.nlme)) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb28-2" title="2"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">Deviance =</span> <span class="dv">-2</span><span class="op">*</span>Res.LL) <span class="co"># compute deviance</span></a></code></pre></div>
 <table class="table table-bordered table-hover table-condensed table-responsive" style="width: auto !important; margin-left: auto; margin-right: auto;">
 <thead>
 <tr>
@@ -3862,16 +3751,16 @@ Mod5
 </tr>
 </tbody>
 </table>
-</div>
 <div id="lme4-2" class="section level2">
 <h2>lme4</h2>
-<p><span style="color:orange">not possible - see above</span> <br/><br/><br/><br/></p>
+<div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb29-1" title="1">AIC.lme4 &lt;-<span class="st"> </span><span class="kw">aictab</span>(<span class="kw">list</span>(mod1.lme4)) <span class="op">%&gt;%</span><span class="st"> </span><span class="co"># Mods 2-5 are missing</span></a>
+<a class="sourceLine" id="cb29-2" title="2"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">Deviance =</span> <span class="dv">-2</span><span class="op">*</span>Res.LL) <span class="co"># compute deviance</span></a></code></pre></div>
 </div>
 <div id="glmmtmb-2" class="section level2">
 <h2>glmmTMB</h2>
-<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb27-1" title="1">AIC.glmm &lt;-<span class="st"> </span><span class="kw">aictab</span>(<span class="kw">list</span>(mod1.glmm, mod2.glmm, mod3.glmm, mod5.glmm), </a>
-<a class="sourceLine" id="cb27-2" title="2">                   <span class="dt">modnames=</span><span class="kw">c</span>(<span class="st">&quot;Mod1&quot;</span>,<span class="st">&quot;Mod2&quot;</span>,<span class="st">&quot;Mod3&quot;</span>,<span class="st">&quot;Mod5&quot;</span>)) <span class="op">%&gt;%</span><span class="st"> </span><span class="co"># Mod4 is missing</span></a>
-<a class="sourceLine" id="cb27-3" title="3"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">Deviance =</span> <span class="dv">-2</span><span class="op">*</span>LL) <span class="co"># compute deviance</span></a></code></pre></div>
+<div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb30-1" title="1">AIC.glmm &lt;-<span class="st"> </span><span class="kw">aictab</span>(<span class="kw">list</span>(mod1.glmm, mod2.glmm, mod3.glmm, mod5.glmm), </a>
+<a class="sourceLine" id="cb30-2" title="2">                   <span class="dt">modnames=</span><span class="kw">c</span>(<span class="st">&quot;Mod1&quot;</span>,<span class="st">&quot;Mod2&quot;</span>,<span class="st">&quot;Mod3&quot;</span>,<span class="st">&quot;Mod5&quot;</span>)) <span class="op">%&gt;%</span><span class="st"> </span><span class="co"># Mod4 is missing</span></a>
+<a class="sourceLine" id="cb30-3" title="3"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">Deviance =</span> <span class="dv">-2</span><span class="op">*</span>LL) <span class="co"># compute deviance</span></a></code></pre></div>
 <table class="table table-bordered table-hover table-condensed table-responsive" style="width: auto !important; margin-left: auto; margin-right: auto;">
 <thead>
 <tr>
@@ -4006,7 +3895,7 @@ Mod5
 </tr>
 <tr class="even">
 <td><code>lme4</code></td>
-<td><span style="color:orange">not possible</span></td>
+<td><span style="color:red">not possible</span></td>
 </tr>
 <tr class="odd">
 <td><code>glmmTMB</code></td>
@@ -4035,14 +3924,17 @@ grp
 <th style="text-align:right;">
 nlme
 </th>
-<th style="text-align:left;">
+<th style="text-align:right;">
 lme4
 </th>
 <th style="text-align:right;">
 glmmTMB
 </th>
-<th style="text-align:left;">
+<th style="text-align:right;">
 sommer
+</th>
+<th style="text-align:left;">
+SAS
 </th>
 </tr>
 </thead>
@@ -4054,11 +3946,14 @@ homoscedastic
 <td style="text-align:right;">
 9.591351
 </td>
-<td style="text-align:left;">
-NA
+<td style="text-align:right;">
+9.591351
 </td>
 <td style="text-align:right;">
 9.591351
+</td>
+<td style="text-align:right;">
+9.591375
 </td>
 <td style="text-align:left;">
 in progress
@@ -4082,8 +3977,11 @@ lme4
 <th style="text-align:right;">
 glmmTMB
 </th>
-<th style="text-align:left;">
+<th style="text-align:right;">
 sommer
+</th>
+<th style="text-align:left;">
+SAS
 </th>
 </tr>
 </thead>
@@ -4096,10 +3994,12 @@ sommer
 4.306075
 </td>
 <td style="text-align:left;">
-NA
 </td>
 <td style="text-align:right;">
 4.306029
+</td>
+<td style="text-align:right;">
+4.307184
 </td>
 <td style="text-align:left;">
 in progress
@@ -4113,10 +4013,12 @@ in progress
 15.505124
 </td>
 <td style="text-align:left;">
-NA
 </td>
 <td style="text-align:right;">
 15.505141
+</td>
+<td style="text-align:right;">
+15.498730
 </td>
 <td style="text-align:left;">
 in progress
@@ -4140,8 +4042,11 @@ lme4
 <th style="text-align:right;">
 glmmTMB
 </th>
-<th style="text-align:left;">
+<th style="text-align:right;">
 sommer
+</th>
+<th style="text-align:left;">
+SAS
 </th>
 </tr>
 </thead>
@@ -4154,10 +4059,12 @@ sommer
 2.252252
 </td>
 <td style="text-align:left;">
-NA
 </td>
 <td style="text-align:right;">
 2.252263
+</td>
+<td style="text-align:right;">
+2.256108
 </td>
 <td style="text-align:left;">
 in progress
@@ -4171,10 +4078,12 @@ in progress
 3.669510
 </td>
 <td style="text-align:left;">
-NA
 </td>
 <td style="text-align:right;">
 3.669499
+</td>
+<td style="text-align:right;">
+3.667748
 </td>
 <td style="text-align:left;">
 in progress
@@ -4188,10 +4097,12 @@ in progress
 25.037273
 </td>
 <td style="text-align:left;">
-NA
 </td>
 <td style="text-align:right;">
 25.037252
+</td>
+<td style="text-align:right;">
+25.012800
 </td>
 <td style="text-align:left;">
 in progress
@@ -4205,10 +4116,12 @@ in progress
 13.338500
 </td>
 <td style="text-align:left;">
-NA
 </td>
 <td style="text-align:right;">
 13.338463
+</td>
+<td style="text-align:right;">
+13.323418
 </td>
 <td style="text-align:left;">
 in progress
@@ -4238,6 +4151,9 @@ glmmTMB
 <th style="text-align:left;">
 sommer
 </th>
+<th style="text-align:left;">
+SAS
+</th>
 </tr>
 </thead>
 <tbody>
@@ -4252,10 +4168,11 @@ sommer
 1.029508
 </td>
 <td style="text-align:left;">
-NA
 </td>
 <td style="text-align:left;">
-NA
+</td>
+<td style="text-align:left;">
+in progress
 </td>
 <td style="text-align:left;">
 in progress
@@ -4272,10 +4189,11 @@ in progress
 3.143271
 </td>
 <td style="text-align:left;">
-NA
 </td>
 <td style="text-align:left;">
-NA
+</td>
+<td style="text-align:left;">
+in progress
 </td>
 <td style="text-align:left;">
 in progress
@@ -4292,10 +4210,11 @@ in progress
 2.259778
 </td>
 <td style="text-align:left;">
-NA
 </td>
 <td style="text-align:left;">
-NA
+</td>
+<td style="text-align:left;">
+in progress
 </td>
 <td style="text-align:left;">
 in progress
@@ -4312,10 +4231,11 @@ in progress
 6.899508
 </td>
 <td style="text-align:left;">
-NA
 </td>
 <td style="text-align:left;">
-NA
+</td>
+<td style="text-align:left;">
+in progress
 </td>
 <td style="text-align:left;">
 in progress
@@ -4332,10 +4252,11 @@ in progress
 10.790254
 </td>
 <td style="text-align:left;">
-NA
 </td>
 <td style="text-align:left;">
-NA
+</td>
+<td style="text-align:left;">
+in progress
 </td>
 <td style="text-align:left;">
 in progress
@@ -4352,10 +4273,11 @@ in progress
 32.944579
 </td>
 <td style="text-align:left;">
-NA
 </td>
 <td style="text-align:left;">
-NA
+</td>
+<td style="text-align:left;">
+in progress
 </td>
 <td style="text-align:left;">
 in progress
@@ -4372,10 +4294,11 @@ in progress
 7.910217
 </td>
 <td style="text-align:left;">
-NA
 </td>
 <td style="text-align:left;">
-NA
+</td>
+<td style="text-align:left;">
+in progress
 </td>
 <td style="text-align:left;">
 in progress
@@ -4392,10 +4315,11 @@ in progress
 24.151309
 </td>
 <td style="text-align:left;">
-NA
 </td>
 <td style="text-align:left;">
-NA
+</td>
+<td style="text-align:left;">
+in progress
 </td>
 <td style="text-align:left;">
 in progress
@@ -4422,8 +4346,11 @@ lme4
 <th style="text-align:right;">
 glmm
 </th>
-<th style="text-align:left;">
+<th style="text-align:right;">
 sommer
+</th>
+<th style="text-align:left;">
+SAS
 </th>
 </tr>
 </thead>
@@ -4439,10 +4366,12 @@ sommer
 0.8796641
 </td>
 <td style="text-align:left;">
-NA
 </td>
 <td style="text-align:right;">
 0.8797279
+</td>
+<td style="text-align:right;">
+1.015902
 </td>
 <td style="text-align:left;">
 in progress
@@ -4459,10 +4388,12 @@ in progress
 3.0811337
 </td>
 <td style="text-align:left;">
-NA
 </td>
 <td style="text-align:right;">
 3.0810363
+</td>
+<td style="text-align:right;">
+2.940510
 </td>
 <td style="text-align:left;">
 in progress
@@ -4479,10 +4410,12 @@ in progress
 6.2624409
 </td>
 <td style="text-align:left;">
-NA
 </td>
 <td style="text-align:right;">
 6.2623554
+</td>
+<td style="text-align:right;">
+5.985088
 </td>
 <td style="text-align:left;">
 in progress
@@ -4499,10 +4432,12 @@ in progress
 9.7595464
 </td>
 <td style="text-align:left;">
-NA
 </td>
 <td style="text-align:right;">
 9.7593959
+</td>
+<td style="text-align:right;">
+9.384459
 </td>
 <td style="text-align:left;">
 in progress
@@ -4519,10 +4454,12 @@ in progress
 3.4464896
 </td>
 <td style="text-align:left;">
-NA
 </td>
 <td style="text-align:right;">
 3.4463471
+</td>
+<td style="text-align:right;">
+3.298242
 </td>
 <td style="text-align:left;">
 in progress
@@ -4539,10 +4476,12 @@ in progress
 4.9971446
 </td>
 <td style="text-align:left;">
-NA
 </td>
 <td style="text-align:right;">
 4.9970592
+</td>
+<td style="text-align:right;">
+4.874422
 </td>
 <td style="text-align:left;">
 in progress
@@ -4559,10 +4498,12 @@ in progress
 48.0948088
 </td>
 <td style="text-align:left;">
-NA
 </td>
 <td style="text-align:right;">
 48.0935931
+</td>
+<td style="text-align:right;">
+47.166373
 </td>
 <td style="text-align:left;">
 in progress
@@ -4579,10 +4520,12 @@ in progress
 19.9375822
 </td>
 <td style="text-align:left;">
-NA
 </td>
 <td style="text-align:right;">
 19.9373384
+</td>
+<td style="text-align:right;">
+19.465822
 </td>
 <td style="text-align:left;">
 in progress
@@ -4602,7 +4545,7 @@ Modnames
 <th style="text-align:right;">
 nlme
 </th>
-<th style="text-align:left;">
+<th style="text-align:right;">
 lme4
 </th>
 <th style="text-align:right;">
@@ -4610,6 +4553,9 @@ glmm
 </th>
 <th style="text-align:left;">
 sommer
+</th>
+<th style="text-align:left;">
+SAS
 </th>
 </tr>
 </thead>
@@ -4621,11 +4567,12 @@ Mod4
 <td style="text-align:right;">
 318.9472
 </td>
-<td style="text-align:left;">
-NA
+<td style="text-align:right;">
 </td>
 <td style="text-align:right;">
-NA
+</td>
+<td style="text-align:left;">
+in progress
 </td>
 <td style="text-align:left;">
 in progress
@@ -4638,11 +4585,13 @@ Mod2
 <td style="text-align:right;">
 319.1999
 </td>
-<td style="text-align:left;">
-NA
+<td style="text-align:right;">
 </td>
 <td style="text-align:right;">
 319.1999
+</td>
+<td style="text-align:left;">
+in progress
 </td>
 <td style="text-align:left;">
 in progress
@@ -4655,11 +4604,13 @@ Mod3
 <td style="text-align:right;">
 320.3167
 </td>
-<td style="text-align:left;">
-NA
+<td style="text-align:right;">
 </td>
 <td style="text-align:right;">
 320.3167
+</td>
+<td style="text-align:left;">
+in progress
 </td>
 <td style="text-align:left;">
 in progress
@@ -4672,11 +4623,14 @@ Mod1
 <td style="text-align:right;">
 323.3365
 </td>
-<td style="text-align:left;">
-NA
+<td style="text-align:right;">
+323.3365
 </td>
 <td style="text-align:right;">
 323.3365
+</td>
+<td style="text-align:left;">
+in progress
 </td>
 <td style="text-align:left;">
 in progress
@@ -4689,11 +4643,13 @@ Mod5
 <td style="text-align:right;">
 332.4141
 </td>
-<td style="text-align:left;">
-NA
+<td style="text-align:right;">
 </td>
 <td style="text-align:right;">
 332.4141
+</td>
+<td style="text-align:left;">
+in progress
 </td>
 <td style="text-align:left;">
 in progress
@@ -4718,11 +4674,13 @@ in progress
 
 <!-- Add font awesome icons -->
 <p style="text-align: center;">
+    <a href="https://www.researchgate.net/project/MMFAIR-Mixed-Models-for-Agriculture-in-R" class="fa fa-pencil"></a>
     <a href="https://www.linkedin.com/in/schmidtpaul1989/" class="fa fa-linkedin"></a>
     <a href="https://www.xing.com/profile/Paul_Schmidt203/cv/" class="fa fa-xing"></a>
-    <a href="https://www.researchgate.net/profile/Paul_Schmidt17/research/" class="fa fa-pencil"></a>
     <a href="https://github.com/SchmidtPaul/" class="fa fa-github"></a>
 </p>
+
+<img src="https://hitcounter.pythonanywhere.com/count/tag.svg?url=https%3A%2F%2Fschmidtpaul.github.io%2FMMFAIR%2Findex.html" alt="Hits" class="center">
 
 &nbsp;
 
