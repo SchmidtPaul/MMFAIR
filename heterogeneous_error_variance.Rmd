@@ -49,26 +49,34 @@ boxplot(yield ~ density, data=dat)
 </div> </div>
 
 # 5 Models {.tabset .tabset-fade .tabset-pills}
-We therefore set up 5 models, which only differ in the variance structure in the error term. More specifically, we allow for different heterogeneous error variances / heteroscedascity per group for the effect levels of Date and Density. This type of variance structure is sometimes also referred to as *diagonal*. 
+We therefore set up 5 models, which only differ in the variance structure in the error term. More specifically, we allow for different heterogeneous error variances / heteroscedascity per group for the effect levels of Date and Density. This type of variance structure is sometimes also referred to as [*diagonal*](variance_structures.html){target="_blank"}. 
 
 Regarding the effects in the model, we take the same approach as [Piepho (2009)](https://acsess.onlinelibrary.wiley.com/doi/abs/10.2134/agronj2008.0226x){target="_blank"}, which calls for fixed main effects for `gen`, `date` and `densf` as well as all their interaction effects, plus random `block` effects.
 
-The different variance structures in the error term of the 5 models are summarised in the table below (only mods 1-4 can be found in [Piepho (2009)](https://acsess.onlinelibrary.wiley.com/doi/abs/10.2134/agronj2008.0226x){target="_blank"}). Notice that in the table, the single variance parameter for the random block effect is excluded for simplicity. Further notice the difference between *mod4* and *mod5*: *mod4* includes the direct product (*a.k.a.* Kronecker product) structure of the two diag-structures of *Date* and *Density*. *mod5* simply includes a diag-structure for the *Date*-*Density*-combinations (see our [summary on variance structures](variance_structures.html){target="_blank"} for more info).
+The different variance structures in the error term of the 5 models are summarised in the table below (only mods 1-4 can be found in [Piepho (2009)](https://acsess.onlinelibrary.wiley.com/doi/abs/10.2134/agronj2008.0226x){target="_blank"}). Further notice the difference between *mod4* and *mod5*: *mod4* includes the direct product (*a.k.a.* Kronecker product) structure of the two diag-structures of *Date* and *Density*. *mod5* simply includes a diag-structure for the *Date*-*Density*-combinations (see our [summary on variance structures](variance_structures.html){target="_blank"} for more info).
 
 ```{r, echo=FALSE}
-tibble(Model = paste0("mod", 1:5) %>% cell_spec(bold=T),
+MODTAB <- tibble(Model = paste0("mod", 1:5) %>% cell_spec(bold=T),
        Block    = "Identity",
        Genotype = "Identity",
        Date     = c("Identity", "Identity", "Diagonal", "Diagonal", "Diag-"),
        Density  = c("Identity", "Diagonal", "Identity", "Diagonal", "onal"),
-       `variance parameters` = c(1,2,4,5,8),
-       `variance estimates`  = c(1,2,4,8,8)) %>% 
+       parameters = c(1,2,4,5,8),
+       estimates  = c(1,2,4,8,8)) %>% 
   mutate(Date    = ifelse(Date    %in% c("Diagonal", "Diag-"), cell_spec(Date,    bold=T), Date),
-         Density = ifelse(Density %in% c("Diagonal", "onal"),  cell_spec(Density, bold=T), Density)) %>%
+         Density = ifelse(Density %in% c("Diagonal", "onal"),  cell_spec(Density, bold=T), Density))
+
+names(MODTAB)[6] <- paste0(names(MODTAB)[6], footnote_marker_alphabet(1))
+names(MODTAB)[7] <- paste0(names(MODTAB)[7], footnote_marker_alphabet(1))
+
+MODTAB %>% 
   kable(escape = FALSE) %>% 
-  kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"), 
-                full_width = FALSE) %>% 
-  add_header_above(c(" ", "Term in multiplicative variance structure"=4, "Number of error"=2))
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"), full_width = FALSE) %>% 
+  add_header_above(c(" ", 
+                     "Term in multiplicative variance structure"=4, 
+                     "Number of variance"=2)) %>% 
+  footnote(alphabet = "ignoring the random block effects",
+           footnote_as_chunk = T)
 ```
 
 ## nlme
@@ -110,7 +118,7 @@ mod1.lme4 <- lmer(formula = yield ~ gen * date * densf + (1|block),
 # mod5.lme4 - not possible
 ```
 
-More specifically, we can read in an [`lmer4` vigniette](https://cran.r-project.org/web/packages/lme4/vignettes/lmer.pdf){target="_blank"}: 
+More specifically, we can read in an [`lme4` vigniette](https://cran.r-project.org/web/packages/lme4/vignettes/lmer.pdf){target="_blank"}: 
 
 *"The main advantage of `nlme` relative to `lme4` is a user interface for fitting models with structure in the residuals (various forms of heteroscedasticity and autocorrelation) and in the random-effects covariance matrices (e.g., compound symmetric models).  With some extra effort, the computational machinery of `lme4` can be used to fit structured models that the basic `lmer` function cannot handle (see [Appendix A](https://cran.r-project.org/web/packages/lme4/vignettes/lmer.pdf#%5B%7B%22num%22%3A15%2C%22gen%22%3A0%7D%2C%7B%22name%22%3A%22XYZ%22%7D%2C81%2C733.028%2Cnull%5D){target="_blank"})"*
 
@@ -481,6 +489,7 @@ mod5.somm.VC %>%
 As is standard procedure, we can do a model selection based on goodness-of-fit statistics such as the AIC. In order to have a direct comparison to Table 1 in [(Piepho, 2009)](https://acsess.onlinelibrary.wiley.com/doi/abs/10.2134/agronj2008.0226x){target="_blank"}, we also calculated the deviance (*i.e.* -2*loglikelihood) for each model.
 
 For `nlme`, `lme4` and `glmmTMB`, we make use of the [`aictab()` function](https://cran.r-project.org/web/packages/AICcmodavg/AICcmodavg.pdf#Rfn.aictab.1){target="_blank"} from the helper package [AICcmodavg](https://CRAN.R-project.org/package=AICcmodavg){target="_blank"}.
+
 ## nlme
 
 ```{r, warning=FALSE}
@@ -501,6 +510,14 @@ AIC.nlme %>%
 ```{r, warning=FALSE}
 AIC.lme4 <- aictab(list(mod1.lme4)) %>% # Mods 2-5 are missing
   mutate(Deviance = -2*Res.LL) # compute deviance
+```
+```{r, echo=FALSE}
+AIC.lme4 %>%  
+  dplyr::select(Modnames, K, AICc, Delta_AICc, Res.LL, Deviance) %>% 
+  mutate_at(vars(AICc:Deviance), round, 1) %>% 
+  kable(escape = FALSE) %>% 
+  kable_styling(bootstrap_options = c("bordered", "hover", "condensed", "responsive"), 
+                full_width = FALSE)
 ```
 
 ## glmmTMB

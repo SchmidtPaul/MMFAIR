@@ -22,19 +22,27 @@ boxplot(yield ~ date, data=dat)
 
 boxplot(yield ~ density, data=dat)
 
-tibble(Model = paste0("mod", 1:5) %>% cell_spec(bold=T),
+MODTAB <- tibble(Model = paste0("mod", 1:5) %>% cell_spec(bold=T),
        Block    = "Identity",
        Genotype = "Identity",
        Date     = c("Identity", "Identity", "Diagonal", "Diagonal", "Diag-"),
        Density  = c("Identity", "Diagonal", "Identity", "Diagonal", "onal"),
-       `variance parameters` = c(1,2,4,5,8),
-       `variance estimates`  = c(1,2,4,8,8)) %>% 
+       parameters = c(1,2,4,5,8),
+       estimates  = c(1,2,4,8,8)) %>% 
   mutate(Date    = ifelse(Date    %in% c("Diagonal", "Diag-"), cell_spec(Date,    bold=T), Date),
-         Density = ifelse(Density %in% c("Diagonal", "onal"),  cell_spec(Density, bold=T), Density)) %>%
+         Density = ifelse(Density %in% c("Diagonal", "onal"),  cell_spec(Density, bold=T), Density))
+
+names(MODTAB)[6] <- paste0(names(MODTAB)[6], footnote_marker_alphabet(1))
+names(MODTAB)[7] <- paste0(names(MODTAB)[7], footnote_marker_alphabet(1))
+
+MODTAB %>% 
   kable(escape = FALSE) %>% 
-  kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"), 
-                full_width = FALSE) %>% 
-  add_header_above(c(" ", "Term in multiplicative variance structure"=4, "Number of error"=2))
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"), full_width = FALSE) %>% 
+  add_header_above(c(" ", 
+                     "Term in multiplicative variance structure"=4, 
+                     "Number of variance"=2)) %>% 
+  footnote(alphabet = "ignoring the random block effects",
+           footnote_as_chunk = T)
 
 dat <- dat %>% 
   mutate(date_densf = interaction(date, densf)) # needed for mod5
@@ -295,6 +303,12 @@ AIC.nlme %>%
 
 AIC.lme4 <- aictab(list(mod1.lme4)) %>% # Mods 2-5 are missing
   mutate(Deviance = -2*Res.LL) # compute deviance
+AIC.lme4 %>%  
+  dplyr::select(Modnames, K, AICc, Delta_AICc, Res.LL, Deviance) %>% 
+  mutate_at(vars(AICc:Deviance), round, 1) %>% 
+  kable(escape = FALSE) %>% 
+  kable_styling(bootstrap_options = c("bordered", "hover", "condensed", "responsive"), 
+                full_width = FALSE)
 
 AIC.glmm <- aictab(list(mod1.glmm, mod2.glmm, mod3.glmm, mod5.glmm), 
                    modnames=c("Mod1","Mod2","Mod3","Mod5")) %>% # Mod4 is missing

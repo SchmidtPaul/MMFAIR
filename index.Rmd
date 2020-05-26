@@ -37,18 +37,38 @@ Find chapters by navigating the menu at the top of the page. Each chapter focuse
 
 # {.unlisted .unnumbered}
 
-In terms of R syntax, we generally try to follow the approach presented on the ["R for Data Science" website](https://r4ds.had.co.nz/){target="_blank"}, making use of [`dplyr`](https://dplyr.tidyverse.org/){target="_blank"}, [tibbles](https://r4ds.had.co.nz/tibbles.html){target="_blank"} and [`%>%`-pipes](https://r4ds.had.co.nz/pipes.html){target="_blank"}.
+Additionally, find summaries at the top of the page for certain topics where we felt additional info may be beneficial, but should not bloat the chapters.
+
+In terms of R syntax, we generally try to follow the approach presented on the ["R for Data Science" website](https://r4ds.had.co.nz/){target="_blank"}, making use of [dplyr](https://dplyr.tidyverse.org/){target="_blank"}, [tibbles](https://r4ds.had.co.nz/tibbles.html){target="_blank"} and [`%>%`-pipes](https://r4ds.had.co.nz/pipes.html){target="_blank"}.
 
 <br/>
 
 # Table of Contents
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
-contents <- rbind(c("Heterogeneous error variance", "yes", "no", "kind of", "in progress", "in progress")) %>% data.frame
-names(contents) <- c("Chapter", "nlme", "lme4", "glmmTMB", "sommer", "SAS")
+contents <- rbind(
+  c("R-side", "Heterogeneous err. var.", "yes", "no", "kind of", "in progress", "in progress"),
+  c("R-side", "First-order autoregressive", "in progress", "in progress", "in progress", "in progress", "in progress"),
+  c("R-side", "Fixed scalar (Smith's weights)", "in progress", "in progress", "in progress", "in progress", "in progress"),
+  c("R-side", "Fixed matrix (fully efficient weighting)", "in progress", "in progress", "in progress", "in progress", "in progress"),
+  c("G-side", "Fixed matrix (kinship/pedigree)", "in progress", "in progress", "in progress", "in progress", "in progress"),
+  c("G-side", "Unstructured", "in progress", "in progress", "in progress", "in progress", "in progress"),
+  c("G-side", "First-order factor analytic", "in progress", "in progress", "in progress", "in progress", "in progress"),
+  c("ModelFit", "log-likelihood, AIC, BIC", "in progress", "in progress", "in progress", "in progress", "in progress"),
+  c("ANOVA", "with DF adjustments", "in progress", "in progress", "in progress", "in progress", "in progress"),
+  c("BLUPs", "raw/conditional predicted()", "in progress", "in progress", "in progress", "in progress", "in progress"),
+  c("BLUEs", "raw/conditional emmeans()", "in progress", "in progress", "in progress", "in progress", "in progress"),
+  c("Extract", "estimated R-side matrix", "in progress", "in progress", "in progress", "in progress", "in progress"),
+  c("Extract", "estimated G-side matrix", "in progress", "in progress", "in progress", "in progress", "in progress"),
+  c("Extract", "MMEq solutions", "in progress", "in progress", "in progress", "in progress", "in progress")
+
+                  ) %>% data.frame
+
+
+names(contents) <- c("Topic", "Chapter", "nlme", "lme4", "glmmTMB", "sommer", "SAS")
 
 contents %>% 
-  mutate(Chapter = cell_spec(Chapter, bold=TRUE)) %>% 
+  #mutate_at(vars(Topic:Chapter), ~cell_spec(., bold=TRUE)) %>% 
   mutate_at(vars(nlme:SAS), 
             ~cell_spec(., 
                        color=case_when(.=="in progress" ~ "orange", 
@@ -58,10 +78,12 @@ contents %>%
                                             .=="no" ~ "red",
                                             TRUE ~ "white"))) %>%
   kable(escape = FALSE) %>% 
-  kable_styling(bootstrap_options = c("striped","hover","responsive"),
+  kable_styling(bootstrap_options = c("hover","responsive"),
                 position = "left",
                 full_width = FALSE) %>% 
-  add_header_above(c(" ", "Possible in"=5))
+  column_spec(1, bold = T) %>%
+  collapse_rows(columns=1, valign = "top") %>% 
+  add_header_above(c(" ", " ", "Possible in"=5))
 ```
 
 
