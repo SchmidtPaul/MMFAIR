@@ -3,18 +3,21 @@ title: "Heterogeneous error variance"
 output: 
   html_document:
     includes:
-      after_body: footer.html						 
+      in_header: header.html
+      after_body: footer.html	
+params:
+  hilang:
+    - sas					 
 ---
 
-
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
-options(knitr.kable.NA = ' ')
+options(knitr.kable.NA = '')
 # packages for better formatting tables for html output
 library(kableExtra)
 library(formattable)
+library(htmltools)
 library(stringr)
 ```
-
 
 ```{r, message=FALSE, warning=FALSE}
 # packages
@@ -23,7 +26,7 @@ pacman::p_load(dplyr, purrr, tibble, tidyr, # data handling
                AICcmodavg, broom.mixed)     # mixed model extractions
 # data
 dat <- agridat::mcconway.turnip %>%
-  as_tibble() %>% 
+  as_tibble() %>%
   mutate(densf = density %>% as.factor)
 ```
 ```{r, echo=FALSE}
@@ -34,17 +37,16 @@ dat %>%
   scroll_box(height = "200px")
 ```
 
-
 # Motivation
 This is a randomized complete block design (4 blocks) with three treatment factors: genotype, date and density, leading to 16 treatment level combinations (2 genotypes, 2 planting dates, 4 densities) [(Piepho, 2009)](https://acsess.onlinelibrary.wiley.com/doi/abs/10.2134/agronj2008.0226x){target="_blank"}. It can be argued that heterogeneous error variances (*i.e.* heteroscedasticity) for two of the treatments should be considered:
 
 <div class = "row"> <div class = "col-md-6">
 ```{r}
-boxplot(yield ~ date, data=dat)
+boxplot(yield ~ date, data = dat)
 ```
 </div> <div class = "col-md-6">
 ```{r}
-boxplot(yield ~ density, data=dat)
+boxplot(yield ~ density, data = dat)
 ```
 </div> </div>
 
@@ -55,7 +57,7 @@ Regarding the effects in the model, we take the same approach as [Piepho (2009)]
 
 The different variance structures in the error term of the 5 models are summarised in the table below (only mods 1-4 can be found in [Piepho (2009)](https://acsess.onlinelibrary.wiley.com/doi/abs/10.2134/agronj2008.0226x){target="_blank"}). Further notice the difference between *mod4* and *mod5*: *mod4* includes the direct product (*a.k.a.* Kronecker product) structure of the two diag-structures of *Date* and *Density*. *mod5* simply includes a diag-structure for the *Date*-*Density*-combinations (see our [summary on variance structures](variance_structures.html){target="_blank"} for more info).
 
-```{r, echo=FALSE}
+```{r, echo=FALSE, purl=FALSE}
 MODTAB <- tibble(Model = paste0("mod", 1:5) %>% cell_spec(bold=T),
        Block    = "Identity",
        Genotype = "Identity",
@@ -83,50 +85,49 @@ MODTAB %>%
 To obtain heterogeneous variances in `nlme`, we need to use the *variance function* [`varIdent()`](https://cran.r-project.org/web/packages/nlme/nlme.pdf#Rfn.varIdent.1){target="_blank"} in the [`weights=`](https://cran.r-project.org/web/packages/nlme/nlme.pdf#Rfn.lme.1){target="_blank"} argument, which is *used to allow for different variances according to the levels of a classification factor*. For the multiplicative variance structure in *mod4*, we can combine two variance functions via [`varComb()`](https://cran.r-project.org/web/packages/nlme/nlme.pdf#Rfn.varComb.1){target="_blank"}. Since it is not possible to pass an interaction term to the `varIdent()` function as `varIdent(form=~1|date:densf)`, we must manually create a column that combines the two columns in order to fit *mod5*:
 
 ```{r}
-dat <- dat %>% 
+dat <- dat %>%
   mutate(date_densf = interaction(date, densf)) # needed for mod5
 
-mod1.nlme <- nlme::lme(fixed   = yield ~ gen * date * densf, 
-                       random  = ~ 1|block,
+mod1.nlme <- nlme::lme(fixed   = yield ~ gen * date * densf,  
+                       random  = ~ 1 | block, 
                        weights = NULL, # default, i.e. homoscedastic errors
                        data    = dat)
 
-mod2.nlme <- mod1.nlme %>% 
-  update(weights = varIdent(form=~1|date))
+mod2.nlme <- mod1.nlme %>%
+  update(weights = varIdent(form =  ~ 1 | date))
 
-mod3.nlme <- mod1.nlme %>% 
-  update(weights = varIdent(form=~1|densf))
+mod3.nlme <- mod1.nlme %>%
+  update(weights = varIdent(form =  ~ 1 | densf))
 
-mod4.nlme <- mod1.nlme %>% 
-  update(weights = varComb(varIdent(form=~1|date), 
-                           varIdent(form=~1|densf))) 
+mod4.nlme <- mod1.nlme %>%
+  update(weights = varComb(varIdent(form =  ~ 1 | date),
+                           varIdent(form =  ~ 1 | densf))) 
 
-mod5.nlme <- mod1.nlme %>% 
-  update(weights = varIdent(form=~1|date_densf))
+mod5.nlme <- mod1.nlme %>%
+  update(weights = varIdent(form =  ~ 1 | date_densf))
 ```
 
 ## lme4
 The short answer here is that with `lme4` it is **not possible** to fit any variance structures, so that in this example only `mod1` could be modeled: 
 
 ```{r}
-mod1.lme4 <- lmer(formula = yield ~ gen * date * densf + (1|block),
-                  data    = dat) 
+mod1.lme4 <- lmer(formula = yield ~ gen * date * densf + (1 | block),
+                  data    = dat)
 
 # mod2.lme4 - not possible
+
 # mod3.lme4 - not possible
+
 # mod4.lme4 - not possible
+
 # mod5.lme4 - not possible
 ```
 
-More specifically, we can read in an [`lme4` vigniette](https://cran.r-project.org/web/packages/lme4/vignettes/lmer.pdf){target="_blank"}: 
-
-*"The main advantage of `nlme` relative to `lme4` is a user interface for fitting models with structure in the residuals (various forms of heteroscedasticity and autocorrelation) and in the random-effects covariance matrices (e.g., compound symmetric models).  With some extra effort, the computational machinery of `lme4` can be used to fit structured models that the basic `lmer` function cannot handle (see [Appendix A](https://cran.r-project.org/web/packages/lme4/vignettes/lmer.pdf#%5B%7B%22num%22%3A15%2C%22gen%22%3A0%7D%2C%7B%22name%22%3A%22XYZ%22%7D%2C81%2C733.028%2Cnull%5D){target="_blank"})"*
+More specifically, we can read in an [`lme4` vigniette](https://cran.r-project.org/web/packages/lme4/vignettes/lmer.pdf){target="_blank"}: *"The main advantage of `nlme` relative to `lme4` is a user interface for fitting models with structure in the residuals (various forms of heteroscedasticity and autocorrelation) and in the random-effects covariance matrices (e.g., compound symmetric models).  With some extra effort, the computational machinery of `lme4` can be used to fit structured models that the basic `lmer` function cannot handle (see [Appendix A](https://cran.r-project.org/web/packages/lme4/vignettes/lmer.pdf#%5B%7B%22num%22%3A15%2C%22gen%22%3A0%7D%2C%7B%22name%22%3A%22XYZ%22%7D%2C81%2C733.028%2Cnull%5D){target="_blank"})"*
 
 Michael Clark [puts it as](https://m-clark.github.io/mixed-models-with-R/extensions.html#heterogeneous-variance){target="_blank"} *"Unfortunately, lme4 does not provide the ability to model the residual covariance structure, at least [not in a straightforward fashion](https://bbolker.github.io/mixedmodels-misc/notes/corr_braindump.html){target="_blank"}"*
 
-<span style="color:red">Thus, there is no info on this package for this example beyond this point, except for model 1.</span>
-<br/><br/><br/><br/>
-
+**Thus, there is no info on this package for this example beyond this point, except for model 1.**
 
 ## glmmTMB
 In `glmmTMB()` it is -to our knowledge- not possible to adjust the variance structure of the error.
@@ -141,7 +142,7 @@ In `glmmTMB()` it is -to our knowledge- not possible to adjust the variance stru
 We can, however, "*fix the residual variance  to  be  0  (actually  a  small  non-zero  value)*" and therefore "*force variance into the random effects*" [(glmmTMB RefMan)](https://cran.r-project.org/web/packages/glmmTMB/glmmTMB.pdf#Rfn.glmmTMB.1){target="_blank"} via adding the `dispformula = ~0` argument. Thus, when doing so, we need to make sure to also add a random term to the model with the desired variance structure. By taking both of these actions, we are essentially mimicing the error (variance) as a random effect (variance). We achieve this by first creating a `unit` column in the data with different entries for each data point:
 
 ```{r}
-dat <- dat %>% 
+dat <- dat %>%
   mutate(unit = 1:n() %>% as.factor) # new column with running number
 ```
 
@@ -150,14 +151,14 @@ We should now be able to mimic the error variance via the random term `(1|unit)`
 Notice that so far we were not able to fit `mod4` with `glmmTMB`, as we do not know how to get the direct product of two variance structures.
 
 ```{r, warning=FALSE}
-mod1.glmm <- glmmTMB(formula = yield ~ gen * date * densf + (1|block),
-                     dispformula = ~1, # = default i.e. homoscedastic error variance
-                     REML    = TRUE,   # needs to be stated since default = ML
-                     data    = dat) 
+mod1.glmm <- glmmTMB(formula = yield ~ gen * date * densf + (1 | block), 
+                     dispformula = ~ 1,  # = default i.e. homoscedastic error variance
+                     REML = TRUE,        # needs to be stated since default = ML
+                     data = dat) 
 
-mod1b.glmm <- mod1.glmm %>% 
-  update(.~. + (1|unit), # add random term to mimic homoscedastic error variance
-         dispformula=~0) # fix original error variance to 0
+mod1b.glmm <- mod1.glmm %>%
+  update(. ~ . + (1 | unit), # add random term to mimic homoscedastic error variance
+         dispformula =  ~ 0) # fix original error variance to 0
 
 mod2.glmm <- mod1.glmm %>% 
   update(.~. + diag(date+0|unit), dispformula=~0)
@@ -165,7 +166,7 @@ mod2.glmm <- mod1.glmm %>%
 mod3.glmm <- mod1.glmm %>% 
   update(.~. + diag(densf+0|unit), dispformula=~0)
 
-# mod4.glmm ?
+# mod4/multiplicative variance structure possible? in progress.
 
 mod5.glmm <- mod1.glmm %>% 
   update(.~. + diag(date:densf+0|unit), dispformula=~0)
@@ -187,36 +188,78 @@ mod1b.glmm %>% VarCorr()
 To allow for different variance structures in the error term in `sommer`, we need to use the [`vs()`](https://cran.r-project.org/web/packages/sommer/sommer.pdf#Rfn.vs.1){target="_blank"} function in the [`rcov=`](https://cran.r-project.org/web/packages/sommer/sommer.pdf#Rfn.mmer.1){target="_blank"} argument. More specifically, we need the [`ds()`](https://cran.r-project.org/web/packages/sommer/sommer.pdf#Rfn.ds.1){target="_blank"} function to obtain heterogeneous variances.
 
 ```{r, message=FALSE, warning=FALSE}
-mod1.somm <- mmer(fixed  = yield ~ gen*date*densf,
+mod1.somm <- mmer(fixed  = yield ~ gen * date * densf, 
                   random = ~ block,
                   rcov   = ~ units, # default
                   data   = dat, verbose=F)
 
-mod2.somm <- mmer(fixed  = yield ~ gen*date*densf,
+mod2.somm <- mmer(fixed  = yield ~ gen * date * densf, 
                   random = ~ block,
-                  rcov   = ~ vs(ds(date),units),
+                  rcov   = ~ vs(ds(date), units), 
                   data   = dat, verbose=F)
 
-mod3.somm <- mmer(fixed  = yield ~ gen*date*densf,
+mod3.somm <- mmer(fixed  = yield ~ gen * date * densf, 
                   random = ~ block,
-                  rcov   = ~ vs(ds(densf),units),
+                  rcov   = ~ vs(ds(densf), units), 
                   data   = dat, verbose=F)
 
-# mod4.somm ?
+# mod4/multiplicative variance structure possible? in progress.
 
-mod5.somm <- mmer(fixed  = yield ~ gen*date*densf,
+mod5.somm <- mmer(fixed  = yield ~ gen * date * densf, 
                   random = ~ block,
-                  rcov   = ~ vs(ds(date_densf),units),
+                  rcov   = ~ vs(ds(date), ds(densf), units), 
                   data   = dat, verbose=F)
 ```
 
-<span style="color:red">mod4 and mod5 give the same VC?</span>
-
 ## SAS
-<span style="color:red">in progress</span>
-<br/><br/><br/><br/>
 
-# Variance Components {.tabset .tabset-fade .tabset-pills}
+```{r, eval=FALSE, hilang="sas", purl=FALSE}
+/* mod1 */
+proc mixed data=dat;
+class gen date densf block;
+model yield = gen * date * densf;
+random block;
+ods output covparms=mod1sasVC FitStatistics=mod1sasAIC;
+run;
+
+/* mod2 */
+proc mixed data=dat;
+class gen date densf block;
+model yield = gen * date * densf;
+random block;
+repeated / group=date;
+ods output covparms=mod2sasVC FitStatistics=mod2sasAIC;
+run;
+
+/* mod3 */
+proc mixed data=dat;
+class gen date densf block;
+model yield = gen * date * densf;
+random block;
+repeated / group=densf;
+ods output covparms=mod3sasVC FitStatistics=mod3sasAIC;
+run;
+
+/* mod4 */
+proc mixed data=dat;
+class gen date densf block;
+model yield = gen * date * densf;
+random block;
+repeated / local=exp(date densf); 
+ods output covparms=mod4sasVC FitStatistics=mod4sasAIC;
+run;
+
+/* mod5 */
+proc mixed data=dat;
+class gen date densf block;
+model yield = gen * date * densf;
+random block;
+repeated / group=date*densf;
+ods output covparms=mod5sasVC FitStatistics=mod5sasAIC;
+run;
+```
+
+# Variance Component Extraction {.tabset .tabset-fade .tabset-pills}
 
 After fitting the models, we would now like to extract the variance component estimates.
 
@@ -233,12 +276,12 @@ By multiplying the latter two, we receive the respective standard error estimate
 
 **mod1**
 ```{r}
-mod1.nlme.VC <- tibble(grp="homoscedastic", varStruct=1) %>% 
+mod1.nlme.VC <- tibble(grp = "homoscedastic", varStruct = 1) %>% 
   mutate(sigma         = mod1.nlme$sigma) %>% 
   mutate(StandardError = sigma*varStruct) %>% 
   mutate(Variance      = StandardError^2)
 ```
-```{r, echo=FALSE}
+```{r, echo=FALSE, purl=FALSE}
 mod1.nlme.VC %>%
   mutate_if(is.double, round, 3) %>% 
   kable(escape = FALSE) %>% 
@@ -248,14 +291,14 @@ mod1.nlme.VC %>%
 
 **mod2**
 ```{r}
-mod2.nlme.VC <- mod2.nlme$modelStruct$varStruct %>% 
-  coef(unconstrained=FALSE, allCoef=TRUE) %>% 
-  enframe(name="grp", value="varStruct") %>% 
-  mutate(sigma         = mod2.nlme$sigma) %>% 
-  mutate(StandardError = sigma*varStruct) %>% 
-  mutate(Variance      = StandardError^2)
+mod2.nlme.VC <- mod2.nlme$modelStruct$varStruct %>%
+  coef(unconstrained = FALSE, allCoef = TRUE) %>%
+  enframe(name = "grp", value = "varStruct") %>%
+  mutate(sigma         = mod2.nlme$sigma) %>%
+  mutate(StandardError = sigma * varStruct) %>%
+  mutate(Variance      = StandardError ^ 2)
 ```
-```{r, echo=FALSE}
+```{r, echo=FALSE, purl=FALSE}
 mod2.nlme.VC %>%
   mutate_if(is.double, round, 3) %>% 
   kable(escape = FALSE) %>% 
@@ -265,14 +308,14 @@ mod2.nlme.VC %>%
 
 **mod3**
 ```{r}
-mod3.nlme.VC <- mod3.nlme$modelStruct$varStruct %>% 
-  coef(unconstrained=FALSE, allCoef=TRUE) %>% 
-  enframe(name="grp", value="varStruct") %>% 
-  mutate(sigma         = mod3.nlme$sigma) %>% 
-  mutate(StandardError = sigma*varStruct) %>% 
-  mutate(Variance      = StandardError^2)
+mod3.nlme.VC <- mod3.nlme$modelStruct$varStruct %>%
+  coef(unconstrained = FALSE, allCoef = TRUE) %>%
+  enframe(name = "grp", value = "varStruct") %>%
+  mutate(sigma         = mod3.nlme$sigma) %>%
+  mutate(StandardError = sigma * varStruct) %>%
+  mutate(Variance      = StandardError ^ 2)
 ```
-```{r, echo=FALSE}
+```{r, echo=FALSE, purl=FALSE}
 mod3.nlme.VC %>%
   mutate_if(is.double, round, 3) %>% 
   kable(escape = FALSE) %>% 
@@ -282,25 +325,25 @@ mod3.nlme.VC %>%
 
 **mod4**
 ```{r}
-mod4.nlme.varStruct.A <- mod4.nlme$modelStruct$varStruct$A %>% 
-  coef(unconstrained=FALSE, allCoef=TRUE) %>% 
-  enframe(name="grpA", value="varStructA")
+mod4.nlme.varStruct.A <- mod4.nlme$modelStruct$varStruct$A %>%
+  coef(unconstrained = FALSE, allCoef = TRUE) %>%
+  enframe(name = "grpA", value = "varStructA")
 
-mod4.nlme.varStruct.B <- mod4.nlme$modelStruct$varStruct$B %>% 
-  coef(unconstrained=FALSE, allCoef=TRUE) %>% 
-  enframe(name="grpB", value="varStructB")
+mod4.nlme.varStruct.B <- mod4.nlme$modelStruct$varStruct$B %>%
+  coef(unconstrained = FALSE, allCoef = TRUE) %>%
+  enframe(name = "grpB", value = "varStructB")
 
-mod4.nlme.VC <- expand.grid(mod4.nlme.varStruct.A$grpA, 
+mod4.nlme.VC <- expand.grid(mod4.nlme.varStruct.A$grpA,
                             mod4.nlme.varStruct.B$grpB,
-                            stringsAsFactors=FALSE) %>% 
-  rename(grpA=Var1, grpB=Var2) %>% 
-  left_join(x=., y=mod4.nlme.varStruct.A, by="grpA") %>% 
-  left_join(x=., y=mod4.nlme.varStruct.B, by="grpB") %>% 
-  mutate(sigma         = mod4.nlme$sigma) %>% 
-  mutate(StandardError = sigma*varStructA*varStructB) %>% 
-  mutate(Variance      = StandardError^2)
+                            stringsAsFactors = FALSE) %>%
+  rename(grpA = Var1, grpB = Var2) %>%
+  left_join(x = ., y = mod4.nlme.varStruct.A, by = "grpA") %>%
+  left_join(x = ., y = mod4.nlme.varStruct.B, by = "grpB") %>%
+  mutate(sigma         = mod4.nlme$sigma) %>%
+  mutate(StandardError = sigma * varStructA * varStructB) %>%
+  mutate(Variance      = StandardError ^ 2)
 ```
-```{r, echo=FALSE}
+```{r, echo=FALSE, purl=FALSE}
 mod4.nlme.VC %>%
   arrange(grpA, grpB) %>% 
   mutate_if(is.double, round, 3) %>% 
@@ -311,15 +354,15 @@ mod4.nlme.VC %>%
 
 **mod5**
 ```{r}
-mod5.nlme.VC <- mod5.nlme$modelStruct$varStruct %>% 
-  coef(unconstrained=FALSE, allCoef=TRUE) %>% 
-  enframe(name="grp", value="varStruct") %>% 
-  separate(grp, sep="[.]", into=c("grpA","grpB")) %>% 
-  mutate(sigma         = mod5.nlme$sigma) %>% 
-  mutate(StandardError = sigma*varStruct) %>% 
-  mutate(Variance      = StandardError^2)
+mod5.nlme.VC <- mod5.nlme$modelStruct$varStruct %>%
+  coef(unconstrained = FALSE, allCoef = TRUE) %>%
+  enframe(name = "grp", value = "varStruct") %>%
+  separate(grp, sep = "[.]", into = c("grpA", "grpB")) %>%
+  mutate(sigma         = mod5.nlme$sigma) %>%
+  mutate(StandardError = sigma * varStruct) %>%
+  mutate(Variance      = StandardError ^ 2)
 ```
-```{r, echo=FALSE}
+```{r, echo=FALSE, purl=FALSE}
 mod5.nlme.VC %>%
   mutate_if(is.double, round, 3) %>% 
   kable(escape = FALSE) %>% 
@@ -332,13 +375,14 @@ mod5.nlme.VC %>%
 ## lme4
 In order to extract variance component estimates from `lme4` objects (in a table format we are used to), we here use the [`tidy()`](https://cran.r-project.org/web/packages/broom.mixed/broom.mixed.pdf#Rfn.glmmTMB.Rul.tidiers.1){target="_blank"} function from the helper package [`broom.mixed`]( https://CRAN.R-project.org/package=broom.mixed){target="_blank"}:
 
+**mod1**
 ```{r}
-mod1.lme4.VC <- mod1.lme4 %>% 
-  tidy(effects="ran_pars", scales="vcov") %>% 
-  separate(term, sep="__", into=c("term","grp")) %>% 
-  filter(group=="Residual")
+mod1.lme4.VC <- mod1.lme4 %>%
+  tidy(effects = "ran_pars", scales = "vcov") %>%
+  separate(term, sep = "__", into = c("term", "grp")) %>%
+  filter(group == "Residual")
 ```
-```{r, echo=FALSE}
+```{r, echo=FALSE, purl=FALSE}
 mod1.lme4.VC %>%
   mutate_if(is.double, round, 3) %>% 
   kable(escape = FALSE) %>% 
@@ -352,12 +396,12 @@ In order to extract variance component estimates from `glmmTMB` objects (in a ta
 
 **mod1**
 ```{r}
-mod1.glmm.VC <- mod1.glmm %>% 
-  tidy(effects="ran_pars", scales="vcov") %>% 
-  separate(term, sep="__", into=c("term","grp")) %>% 
-  filter(group=="Residual")
+mod1.glmm.VC <- mod1.glmm %>%
+  tidy(effects = "ran_pars", scales = "vcov") %>%
+  separate(term, sep = "__", into = c("term", "grp")) %>%
+  filter(group == "Residual")
 ```
-```{r, echo=FALSE}
+```{r, echo=FALSE, purl=FALSE}
 mod1.glmm.VC %>%
   mutate_if(is.double, round, 3) %>% 
   kable(escape = FALSE) %>% 
@@ -367,12 +411,12 @@ mod1.glmm.VC %>%
 
 **mod2**
 ```{r}
-mod2.glmm.VC <- mod2.glmm %>% 
-  tidy(effects="ran_pars", scales="vcov") %>% 
-  separate(term, sep="__", into=c("term","grp")) %>% 
-  filter(group=="unit", term=="var")
+mod2.glmm.VC <- mod2.glmm %>%
+  tidy(effects = "ran_pars", scales = "vcov") %>%
+  separate(term, sep = "__", into = c("term", "grp")) %>%
+  filter(group == "unit", term == "var")
 ```
-```{r, echo=FALSE}
+```{r, echo=FALSE, purl=FALSE}
 mod2.glmm.VC %>%
   mutate_if(is.double, round, 3) %>% 
   kable(escape = FALSE) %>% 
@@ -382,12 +426,12 @@ mod2.glmm.VC %>%
 
 **mod3**
 ```{r}
-mod3.glmm.VC <- mod3.glmm %>% 
-  tidy(effects="ran_pars", scales="vcov") %>% 
-  separate(term, sep="__", into=c("term","grp")) %>% 
-  filter(group=="unit", term=="var")
+mod3.glmm.VC <- mod3.glmm %>%
+  tidy(effects = "ran_pars", scales = "vcov") %>%
+  separate(term, sep = "__", into = c("term", "grp")) %>%
+  filter(group == "unit", term == "var")
 ```
-```{r, echo=FALSE}
+```{r, echo=FALSE, purl=FALSE}
 mod3.glmm.VC %>%
   mutate_if(is.double, round, 3) %>% 
   kable(escape = FALSE) %>% 
@@ -397,17 +441,17 @@ mod3.glmm.VC %>%
 
 **mod4**
 
-?not possible - see above?
+mod4/multiplicative variance structure possible? in progress.
 
 **mod5**
 ```{r}
-mod5.glmm.VC <- mod5.glmm %>% 
-  tidy(effects="ran_pars", scales="vcov") %>% 
-  separate(term, sep="__", into=c("term","grp")) %>% 
-  filter(group=="unit", term=="var") %>% 
-  separate(grp, sep=":", into=c("grpA","grpB"))
+mod5.glmm.VC <- mod5.glmm %>%
+  tidy(effects = "ran_pars", scales = "vcov") %>%
+  separate(term, sep = "__", into = c("term", "grp")) %>%
+  filter(group == "unit", term == "var") %>%
+  separate(grp, sep = ":", into = c("grpA", "grpB"))
 ```
-```{r, echo=FALSE}
+```{r, echo=FALSE, purl=FALSE}
 mod5.glmm.VC %>%
   mutate_if(is.double, round, 3) %>% 
   kable(escape = FALSE) %>% 
@@ -416,6 +460,9 @@ mod5.glmm.VC %>%
 ```
 
 ## sommer
+It is quite easy to extract variance component estimates from `sommer` objects in a table format we are used to:
+
+**mod1**
 ```{r}
 mod1.somm.VC <- summary(mod1.somm)$varcomp 
 ```
@@ -424,6 +471,8 @@ mod1.somm.VC <- mod1.somm.VC %>%
   as_tibble(rownames="grp") %>% 
   mutate(grp = str_replace(grp, "\\..*", "")) %>% 
   filter(grp!="block")
+```
+```{r, echo=FALSE, purl=FALSE}
 mod1.somm.VC %>% 
   mutate_if(is.double, round, 3) %>% 
   kable(escape = FALSE) %>% 
@@ -431,6 +480,7 @@ mod1.somm.VC %>%
                 full_width = FALSE)
 ```
 
+**mod2**
 ```{r}
 mod2.somm.VC <- summary(mod2.somm)$varcomp
 ```
@@ -439,6 +489,8 @@ mod2.somm.VC <- mod2.somm.VC %>%
   as_tibble(rownames="grp") %>% 
   mutate(grp = str_replace(grp, "\\..*", "")) %>% 
   filter(grp!="block") 
+```
+```{r, echo=FALSE, purl=FALSE}
 mod2.somm.VC %>% 
   mutate_if(is.double, round, 3) %>% 
   kable(escape = FALSE) %>% 
@@ -446,6 +498,7 @@ mod2.somm.VC %>%
                 full_width = FALSE)
 ```
 
+**mod3**
 ```{r}
 mod3.somm.VC <- summary(mod3.somm)$varcomp
 ```
@@ -454,6 +507,8 @@ mod3.somm.VC <- mod3.somm.VC %>%
   as_tibble(rownames="grp") %>% 
   mutate(grp = str_replace(grp, "\\..*", "")) %>% 
   filter(grp!="block") 
+```
+```{r, echo=FALSE, purl=FALSE}
 mod3.somm.VC %>% 
   mutate_if(is.double, round, 3) %>% 
   kable(escape = FALSE) %>% 
@@ -461,10 +516,11 @@ mod3.somm.VC %>%
                 full_width = FALSE)
 ```
 
-```{r}
-# mod4.somm ?
-```
+**mod4**
 
+mod4/multiplicative variance structure possible? in progress.
+
+**mod5**
 ```{r}
 mod5.somm.VC <- summary(mod5.somm)$varcomp
 ```
@@ -473,6 +529,8 @@ mod5.somm.VC <- mod5.somm.VC %>%
   as_tibble(rownames="grp") %>% 
   mutate(grp = str_replace(grp, "\\.yield-yield", "")) %>% 
   filter(grp!="block") 
+```
+```{r, echo=FALSE, purl=FALSE}
 mod5.somm.VC %>% 
   arrange(grp) %>%
   mutate_if(is.double, round, 3) %>% 
@@ -482,8 +540,101 @@ mod5.somm.VC %>%
 ```
 
 ## SAS
-<span style="color:red">in progress</span>
-<br/><br/><br/><br/>
+
+Thanks to the [`ODS` (Output Delivery System)](https://support.sas.com/rnd/base/ods/){target="_blank"} in SAS, there are no extra steps required to extract the variance component estimates. This was already achieved via the `ods output covparms=modsasVC;` lines in the `PROC MIXED` statements in the previous section. It should be noted, however, that the estimates for `mod4` **do** need further formatting in order to obtain the here presented results. These steps are somewhat similar to those for the `nlme.VC`.
+
+```{r, echo=FALSE, message=FALSE}
+sasvc <- readr::read_delim("SAS/heterogeneous_error_variance_results_VC.txt", delim="\t") %>% 
+  filter(CovParm != "block")
+
+mod1.sas.VC <- sasvc %>%
+  filter(mod==1) %>% 
+  mutate(Group="homoscedastic") %>% 
+  dplyr::select(CovParm, Group, Estimate)
+
+mod2.sas.VC <- sasvc %>%
+  filter(mod==2) %>% 
+  # mutate(Group = str_remove(Group, "date ")) %>% 
+  dplyr::select(CovParm, Group, Estimate)
+
+mod3.sas.VC <- sasvc %>%
+  filter(mod==3) %>% 
+  # mutate(Group = str_remove(Group, "densf ")) %>% 
+  dplyr::select(CovParm, Group, Estimate)
+
+mod4.sas.VC <- sasvc %>%
+  filter(mod==4) %>% 
+  dplyr::select(CovParm, Estimate) %>% 
+  bind_rows(tibble(CovParm=c("EXP date", "EXP densf"), Estimate=c(0.5581,sum(-1.29,-0.507,1.06)*(-1)))) %>% 
+  bind_cols(Group=c("21Aug1990","1","2","4",NA,"28Aug1990","8")) %>% 
+  mutate(CovParm = str_remove(CovParm, "EXP "))
+mod4.sas.varStruct.A <- mod4.sas.VC %>% filter(CovParm=="date")
+mod4.sas.varStruct.B <- mod4.sas.VC %>% filter(CovParm=="densf")
+mod4.sas.VC <- expand.grid(mod4.sas.varStruct.A$Group,
+                           mod4.sas.varStruct.B$Group,
+                           stringsAsFactors = FALSE) %>%
+  rename(grpA = Var1, grpB = Var2) %>%
+  left_join(x = ., y = mod4.sas.VC %>% dplyr::select(-CovParm) %>% rename(EXPdate=Estimate), 
+            by = c("grpA"="Group")) %>%
+  left_join(x = ., y = mod4.sas.VC %>% dplyr::select(-CovParm) %>% rename(EXPdensf=Estimate), 
+            by = c("grpB"="Group")) %>%
+  mutate(sigma    = mod4.sas.VC %>% filter(CovParm=="Residual") %>% pull(Estimate)) %>%
+  mutate(Variance = sigma * exp(EXPdate) * exp(EXPdensf)) %>% 
+  arrange(grpB, grpA)
+  
+mod5.sas.VC <- expand.grid(mod4.sas.varStruct.A$Group,
+                           mod4.sas.varStruct.B$Group,
+                           stringsAsFactors = FALSE) %>% 
+  rename(grpA = Var1, grpB = Var2) %>% 
+  arrange(grpA, grpB) %>% 
+  bind_cols(sasvc %>% filter(mod==5) %>% dplyr::select(CovParm, Estimate)) %>% 
+  dplyr::select(CovParm, grpA, grpB, Estimate)
+```
+
+**mod1**
+```{r, echo=FALSE, purl=FALSE}
+mod1.sas.VC %>% 
+  mutate_if(is.double, round, 3) %>% 
+  kable(escape = FALSE) %>% 
+  kable_styling(bootstrap_options = c("bordered", "hover", "condensed", "responsive"), 
+                full_width = FALSE)
+```
+
+**mod2**
+```{r, echo=FALSE, purl=FALSE}
+mod2.sas.VC %>% 
+  mutate_if(is.double, round, 3) %>% 
+  kable(escape = FALSE) %>% 
+  kable_styling(bootstrap_options = c("bordered", "hover", "condensed", "responsive"), 
+                full_width = FALSE)
+```
+
+**mod3**
+```{r, echo=FALSE, purl=FALSE}
+mod3.sas.VC %>% 
+  mutate_if(is.double, round, 3) %>% 
+  kable(escape = FALSE) %>% 
+  kable_styling(bootstrap_options = c("bordered", "hover", "condensed", "responsive"), 
+                full_width = FALSE)
+```
+
+**mod4**
+```{r, echo=FALSE, purl=FALSE}
+mod4.sas.VC %>% 
+  mutate_if(is.double, round, 3) %>% 
+  kable(escape = FALSE) %>% 
+  kable_styling(bootstrap_options = c("bordered", "hover", "condensed", "responsive"), 
+                full_width = FALSE)
+```
+
+**mod5**
+```{r, echo=FALSE, purl=FALSE}
+mod5.sas.VC %>% 
+  mutate_if(is.double, round, 3) %>% 
+  kable(escape = FALSE) %>% 
+  kable_styling(bootstrap_options = c("bordered", "hover", "condensed", "responsive"), 
+                full_width = FALSE)
+```
 
 # Model Fit {.tabset .tabset-fade .tabset-pills}
 As is standard procedure, we can do a model selection based on goodness-of-fit statistics such as the AIC. In order to have a direct comparison to Table 1 in [(Piepho, 2009)](https://acsess.onlinelibrary.wiley.com/doi/abs/10.2134/agronj2008.0226x){target="_blank"}, we also calculated the deviance (*i.e.* -2*loglikelihood) for each model.
@@ -494,10 +645,10 @@ For `nlme`, `lme4` and `glmmTMB`, we make use of the [`aictab()` function](https
 
 ```{r, warning=FALSE}
 AIC.nlme <- aictab(list(mod1.nlme, mod2.nlme, mod3.nlme, mod4.nlme, mod5.nlme)) %>%
-  mutate(Deviance = -2*Res.LL) # compute deviance
+  mutate(Deviance = -2 * Res.LL) # compute deviance manually
 ```
 
-```{r, echo=FALSE}
+```{r, echo=FALSE, purl=FALSE}
 AIC.nlme %>%  
   dplyr::select(Modnames, K, AICc, Delta_AICc, Res.LL, Deviance) %>% 
   mutate_at(vars(AICc:Deviance), round, 1) %>% 
@@ -509,9 +660,9 @@ AIC.nlme %>%
 ## lme4
 ```{r, warning=FALSE}
 AIC.lme4 <- aictab(list(mod1.lme4)) %>% # Mods 2-5 are missing
-  mutate(Deviance = -2*Res.LL) # compute deviance
+  mutate(Deviance = -2 * Res.LL) # compute deviance manually
 ```
-```{r, echo=FALSE}
+```{r, echo=FALSE, purl=FALSE}
 AIC.lme4 %>%  
   dplyr::select(Modnames, K, AICc, Delta_AICc, Res.LL, Deviance) %>% 
   mutate_at(vars(AICc:Deviance), round, 1) %>% 
@@ -524,10 +675,10 @@ AIC.lme4 %>%
 ```{r, warning=FALSE}
 AIC.glmm <- aictab(list(mod1.glmm, mod2.glmm, mod3.glmm, mod5.glmm), 
                    modnames=c("Mod1","Mod2","Mod3","Mod5")) %>% # Mod4 is missing
-  mutate(Deviance = -2*LL) # compute deviance
+  mutate(Deviance = -2*LL) # compute deviance manually
 ```
 
-```{r, echo=FALSE}
+```{r, echo=FALSE, purl=FALSE}
 AIC.glmm %>%  
   dplyr::select(Modnames, K, AICc, Delta_AICc, LL, Deviance) %>%  
   mutate_at(vars(AICc:Deviance), ~round(., 1)) %>% 
@@ -537,12 +688,46 @@ AIC.glmm %>%
 ```
 
 ## sommer
-<span style="color:red">in progress</span>
-<br/><br/><br/><br/>
+
+Unfortunately, the `aictab()` function does not work on `mmer` objects. We therefore create a comparable table manually. Notice further that in the `sommer` package, the likelihood is calculated in a different way compared to `nlme`, `lme4` and `glmmTMB`, leading to deviating values between packages.
+
+```{r}
+somm.mods <- list(mod1.somm, mod2.somm, mod3.somm, mod5.somm)
+
+AIC.somm <- tibble(
+    Modnames = paste0("Mod", c(1:3, 5)), # Mod4 is missing
+    AIC = somm.mods %>% map("AIC") %>% unlist,
+    LL  = somm.mods %>% map("monitor") %>% lapply(. %>% `[`(1, ncol(.))) %>% unlist) %>% # last element in first row of "monitor"
+  mutate(Deviance = -2 * LL) %>% # compute deviance manually
+  arrange(AIC)
+```
+```{r, echo=FALSE, purl=FALSE}
+AIC.somm %>%  
+  mutate_at(vars(AIC:Deviance), ~round(., 1)) %>% 
+  kable(escape = FALSE) %>% 
+  kable_styling(bootstrap_options = c("bordered", "hover", "condensed", "responsive"), 
+                full_width = FALSE)
+```
 
 ## SAS
-<span style="color:red">in progress</span>
-<br/><br/><br/><br/>
+
+Thanks to the [`ODS` (Output Delivery System)](https://support.sas.com/rnd/base/ods/){target="_blank"} in SAS, there are no extra steps required to extract the model fit statistics. This was already achieved via the `ods output FitStatistics=modsasAIC;` lines in the `PROC MIXED` statements in the previous section.
+
+```{r, echo=FALSE, message=FALSE}
+AIC.sas <- readr::read_delim("SAS/heterogeneous_error_variance_results_AIC.txt", delim="\t") %>% 
+  mutate(Descr=str_remove(Descr, " \\(kleiner ist besser\\)"),
+         Modnames=paste0("Mod",mod)) %>% 
+  dplyr::select(-mod) %>% 
+  pivot_wider(names_from="Descr", values_from="Value") %>% 
+  rename(Deviance = `-2 Res Log-Likelihood`)
+```
+```{r, echo=FALSE, purl=FALSE}
+AIC.sas %>%  
+  mutate_at(vars(Deviance:BIC), ~round(., 1)) %>% 
+  kable(escape = FALSE) %>% 
+  kable_styling(bootstrap_options = c("bordered", "hover", "condensed", "responsive"), 
+                full_width = FALSE)
+```
 
 # Summary {.tabset .tabset-fade}
 
@@ -550,11 +735,11 @@ AIC.glmm %>%
 
 package | model syntax
 ---|---
-`nlme` | `weights = varIdent(form=~1|TERM)`
+`nlme` | `weights = varIdent(form = ~ 1 | TERM)`
 `lme4` | <span style="color:red">not possible</span>
-`glmmTMB` | `random=~diag(TERM+0|unit), dispformula=~0`
-`sommer` | in progress
-`SAS` | in progress
+`glmmTMB` | `random = ~ diag(TERM + 0 | unit), dispformula =  ~ 0`
+`sommer` | `rcov = ~ vs(ds(TERM), units)`
+`SAS` | `repeated / group=TERM;`
 
 ## VarComp
 
@@ -567,7 +752,9 @@ plyr::join_all(list(mod1.nlme.VC %>% dplyr::select(grp, Variance) %>% rename(nlm
                       dplyr::select(grp, estimate) %>% rename(glmmTMB=estimate),
                     mod1.somm.VC %>% mutate(grp="homoscedastic") %>% 
                       dplyr::select(grp, VarComp) %>% rename(sommer=VarComp),
-                    mod1.nlme.VC %>% dplyr::select(grp) %>% mutate(SAS="in progress")), 
+                    mod1.sas.VC %>% mutate(grp="homoscedastic") %>% 
+                      dplyr::select(grp, Estimate) %>% rename(SAS=Estimate)
+                    ), 
                by="grp", type="left") %>%
   kable(escape = FALSE) %>% 
   kable_styling(bootstrap_options = c("bordered", "hover", "condensed", "responsive"), 
@@ -582,7 +769,9 @@ plyr::join_all(list(mod2.nlme.VC %>% dplyr::select(grp, Variance) %>% rename(nlm
                       mutate(grp = str_remove(grp, "date")) %>% rename(glmmTMB=estimate),
                     mod2.somm.VC %>% dplyr::select(grp, VarComp) %>% 
                       mutate(grp = str_replace(grp, ":units", "")) %>% rename(sommer=VarComp),
-                    mod2.nlme.VC %>% dplyr::select(grp) %>% mutate(SAS="in progress")), 
+                    mod2.sas.VC %>% mutate(grp = str_remove(Group, "date ") %>% 
+                                                 str_replace("UG","ug")) %>% 
+                      dplyr::select(grp, Estimate) %>% rename(SAS=Estimate)), 
                by="grp", type="left") %>% 
   kable(escape = FALSE) %>% 
   kable_styling(bootstrap_options = c("bordered", "hover", "condensed", "responsive"), 
@@ -597,7 +786,10 @@ plyr::join_all(list(mod3.nlme.VC %>% dplyr::select(grp, Variance) %>% rename(nlm
                       mutate(grp = str_remove(grp, "densf")) %>% rename(glmmTMB=estimate),
                     mod3.somm.VC %>% dplyr::select(grp, VarComp) %>% 
                       mutate(grp = str_replace(grp, ":units", "")) %>% rename(sommer=VarComp),
-                    mod3.nlme.VC %>% dplyr::select(grp) %>% mutate(SAS="in progress")), 
+                    mod3.sas.VC %>% 
+                      mutate(grp = str_remove(Group, "densf ")) %>% 
+                      dplyr::select(grp, Estimate) %>% rename(SAS=Estimate)
+                    ), 
                by="grp", type="left") %>% 
   kable(escape = FALSE) %>% 
   kable_styling(bootstrap_options = c("bordered", "hover", "condensed", "responsive"), 
@@ -610,8 +802,9 @@ plyr::join_all(list(mod4.nlme.VC %>% dplyr::select(grpA, grpB, Variance) %>% ren
                     mod4.nlme.VC %>% dplyr::select(grpA, grpB) %>% mutate(lme4=NA),
                     mod4.nlme.VC %>% dplyr::select(grpA, grpB) %>% mutate(glmmTMB=NA),
                     mod4.nlme.VC %>% dplyr::select(grpA, grpB) %>% mutate(sommer="in progress"),
-                    mod4.nlme.VC %>% dplyr::select(grpA, grpB) %>% mutate(SAS="in progress")), 
+                    mod4.sas.VC %>% dplyr::select(grpA, grpB, Variance) %>% rename(SAS=Variance)), 
                by=c("grpA", "grpB"), type="left") %>% 
+  arrange(grpA, grpB) %>% 
   kable(escape = FALSE) %>% 
   kable_styling(bootstrap_options = c("bordered", "hover", "condensed", "responsive"), 
                 full_width = FALSE)
@@ -623,12 +816,13 @@ plyr::join_all(list(mod5.nlme.VC %>% dplyr::select(grpA, grpB, Variance) %>% ren
                     mod5.nlme.VC %>% dplyr::select(grpA, grpB) %>% mutate(lme4=NA),
                     mod5.glmm.VC %>% mutate(grpA = str_remove(grpA, "date"),
                                             grpB = str_remove(grpB, "densf")) %>% 
-                      dplyr::select(grpA, grpB, estimate) %>% rename(glmm=estimate),
+                      dplyr::select(grpA, grpB, estimate) %>% rename(glmmTMB=estimate),
                     mod5.somm.VC %>% mutate(grp = str_replace(grp, ":units", "")) %>% 
-                     dplyr::select(grp, VarComp) %>% separate(grp, sep="\\.", into=c("grpA","grpB")) %>%
+                     dplyr::select(grp, VarComp) %>% separate(grp, sep="\\:", into=c("grpA","grpB")) %>%
                      rename(sommer=VarComp),
-                    mod5.nlme.VC %>% dplyr::select(grpA, grpB) %>% mutate(SAS="in progress")), 
+                    mod5.sas.VC %>% dplyr::select(grpA, grpB, Estimate) %>% rename(SAS=Estimate)), 
                by=c("grpA", "grpB"), type="left") %>% 
+  arrange(grpA, grpB) %>% 
   kable(escape = FALSE) %>% 
   kable_styling(bootstrap_options = c("bordered", "hover", "condensed", "responsive"), 
                 full_width = FALSE)
@@ -639,10 +833,13 @@ plyr::join_all(list(mod5.nlme.VC %>% dplyr::select(grpA, grpB, Variance) %>% ren
 ```{r, echo=FALSE}
 plyr::join_all(list(AIC.nlme %>% dplyr::select(Modnames, AICc) %>% rename(nlme=AICc),
                     AIC.lme4 %>% dplyr::select(Modnames, AICc) %>% rename(lme4=AICc),
-                    AIC.glmm %>% dplyr::select(Modnames, AICc) %>% rename(glmm=AICc),
-                    AIC.nlme %>% dplyr::select(Modnames) %>% mutate(sommer="in progress"),
-                    AIC.nlme %>% dplyr::select(Modnames) %>% mutate(SAS="in progress")
+                    AIC.glmm %>% dplyr::select(Modnames, AICc) %>% rename(glmmTMB=AICc),
+                    AIC.somm %>% dplyr::select(Modnames, AIC)  %>% rename(sommer=AIC),
+                    AIC.sas  %>% dplyr::select(Modnames, AICC) %>% rename(SAS=AICC)
                     ), by="Modnames", type="left") %>% 
+  mutate_if(is.double, round, 3) %>% 
+  # mutate_at(vars(nlme:SAS), 
+  #           ~ cell_spec(., color=case_when(.==min(., na.rm=TRUE) ~ "#158cba", TRUE ~ "black"))) %>% 
   kable(escape = FALSE) %>% 
   kable_styling(bootstrap_options = c("bordered", "hover", "condensed", "responsive"), 
                 full_width = FALSE)

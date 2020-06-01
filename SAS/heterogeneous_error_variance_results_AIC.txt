@@ -1,0 +1,21 @@
+Descr	Value	mod
+-2 Res Log-Likelihood	272.1	1
+AIC (kleiner ist besser)	276.1	1
+AICC (kleiner ist besser)	276.4	1
+BIC (kleiner ist besser)	274.9	1
+-2 Res Log-Likelihood	263.9	2
+AIC (kleiner ist besser)	269.9	2
+AICC (kleiner ist besser)	270.5	2
+BIC (kleiner ist besser)	268.1	2
+-2 Res Log-Likelihood	256.3	3
+AIC (kleiner ist besser)	266.3	3
+AICC (kleiner ist besser)	267.7	3
+BIC (kleiner ist besser)	263.2	3
+-2 Res Log-Likelihood	250.3	4
+AIC (kleiner ist besser)	262.3	4
+AICC (kleiner ist besser)	264.3	4
+BIC (kleiner ist besser)	258.6	4
+-2 Res Log-Likelihood	248.2	5
+AIC (kleiner ist besser)	266.2	5
+AICC (kleiner ist besser)	270.9	5
+BIC (kleiner ist besser)	260.7	5

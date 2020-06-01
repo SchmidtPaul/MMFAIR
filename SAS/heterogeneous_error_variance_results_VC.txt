@@ -1,0 +1,26 @@
+CovParm	Estimate	mod	Group
+block	2.8117	1	
+Residual	9.5914	1	
+block	1.5966	2	
+Residual	4.3061	2	date 21AUG1990
+Residual	15.5051	2	date 28AUG1990
+block	0.4747	3	
+Residual	2.2522	3	densf 1
+Residual	3.6695	3	densf 2
+Residual	25.0373	3	densf 4
+Residual	13.3385	3	densf 8
+block	0.1603	4	
+EXP date	-0.5581	4	
+EXP densf	-1.2937	4	
+EXP densf	-0.5075	4	
+EXP densf	1.0559	4	
+Residual	6.5593	4	
+block	0.07393	5	
+Residual	0.8796	5	date*densf 21A
+Residual	3.0812	5	date*densf 21A
+Residual	6.2625	5	date*densf 21A
+Residual	9.7597	5	date*densf 21A
+Residual	3.4465	5	date*densf 28A
+Residual	4.9972	5	date*densf 28A
+Residual	48.0949	5	date*densf 28A
+Residual	19.9377	5	date*densf 28A
