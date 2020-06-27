@@ -456,6 +456,9 @@ div.tocify {
     <li>
       <a href="heterogeneous_error_variance.html">Heterogeneous error variance</a>
     </li>
+    <li>
+      <a href="autoregressive_time_series.html">First-order autoregressive</a>
+    </li>
   </ul>
 </li>
 <li class="dropdown">
@@ -2696,14 +2699,14 @@ var
 <p>In SAS, there is an actual <code>subject=</code> statement that is used to identify the subjects on which repeated measurements are taken.</p>
 
 
-<textarea id="VJGEI">
+<textarea id="ERHAO">
 proc mixed data=dat;
 class variety block factweek plot;
 model y=block variety factweek block*factweek variety*factweek /ddfm=kr2;
 repeated factweek/sub=plot type=VC rcorr;
 run; 
 </textarea>
-<script> var codeElement = document.getElementById("VJGEI"); var editor = null; if (null != codeElement) { editor = CodeMirror.fromTextArea(codeElement, { lineNumbers: true, readOnly: true, viewportMargin: Infinity, mode: 'text/x-sas' }); } </script>
+<script> var codeElement = document.getElementById("ERHAO"); var editor = null; if (null != codeElement) { editor = CodeMirror.fromTextArea(codeElement, { lineNumbers: true, readOnly: true, viewportMargin: Infinity, mode: 'text/x-sas' }); } </script>
 
 </div>
 </div>
@@ -2822,14 +2825,14 @@ ar(1)
 <h2>SAS</h2>
 
 
-<textarea id="IYQJR">
+<textarea id="DUGTJ">
 proc mixed data=dat;
 class variety block factweek plot;
 model y=block variety factweek block*factweek variety*factweek /ddfm=kr2;
 repeated factweek/sub=plot type=ar(1) rcorr;
 run; 
 </textarea>
-<script> var codeElement = document.getElementById("IYQJR"); var editor = null; if (null != codeElement) { editor = CodeMirror.fromTextArea(codeElement, { lineNumbers: true, readOnly: true, viewportMargin: Infinity, mode: 'text/x-sas' }); } </script>
+<script> var codeElement = document.getElementById("DUGTJ"); var editor = null; if (null != codeElement) { editor = CodeMirror.fromTextArea(codeElement, { lineNumbers: true, readOnly: true, viewportMargin: Infinity, mode: 'text/x-sas' }); } </script>
 
 </div>
 </div>
