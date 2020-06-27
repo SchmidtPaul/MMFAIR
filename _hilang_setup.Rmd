@@ -8,7 +8,6 @@ for(i in seq_along(params$hilang)) {
 }
 ```
 
-
 ```{r eval=TRUE, echo=FALSE}
 knitr::knit_hooks$set(source = function(x, options) {
   if (!is.null(options$hilang)) {
@@ -36,7 +35,7 @@ knitr::knit_hooks$set(source = function(x, options) {
       )
     )
   } else {
-    stringr::str_c("\n\n```", tolower(options$engine), "\n", paste(x, collapse = "\n", "\n```\n\n"))
+    stringr::str_c("\n\n```", tolower(options$engine), "\n", paste0(x, collapse = "\n"), "\n```\n\n")
   }
 })
 ```

@@ -73,6 +73,8 @@ output:
 ## Publications
 [Piepho, H. P. (2009). Data transformation in statistical analysis of field trials with changing treatment variance. Agronomy Journal, 101(4), 865-869.](https://acsess.onlinelibrary.wiley.com/doi/abs/10.2134/agronj2008.0226x){target="_blank"}
 
+[Piepho, H. P. & Edmondson, R. N. (2018). A tutorial on the statistical analysis of factorial experiments with qualitative and quantitative treatment factor levels. Journal of Agronomy and Crop Science 204(5): 429-455.](https://onlinelibrary.wiley.com/doi/full/10.1111/jac.12267){target="_blank"}
+
 ## Websites
 ["GLMM FAQ"](http://bbolker.github.io/mixedmodels-misc/glmmFAQ.html){target="_blank"} by Ben Bolker and others
 

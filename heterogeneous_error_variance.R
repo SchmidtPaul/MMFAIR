@@ -1,30 +1,20 @@
 params <-
 list(hilang = "sas")
 
-options(knitr.kable.NA = ' ')
-# packages for better formatting tables for html output
-library(kableExtra)
-library(formattable)
-library(htmltools)
-library(stringr)
-
 # packages
-pacman::p_load(dplyr, purrr, tibble, tidyr, # data handling
+pacman::p_load(dplyr, purrr, stringr, tibble, tidyr, # data handling
                nlme, lme4, glmmTMB, sommer, # mixed modelling
                AICcmodavg, broom.mixed)     # mixed model extractions
+
 # data
 dat <- agridat::mcconway.turnip %>%
   as_tibble() %>%
   mutate(densf = density %>% as.factor)
-dat %>%
-  kable(escape = FALSE) %>% 
-  kable_styling(bootstrap_options = c("bordered", "hover", "condensed", "responsive"), 
-                full_width = FALSE) %>% 
-  scroll_box(height = "200px")
 
-boxplot(yield ~ date, data = dat)
 
-boxplot(yield ~ density, data = dat)
+
+
+
 
 
 
@@ -70,18 +60,18 @@ mod1.glmm <- glmmTMB(formula = yield ~ gen * date * densf + (1 | block),
 
 mod1b.glmm <- mod1.glmm %>%
   update(. ~ . + (1 | unit), # add random term to mimic homoscedastic error variance
-         dispformula =  ~ 0) # fix original error variance to 0
+         dispformula = ~ 0) # fix original error variance to 0
 
 mod2.glmm <- mod1.glmm %>% 
-  update(.~. + diag(date+0|unit), dispformula=~0)
+  update(. ~ . + diag(date + 0 | unit), dispformula = ~ 0)
 
 mod3.glmm <- mod1.glmm %>% 
-  update(.~. + diag(densf+0|unit), dispformula=~0)
+  update(. ~ . + diag(densf + 0 | unit), dispformula = ~ 0)
 
-# mod4/multiplicative variance structure possible? in progress.
+# mod4/multiplicative variance structure not possible.
 
 mod5.glmm <- mod1.glmm %>% 
-  update(.~. + diag(date:densf+0|unit), dispformula=~0)
+  update(. ~ . + diag(date:densf + 0 | unit), dispformula = ~ 0)
 
 mod1.glmm %>% VarCorr()
 
@@ -106,15 +96,10 @@ mod3.somm <- mmer(fixed  = yield ~ gen * date * densf,
 
 mod5.somm <- mmer(fixed  = yield ~ gen * date * densf, 
                   random = ~ block,
-                  rcov   = ~ vs(ds(date_densf), units), 
+                  rcov   = ~ vs(ds(date), ds(densf), units), 
                   data   = dat, verbose=F)
-summary(mod5.somm)$varcomp
 
-mod5.somm <- mmer(fixed  = yield ~ gen * date * densf, 
-                   random = ~ block,
-                   rcov   = ~ vs(ds(date), ds(densf), units), 
-                   data   = dat, verbose=F)
-summary(mod5b.somm)$varcomp
+
 
 mod1.nlme.VC <- tibble(grp = "homoscedastic", varStruct = 1) %>% 
   mutate(sigma         = mod1.nlme$sigma) %>% 
@@ -246,7 +231,7 @@ mod3.sas.VC <- sasvc %>%
 mod4.sas.VC <- sasvc %>%
   filter(mod==4) %>% 
   dplyr::select(CovParm, Estimate) %>% 
-  bind_rows(tibble(CovParm=c("EXP date", "EXP densf"), Estimate=c(0.5581,sum(-1.29,-0.507,1.06)))) %>% 
+  bind_rows(tibble(CovParm=c("EXP date", "EXP densf"), Estimate=c(0.5581,sum(-1.29,-0.507,1.06)*(-1)))) %>% 
   bind_cols(Group=c("21Aug1990","1","2","4",NA,"28Aug1990","8")) %>% 
   mutate(CovParm = str_remove(CovParm, "EXP "))
 mod4.sas.varStruct.A <- mod4.sas.VC %>% filter(CovParm=="date")
@@ -335,10 +320,9 @@ plyr::join_all(list(mod2.nlme.VC %>% dplyr::select(grp, Variance) %>% rename(nlm
                       mutate(grp = str_remove(grp, "date")) %>% rename(glmmTMB=estimate),
                     mod2.somm.VC %>% dplyr::select(grp, VarComp) %>% 
                       mutate(grp = str_replace(grp, ":units", "")) %>% rename(sommer=VarComp),
-                    mod2.sas.VC %>% 
-                      mutate(grp = str_remove(Group, "date ") %>% str_replace("UG","ug")) %>% 
-                      dplyr::select(grp, Estimate) %>% rename(SAS=Estimate)
-                    ), 
+                    mod2.sas.VC %>% mutate(grp = str_remove(Group, "date ") %>% 
+                                                 str_replace("UG","ug")) %>% 
+                      dplyr::select(grp, Estimate) %>% rename(SAS=Estimate)), 
                by="grp", type="left") %>% 
   kable(escape = FALSE) %>% 
   kable_styling(bootstrap_options = c("bordered", "hover", "condensed", "responsive"), 
@@ -365,6 +349,7 @@ plyr::join_all(list(mod4.nlme.VC %>% dplyr::select(grpA, grpB, Variance) %>% ren
                     mod4.nlme.VC %>% dplyr::select(grpA, grpB) %>% mutate(sommer="in progress"),
                     mod4.sas.VC %>% dplyr::select(grpA, grpB, Variance) %>% rename(SAS=Variance)), 
                by=c("grpA", "grpB"), type="left") %>% 
+  arrange(grpA, grpB) %>% 
   kable(escape = FALSE) %>% 
   kable_styling(bootstrap_options = c("bordered", "hover", "condensed", "responsive"), 
                 full_width = FALSE)
@@ -379,6 +364,7 @@ plyr::join_all(list(mod5.nlme.VC %>% dplyr::select(grpA, grpB, Variance) %>% ren
                      rename(sommer=VarComp),
                     mod5.sas.VC %>% dplyr::select(grpA, grpB, Estimate) %>% rename(SAS=Estimate)), 
                by=c("grpA", "grpB"), type="left") %>% 
+  arrange(grpA, grpB) %>% 
   kable(escape = FALSE) %>% 
   kable_styling(bootstrap_options = c("bordered", "hover", "condensed", "responsive"), 
                 full_width = FALSE)
@@ -386,9 +372,12 @@ plyr::join_all(list(mod5.nlme.VC %>% dplyr::select(grpA, grpB, Variance) %>% ren
 plyr::join_all(list(AIC.nlme %>% dplyr::select(Modnames, AICc) %>% rename(nlme=AICc),
                     AIC.lme4 %>% dplyr::select(Modnames, AICc) %>% rename(lme4=AICc),
                     AIC.glmm %>% dplyr::select(Modnames, AICc) %>% rename(glmmTMB=AICc),
-                    AIC.somm %>% dplyr::select(Modnames, AIC) %>% rename(sommer=AIC),
-                    AIC.sas  %>% dplyr::select(Modnames, AICC) %>% rename(sas=AICC)
+                    AIC.somm %>% dplyr::select(Modnames, AIC)  %>% rename(sommer=AIC),
+                    AIC.sas  %>% dplyr::select(Modnames, AICC) %>% rename(SAS=AICC)
                     ), by="Modnames", type="left") %>% 
+  mutate_if(is.double, round, 3) %>% 
+  # mutate_at(vars(nlme:SAS), 
+  #           ~ cell_spec(., color=case_when(.==min(., na.rm=TRUE) ~ "#158cba", TRUE ~ "black"))) %>% 
   kable(escape = FALSE) %>% 
   kable_styling(bootstrap_options = c("bordered", "hover", "condensed", "responsive"), 
                 full_width = FALSE)

@@ -378,17 +378,25 @@ summary {
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.31.0/mode/sas/sas.min.js"></script>
 
-<pre class="r"><code>a &lt;- 2 + 3 </code></pre>
-<pre><code>
+<pre class="r"><code>a &lt;- 2 + 3
 
-# comment </code></pre>
-<pre><code>
+# comment
 
-a * 3 # comment </code></pre>
+a * 3 # comment</code></pre>
 <pre><code>## [1] 15</code></pre>
+<pre class="r"><code># packages
+
+pacman::p_load(dplyr, purrr, stringr, tibble, tidyr, # data handling
+               nlme, lme4, glmmTMB, sommer, # mixed modelling
+               AICcmodavg, broom.mixed)     # mixed model extractions
+
+# data
+dat &lt;- agridat::mcconway.turnip %&gt;%
+  as_tibble() %&gt;%
+  mutate(densf = density %&gt;% as.factor)</code></pre>
 
 
-<textarea id="EZSXL">
+<textarea id="VJBRC">
 libname foo "/tmp/foobar";
 %let count=1;
 
@@ -426,7 +434,7 @@ proc sql;
     from foo;
 quit;
 </textarea>
-<script> var codeElement = document.getElementById("EZSXL"); var editor = null; if (null != codeElement) { editor = CodeMirror.fromTextArea(codeElement, { lineNumbers: true, readOnly: true, viewportMargin: Infinity, mode: 'text/x-sas' }); } </script>
+<script> var codeElement = document.getElementById("VJBRC"); var editor = null; if (null != codeElement) { editor = CodeMirror.fromTextArea(codeElement, { lineNumbers: true, readOnly: true, viewportMargin: Infinity, mode: 'text/x-sas' }); } </script>
 
 
 

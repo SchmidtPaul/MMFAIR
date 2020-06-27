@@ -7,6 +7,12 @@ output:
 ---
 
 ```{r, echo=FALSE, warning=FALSE, message=FALSE}
+options(knitr.kable.NA = '')
+# packages for better formatting tables for html output
+library(kableExtra)
+library(formattable)
+library(htmltools)
+
 pacman::p_load(dplyr, purrr, tibble, tidyr, # data handling
                ggplot2, viridis,            # plot
                nlme, lme4, glmmTMB, sommer, # mixed modelling
@@ -23,12 +29,6 @@ mod1.nlme <- nlme::lme(fixed   = yield ~ gen * date * densf,
                        weights = NULL, # default, i.e. homoscedastic errors
                        data    = dat)
 
-# mod2.nlme <- mod1.nlme %>% 
-#   update(weights = varIdent(form=~1|date))
-# 
-# mod3.nlme <- mod1.nlme %>% 
-#   update(weights = varIdent(form=~1|densf))
-
 mod4.nlme <- mod1.nlme %>% 
   update(weights = varComb(varIdent(form=~1|date), 
                            varIdent(form=~1|densf))) 
@@ -40,20 +40,6 @@ mod1.nlme.VC <- tibble(grp="homoscedastic", varStruct=1) %>%
   mutate(sigma         = mod1.nlme$sigma) %>% 
   mutate(StandardError = sigma*varStruct) %>% 
   mutate(Variance      = StandardError^2)
-
-# mod2.nlme.VC <- mod2.nlme$modelStruct$varStruct %>% 
-#   coef(unconstrained=FALSE, allCoef=TRUE) %>% 
-#   enframe(name="grp", value="varStruct") %>% 
-#   mutate(sigma         = mod2.nlme$sigma) %>% 
-#   mutate(StandardError = sigma*varStruct) %>% 
-#   mutate(Variance      = StandardError^2)
-# 
-# mod3.nlme.VC <- mod3.nlme$modelStruct$varStruct %>% 
-#   coef(unconstrained=FALSE, allCoef=TRUE) %>% 
-#   enframe(name="grp", value="varStruct") %>% 
-#   mutate(sigma         = mod3.nlme$sigma) %>% 
-#   mutate(StandardError = sigma*varStruct) %>% 
-#   mutate(Variance      = StandardError^2)
 
 mod4.nlme.varStruct.A <- mod4.nlme$modelStruct$varStruct$A %>% 
   coef(unconstrained=FALSE, allCoef=TRUE) %>% 
@@ -98,22 +84,6 @@ mat1 <- left_join(x  = setup %>% mutate(grp="homoscedastic"),
             by = c("X"="nID")) %>% as_tibble() %>% 
   mutate(Variance = case_when(X==Y~Variance, TRUE~NA_real_)) 
 
-# mat2 <- left_join(x  = setup,
-#                   y  = mod2.nlme.VC %>% dplyr::select(-StandardError),
-#                   by = c("date"="grp")) %>% 
-#   left_join(x  = expand.grid(X=.$nID, Y=.$nID),
-#             y  = .,
-#             by = c("X"="nID")) %>% as_tibble() %>% 
-#   mutate(Variance = case_when(X==Y~Variance, TRUE~NA_real_)) 
-# 
-# mat3 <- left_join(x  = setup,
-#                   y  = mod3.nlme.VC %>% dplyr::select(-StandardError),
-#                   by = c("densf"="grp")) %>% 
-#   left_join(x  = expand.grid(X=.$nID, Y=.$nID),
-#             y  = .,
-#             by = c("X"="nID")) %>% as_tibble() %>% 
-#   mutate(Variance = case_when(X==Y~Variance, TRUE~NA_real_)) 
-
 mat4 <- left_join(x  = setup,
                   y  = mod4.nlme.VC %>% dplyr::select(-StandardError),
                   by = c("date"="grpA", "densf"="grpB")) %>% 
@@ -132,8 +102,50 @@ mat5 <- left_join(x  = setup,
 } # get mat1 - mat5
 ```
 
+Here you will find a list of variance structures (*a.k.a* covariance structures, variance-covariance-structures, correlation structures) with short explanations and possibly examples.
+
+# Identitiy
+**This covariance structure has homogeneous variances and zero correlation between elements.**
+
+Number of parameters = 1 (*i.e.* $\sigma$)
+
+$$
+\left(\begin{array}{cc} 
+\sigma^2 & 0 & 0 & 0\\
+  & \sigma^2 & 0 & 0\\
+  &   & \sigma^2 & 0\\
+  &   &   & \sigma^2\\
+\end{array}\right) =
+\left(\begin{array}{cc} 
+1 & 0 & 0 & 0\\
+  & 1 & 0 & 0\\
+  &   & 1 & 0\\
+  &   &   & 1\\
+\end{array}\right) \sigma^2
+$$
+
+
+This is the simplest covariance structure and the default setting in most, if not all, linear modelling packages.
+
 # Diagonal
 **This covariance structure has heterogenous variances and zero correlation between elements.**
+
+Number of parameters: $t$ (*i.e.* $\sigma_1$, $\sigma_2$, ..., $\sigma_t$), which is the overall dimension of the covariance matrix (*e.g.* number of treatement levels).
+
+$$
+\left(\begin{array}{cc} 
+\sigma_1^2 & 0 & 0 & 0\\
+  & \sigma_2^2 & 0 & 0\\
+  &   & \sigma_3^2 & 0\\
+  &   &   & \sigma_4^2\\
+\end{array}\right) =
+\left(\begin{array}{cc} 
+1 & 0 & 0 & 0\\
+  & k_1 & 0 & 0\\
+  &   & k_2 & 0\\
+  &   &   & k_3\\
+\end{array}\right) \sigma^2
+$$
 
 In our [chapter on heterogeneous error variances](heterogeneous_error_variance.html){target="_blank"}, we fit models in which we allow for different error variances for two of the treatments. Thus, the off-diagonals are all 0, but there are multiple variances on the diagonal. More specifically, in `mod5` we allows for 8 different error variances - one for each factor-level-combination of the respective factor effects `date` and `density`. This is visualized in the plot below as 8 different colors. Speaking in the [syntax of `nlme`](https://cran.r-project.org/web/packages/nlme/nlme.pdf#Rfn.nlmeStruct.1){target="_blank"}, we obtain 8 parameter estimates: 1 estimate for the [model-object's `sigma`](https://cran.r-project.org/web/packages/nlme/nlme.pdf#Rfn.nlmeObject.1){target="_blank"} (= standard deviation for error term) and 7 estimates (that are different from 1) in the [model-object's `varStruct`](https://cran.r-project.org/web/packages/nlme/nlme.pdf#Rfn.nlmeStruct.1){target="_blank"} as can be seen on the y-axis:
 
@@ -170,10 +182,58 @@ ggplot(data=MAT, aes(x=X, y=Y)) + coord_fixed() +
 
 > In order to give a clearer picture, the variance matrix presented here was reduced to data of a single block in order to have dimensions 16x16. Since there were [4 complete blocks in the dataset](heterogeneous_error_variance.html){target="_blank"}, the entire variance matrix of the error term has dimensions 64x64. However, given that data/errors are sorted accordingly, our presented matrix is simply 1 out of 4 blocks in a [block diagonal matrix](https://www.wikiwand.com/en/Block_matrix#/Block_diagonal_matrices){target="_blank"}.
 
-# Multiplicative
-**It is possible to combine any two or more variance structures via direct multiplication** *a.k.a.* the [Kronecker product](https://www.wikiwand.com/en/Kronecker_product){target="_blank"}. This operation on two matrices of arbitrary size resulting in a block matrix is sometimes denoted by `r knitr::asis_output("\U2297")`. 
+# First order autoregressive AR(1)
 
-To give an example, we refer to to `mod4` in the [chapter on heterogeneous error variances](heterogeneous_error_variance.html){target="_blank"}. Here, a multiplicative variance structure results from the kronecker product of two diagonal variance structures. The first diagonal variance structure allows for different variances for the 2 levels of `date`, while the second diagonal variance structure allows for different variances for the 4 levels of `density`. Their Kronecker product therefore results in 8 different variances, visualized in the plot below as 8 different colors. 
+**This covariance structure has homogeneous variances, while the correlation between any two elements gets smaller the further apart they are separated (e.g. in terms of time or space).**
+
+Number of parameters: 2 (*i.e.* $\sigma$ and $\rho$).
+
+$$
+\left(\begin{array}{cc} 
+\sigma^2 & \sigma^2\rho & \sigma^2\rho^2 & \sigma^2\rho^3\\
+ & \sigma^2 & \sigma^2\rho & \sigma^2\rho^2\\
+ &  & \sigma^2 & \sigma^2\rho\\
+ &  &  & \sigma^2\\
+\end{array}\right) =
+\left(\begin{array}{cc} 
+1 & \rho & \rho^2 & \rho^3\\
+ & 1 & \rho & \rho^2\\
+ &  & 1 & \rho\\
+ &  &  & 1\\
+\end{array}\right) \sigma^2
+$$
+
+As can be seen, the correlation between any two elements can be described more speficically as: it is equal to $\rho$ for adjacent elements, $\rho^2$ for elements that are separated by a third, and so on. Note that since it is a correlation, we have -1 < $\rho$ < 1 and therefore $\rho$ indeed gets smaller when squared etc. This correlation model is useful, if all time points are equally spaced.
+
+As an explicit example, take the correlation between errors of two adjacent time points, in this case weeks, to be $\rho=0.9$. The correlation between errors that are two weeks apart is then $\rho^2=0.9^2=0.81$ and when they are three weeks apart it is $\rho^3=0.9^3=0.729$ and so on. Thus, the advantage here is that correlations become smaller over time and thus we have different correlation estimates, yet only a single correlation parameter $\rho$ is fitted in the model.
+
+# Multiplicative
+**It is possible to combine any two or more variance structures via direct multiplication *a.k.a.* the [Kronecker product](https://www.wikiwand.com/en/Kronecker_product){target="_blank"}.** 
+
+$$
+\left(\begin{array}{cc} 
+1 & 0 \\
+  & k_1 \\
+\end{array}\right) 
+\otimes
+\left(\begin{array}{cc} 
+1 & 0 & 0 \\
+  & k_2 & 0 \\
+  &   & k_3 \\
+\end{array}\right) \sigma^2 
+=
+\left(\begin{array}{cc} 
+1\cdot1 & 0 & 0 & 0 & 0 & 0 \\
+  & 1\cdot k_2 & 0 & 0 & 0 & 0 \\
+  &   & 1\cdot k_3 & 0 & 0 & 0 \\
+  &   &   & k_1\cdot 1 & 0 & 0 \\
+  &   &   &  & k_1\cdot k_2 & 0 \\
+  &   &   &  &  & k_1\cdot k_3 \\
+\end{array}\right) \sigma^2
+$$
+
+
+This operation on two matrices of arbitrary size resulting in a block matrix is sometimes denoted by $\otimes$. To give an example, we refer to `mod4` in the [chapter on heterogeneous error variances](heterogeneous_error_variance.html){target="_blank"}. Here, a multiplicative variance structure results from the kronecker product of two diagonal variance structures. The first diagonal variance structure allows for different variances for the 2 levels of `date`, while the second diagonal variance structure allows for different variances for the 4 levels of `density`. Their Kronecker product therefore results in 8 different variances, visualized in the plot below as 8 different colors. 
 
 ```{r, echo=FALSE}
 MAT <- mat4
@@ -216,8 +276,31 @@ One may now ask where the difference lies between this multiplicative variance s
 
 Therefore, **direct multiplication can lead to the desired structure with fewer parameters needing to be estimated**. Notice that the number of parameters penalizes the AIC and therefore has a direct impact on model selection decisions. In the underlying [chapter on heterogeneous error variances](heterogeneous_error_variance.html){target="_blank"}, `mod4` (= multiplicative) is indeed chosen over `mod5` based on the AIC.
 
-# More on this
-<span style="color:red">in progress</span>
-<br/>
+# Summary
 
-[Relevant section in SPSS documentation](https://www.ibm.com/support/knowledgecenter/SSLVMB_23.0.0/spss/advanced/covariance_structures.html){target="_blank"} 
+```{r, echo=FALSE}
+tribble(
+  ~`Variance Structure`,         ~total, ~var, ~cor,~nlme,    ~lme4,    ~glmmTMB, ~sommer,  ~SAS,
+  "Identitiy",                   "1",    "1",  "0" ,"default","default","default","default","VC",
+  "Diagonal",                    "t",    "t",  "0" ,NA,       NA,       NA,       NA,      "UN(1)",
+  "First order autoregressive ", "2",    "1",  "1" ,NA,       NA,       NA,       NA,      "AR(1)"
+) %>% 
+  kable(escape = FALSE) %>% 
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"), 
+                full_width = FALSE) %>% 
+  add_header_above(c(" ", 
+                     "number of parameters"=3, 
+                     "name in package"=5)) %>% 
+  footnote(general = "t = overall dimension of the covariance matrix (e.g. number of treatement levels).")
+```
+
+
+# More on this
+
+[ASReml-R documentation](https://asreml.kb.vsni.co.uk/wp-content/uploads/sites/3/2018/02/ASReml-R-Reference-Manual-4.pdf#section.4.2){target="_blank"} 
+
+[SAS documentation](https://documentation.sas.com/?docsetId=statug&docsetTarget=statug_mixed_syntax14.htm&docsetVersion=14.3&locale=en#statug.mixed.repeatedstmt_type){target="_blank"} 
+
+[SPSS documentation](https://www.ibm.com/support/knowledgecenter/SSLVMB_23.0.0/spss/advanced/covariance_structures.html){target="_blank"} 
+
+<span style="color:red">in progress</span>

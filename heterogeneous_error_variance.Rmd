@@ -10,26 +10,28 @@ params:
     - sas					 
 ---
 
-```{r echo=FALSE, message=FALSE, warning=FALSE}
-options(knitr.kable.NA = '')
-# packages for better formatting tables for html output
-library(kableExtra)
-library(formattable)
-library(htmltools)
-library(stringr)
+```{r, echo=FALSE, message=FALSE, warning=FALSE, purl=FALSE}
+# markdown options
+options(knitr.kable.NA = '') # show NA as empty cells in output tables
+pacman::p_load(kableExtra, formattable, htmltools) # packages for better formatting tables for html output
+```
+
+```{r, child="_hilang_setup.Rmd"}
 ```
 
 ```{r, message=FALSE, warning=FALSE}
 # packages
-pacman::p_load(dplyr, purrr, tibble, tidyr, # data handling
+pacman::p_load(dplyr, purrr, stringr, tibble, tidyr, # data handling
                nlme, lme4, glmmTMB, sommer, # mixed modelling
                AICcmodavg, broom.mixed)     # mixed model extractions
+
 # data
 dat <- agridat::mcconway.turnip %>%
   as_tibble() %>%
   mutate(densf = density %>% as.factor)
 ```
-```{r, echo=FALSE}
+
+```{r, echo=FALSE, purl=FALSE}
 dat %>%
   kable(escape = FALSE) %>% 
   kable_styling(bootstrap_options = c("bordered", "hover", "condensed", "responsive"), 
@@ -37,15 +39,17 @@ dat %>%
   scroll_box(height = "200px")
 ```
 
+<br/>
+
 # Motivation
 This is a randomized complete block design (4 blocks) with three treatment factors: genotype, date and density, leading to 16 treatment level combinations (2 genotypes, 2 planting dates, 4 densities) [(Piepho, 2009)](https://acsess.onlinelibrary.wiley.com/doi/abs/10.2134/agronj2008.0226x){target="_blank"}. It can be argued that heterogeneous error variances (*i.e.* heteroscedasticity) for two of the treatments should be considered:
 
 <div class = "row"> <div class = "col-md-6">
-```{r}
+```{r, purl=FALSE}
 boxplot(yield ~ date, data = dat)
 ```
 </div> <div class = "col-md-6">
-```{r}
+```{r, purl=FALSE}
 boxplot(yield ~ density, data = dat)
 ```
 </div> </div>
@@ -108,7 +112,7 @@ mod5.nlme <- mod1.nlme %>%
 ```
 
 ## lme4
-The short answer here is that with `lme4` it is **not possible** to fit any variance structures, so that in this example only `mod1` could be modeled: 
+The short answer here is that with `lme4` it is **not possible** to fit any variance structures, so that in this chapter only `mod1` could be modeled: 
 
 ```{r}
 mod1.lme4 <- lmer(formula = yield ~ gen * date * densf + (1 | block),
@@ -127,19 +131,19 @@ More specifically, we can read in an [`lme4` vigniette](https://cran.r-project.o
 
 Michael Clark [puts it as](https://m-clark.github.io/mixed-models-with-R/extensions.html#heterogeneous-variance){target="_blank"} *"Unfortunately, lme4 does not provide the ability to model the residual covariance structure, at least [not in a straightforward fashion](https://bbolker.github.io/mixedmodels-misc/notes/corr_braindump.html){target="_blank"}"*
 
-**Thus, there is no info on this package for this example beyond this point, except for model 1.**
+**Thus, there is no info on this package for this chapter beyond this point, except for model 1.**
 
 ## glmmTMB
 In `glmmTMB()` it is -to our knowledge- not possible to adjust the variance structure of the error.
 
 >Just like in `nlme`, there is a `weights=` argument in `glmmTMB()`. However, to our understanding, they have different functions: 
 > 
->In `nlme`, it requires *"an optional `varFunc` object or one-sided formula describing the within-group heteroscedasticity structure"* [(nlme RefMan)](https://cran.r-project.org/web/packages/glmmTMB/glmmTMB.pdf#Rfn.glmmTMB.1){target="_blank"} and we make use of this in the example at hand.   
+>In `nlme`, it requires *"an optional `varFunc` object or one-sided formula describing the within-group heteroscedasticity structure"* [(nlme RefMan)](https://cran.r-project.org/web/packages/glmmTMB/glmmTMB.pdf#Rfn.glmmTMB.1){target="_blank"} and we make use of this in the chapter at hand.   
 >
 >In `glmmTMB`, the [RefMan](https://cran.r-project.org/web/packages/glmmTMB/glmmTMB.pdf#Rfn.glmmTMB.1){target="_blank"} only states *"weights, as in `glm`. Not automatically scaled to have sum 1"*. Following this trail, the [`glm` documentation](https://stat.ethz.ch/R-manual/R-devel/library/stats/html/glm.html){target="_blank"} description for the `weights=` argument is *"an optional vector of ‘prior weights’ to be used in the fitting process. Should be NULL or a numeric vector."*.
 > Accordingly, it cannot be used to allow for heterogeneous error variances in this package.
 
-We can, however, "*fix the residual variance  to  be  0  (actually  a  small  non-zero  value)*" and therefore "*force variance into the random effects*" [(glmmTMB RefMan)](https://cran.r-project.org/web/packages/glmmTMB/glmmTMB.pdf#Rfn.glmmTMB.1){target="_blank"} via adding the `dispformula = ~0` argument. Thus, when doing so, we need to make sure to also add a random term to the model with the desired variance structure. By taking both of these actions, we are essentially mimicing the error (variance) as a random effect (variance). We achieve this by first creating a `unit` column in the data with different entries for each data point:
+We can, however, "*fix the residual variance  to  be  0  (actually  a  small  non-zero  value)*" and therefore "*force variance into the random effects*" [(glmmTMB RefMan)](https://cran.r-project.org/web/packages/glmmTMB/glmmTMB.pdf#Rfn.glmmTMB.1){target="_blank"} via adding the `dispformula = ~ 0` argument. Thus, when doing so, we need to make sure to also add a random term to the model with the desired variance structure. By taking both of these actions, we are essentially mimicing the error (variance) as a random effect (variance). We achieve this by first creating a `unit` column in the data with different entries for each data point:
 
 ```{r}
 dat <- dat %>%
@@ -148,7 +152,7 @@ dat <- dat %>%
 
 We should now be able to mimic the error variance via the random term `(1|unit)`. We can verify this quickly, by modelling *mod1* with a homoscedastic error variance in the standard fashion (`mod1`) and via a mimicked error term (`mod1b`). For all other models we make use of the `diag()` function. Notice that we must write `diag(TERM + 0|unit)`, since leaving out the `+ 0` would by default lead to estimating not only the desired heterogeneous variances, but an additional overall variance.
 
-Notice that so far we were not able to fit `mod4` with `glmmTMB`, as we do not know how to get the direct product of two variance structures.
+Notice that [at the moment, it is not possible](https://github.com/glmmTMB/glmmTMB/issues/592){target="_blank"}  to fit `mod4` with `glmmTMB`.
 
 ```{r, warning=FALSE}
 mod1.glmm <- glmmTMB(formula = yield ~ gen * date * densf + (1 | block), 
@@ -158,18 +162,18 @@ mod1.glmm <- glmmTMB(formula = yield ~ gen * date * densf + (1 | block),
 
 mod1b.glmm <- mod1.glmm %>%
   update(. ~ . + (1 | unit), # add random term to mimic homoscedastic error variance
-         dispformula =  ~ 0) # fix original error variance to 0
+         dispformula = ~ 0) # fix original error variance to 0
 
 mod2.glmm <- mod1.glmm %>% 
-  update(.~. + diag(date+0|unit), dispformula=~0)
+  update(. ~ . + diag(date + 0 | unit), dispformula = ~ 0)
 
 mod3.glmm <- mod1.glmm %>% 
-  update(.~. + diag(densf+0|unit), dispformula=~0)
+  update(. ~ . + diag(densf + 0 | unit), dispformula = ~ 0)
 
-# mod4/multiplicative variance structure possible? in progress.
+# mod4/multiplicative variance structure not possible.
 
 mod5.glmm <- mod1.glmm %>% 
-  update(.~. + diag(date:densf+0|unit), dispformula=~0)
+  update(. ~ . + diag(date:densf + 0 | unit), dispformula = ~ 0)
 ```
 
 As can be seen below, mimicing the error (variance) worked, as it leads to comparable variance component estimates:
@@ -370,7 +374,7 @@ mod5.nlme.VC %>%
                 full_width = FALSE)
 ```
 
-> We want to point out that the `tidy(effects="ran_pars")` function of the  `broom.mixed` package (which we used it in this example to obtain the variance component estimates from `glmmTMB()` models) [actually works](https://cran.r-project.org/web/packages/broom.mixed/vignettes/broom_mixed_intro.html){target="_blank"} on `lme()` objects as well (but it does not on `gls()` and `nlme()`). We did not use it here, however, since it only seems to provide the sigma estimate and not the varStruct estimates (see [github issue](https://github.com/bbolker/broom.mixed/issues/96){target="_blank"}).
+> We want to point out that the `tidy(effects="ran_pars")` function of the  `broom.mixed` package (which we used it in this chapter to obtain the variance component estimates from `glmmTMB()` models) [actually works](https://cran.r-project.org/web/packages/broom.mixed/vignettes/broom_mixed_intro.html){target="_blank"} on `lme()` objects as well (but it does not on `gls()` and `nlme()`). We did not use it here, however, since it only seems to provide the sigma estimate and not the varStruct estimates (see [github issue](https://github.com/bbolker/broom.mixed/issues/96){target="_blank"}).
 
 ## lme4
 In order to extract variance component estimates from `lme4` objects (in a table format we are used to), we here use the [`tidy()`](https://cran.r-project.org/web/packages/broom.mixed/broom.mixed.pdf#Rfn.glmmTMB.Rul.tidiers.1){target="_blank"} function from the helper package [`broom.mixed`]( https://CRAN.R-project.org/package=broom.mixed){target="_blank"}:
@@ -441,7 +445,7 @@ mod3.glmm.VC %>%
 
 **mod4**
 
-mod4/multiplicative variance structure possible? in progress.
+mod4/multiplicative variance structure not possible.
 
 **mod5**
 ```{r}
