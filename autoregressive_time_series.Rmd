@@ -247,9 +247,7 @@ mod.ar1.glmm <- glmmTMB(formula = y ~ factweek * (variety + block)
                         data = dat) 
 
 # Extract variance component estimates
-mod.iid.glmm.VC <- mod.ar1.glmm %>%
-  tidy(effects = "ran_pars", scales ="sdcor") %>%
-  separate(term, sep = "__", into = c("term", "grp"))
+
 ```
 ```{r, echo=FALSE, purl=FALSE}
 # mod.ar1.glmm %>%
@@ -276,6 +274,4 @@ run;
 
 # More on this 
 
-*"the error terms must now be allowed to be serially correlated. It is important to note that measurements taken on the same observational unit (plot in this case) are serially correlated, but observations on different units can be considered independent because of the randomized allocation of treatments to units. , and in the specification of these models, it is important to suitably identify the subjects. In SAS, for example, subject= option is used for that purpose. In R, subjects are identified after a vertical bar in the argument needed with the respective correlation function or in the random effect specification. Observations on the same subject are serially correlated, whereas observations on different subjects are independent. There are many models for serial correlation of longitudinal data (repeated measurements over time)."*
-
-The larger the distance in time (time lag), the lower is the covariance and correlation. This is depicted in Figure 7 for a few values of the autocorrelation q. This correlation model is useful, if all time points are equally spaced. IDEA: R Shiny zum selbst ausprobieren.
+in progress
