@@ -10,6 +10,8 @@ navbar:
       menu: 
       - text: "Heterogeneous error variance"
         href: heterogeneous_error_variance.html
+      - text: "First-order autoregressive"
+        href: autoregressive_time_series.html
     - text: "Summaries"
       menu: 
       - text: "Variance Structures"
