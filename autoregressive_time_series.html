@@ -498,6 +498,9 @@ div.tocify {
 </div>
 
 
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.31.0/mode/sas/sas.min.js"></script>
+
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" title="1"><span class="co"># packages</span></a>
 <a class="sourceLine" id="cb1-2" title="2">pacman<span class="op">::</span><span class="kw">p_load</span>(dplyr, purrr, tibble, tidyr, stringr, <span class="co"># data handling</span></a>
 <a class="sourceLine" id="cb1-3" title="3">               ggplot2, viridis,            <span class="co"># plot</span></a>
@@ -2546,7 +2549,7 @@ varweek
 <p>As <a href="https://onlinelibrary.wiley.com/doi/full/10.1111/jac.12267" target="_blank">Piepho &amp; Edmondson (2018)</a> put it: <em>“the week factor is not a treatment factor that can be randomized. Instead, repeated measurements are taken on each plot on five consecutive occasions. Successive measurements on the same plot are likely to be serially correlated, and this means that for a reliable and efficient analysis of repeated-measures data we need to take proper account of the serial correlations between the repeated measures (<a href="https://onlinelibrary.wiley.com/doi/abs/10.1111/j.1439-037X.2004.00097.x" target="_blank">Piepho, Büchse &amp; Richter, 2004</a>; <a href="http://library.mpib-berlin.mpg.de/toc/z2008_18.pdf" target="_blank">Pinheiro &amp; Bates, 2000</a>).”</em></p>
 </div>
 <div class="col-md-6">
-<p><img src="autoregressive_time_series_files/figure-html/unnamed-chunk-4-1.png" width="384" /></p>
+<p><img src="autoregressive_time_series_files/figure-html/unnamed-chunk-5-1.png" width="384" /></p>
 </div>
 </div>
 </div>
@@ -2691,11 +2694,17 @@ var
 <div id="sas" class="section level2">
 <h2>SAS</h2>
 <p>In SAS, there is an actual <code>subject=</code> statement that is used to identify the subjects on which repeated measurements are taken.</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" title="1">proc mixed data=dat;</a>
-<a class="sourceLine" id="cb5-2" title="2">class variety block factweek plot;</a>
-<a class="sourceLine" id="cb5-3" title="3">model y=block variety factweek block<span class="op">*</span>factweek variety<span class="op">*</span>factweek <span class="op">/</span>ddfm=kr2;</a>
-<a class="sourceLine" id="cb5-4" title="4">repeated factweek<span class="op">/</span>sub=plot type=VC rcorr;</a>
-<a class="sourceLine" id="cb5-5" title="5">run; </a></code></pre></div>
+
+
+<textarea id="VJGEI">
+proc mixed data=dat;
+class variety block factweek plot;
+model y=block variety factweek block*factweek variety*factweek /ddfm=kr2;
+repeated factweek/sub=plot type=VC rcorr;
+run; 
+</textarea>
+<script> var codeElement = document.getElementById("VJGEI"); var editor = null; if (null != codeElement) { editor = CodeMirror.fromTextArea(codeElement, { lineNumbers: true, readOnly: true, viewportMargin: Infinity, mode: 'text/x-sas' }); } </script>
+
 </div>
 </div>
 <div id="multiple-weeks---autocorrelated-errors" class="section level1 tabset tabset-fade tabset-pills">
@@ -2716,19 +2725,19 @@ var
 <div id="nlme-1" class="section level2">
 <h2>nlme</h2>
 <p>In <code>nlme</code> we make use of the <code>correlation =</code> argument and use the <code>corAR1</code> <a href="https://cran.r-project.org/web/packages/nlme/nlme.pdf#Rfn.corClasses.1" target="_blank">correlation strucutre class</a>. In its syntax, subjects are identified after the <code>|</code>.</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" title="1">mod.ar1.nlme &lt;-<span class="st"> </span>nlme<span class="op">::</span><span class="kw">gls</span>(<span class="dt">model =</span> y <span class="op">~</span><span class="st"> </span>factweek <span class="op">*</span><span class="st"> </span>(variety <span class="op">+</span><span class="st"> </span>block),</a>
-<a class="sourceLine" id="cb6-2" title="2">                          <span class="dt">correlation =</span> <span class="kw">corAR1</span>(<span class="dt">form =</span> <span class="op">~</span><span class="st"> </span>varweek <span class="op">|</span><span class="st"> </span>plot),</a>
-<a class="sourceLine" id="cb6-3" title="3">                          <span class="dt">data =</span> dat)</a>
-<a class="sourceLine" id="cb6-4" title="4"></a>
-<a class="sourceLine" id="cb6-5" title="5"><span class="co"># Extract variance component estimates</span></a>
-<a class="sourceLine" id="cb6-6" title="6">mod.ar1.nlme.VC &lt;-<span class="st"> </span><span class="kw">tibble</span>(<span class="dt">varstruct =</span> <span class="st">&quot;ar(1)&quot;</span>) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb6-7" title="7"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">sigma    =</span> mod.ar1.nlme<span class="op">$</span>sigma,</a>
-<a class="sourceLine" id="cb6-8" title="8">         <span class="dt">rho      =</span> <span class="kw">coef</span>(mod.ar1.nlme<span class="op">$</span>modelStruct<span class="op">$</span>corStruct, <span class="dt">unconstrained =</span> <span class="ot">FALSE</span>)) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb6-9" title="9"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">Variance =</span> sigma<span class="op">^</span><span class="dv">2</span>,</a>
-<a class="sourceLine" id="cb6-10" title="10">         <span class="dt">Corr1wk  =</span> rho,</a>
-<a class="sourceLine" id="cb6-11" title="11">         <span class="dt">Corr2wks =</span> rho<span class="op">^</span><span class="dv">2</span>,</a>
-<a class="sourceLine" id="cb6-12" title="12">         <span class="dt">Corr3wks =</span> rho<span class="op">^</span><span class="dv">3</span>,</a>
-<a class="sourceLine" id="cb6-13" title="13">         <span class="dt">Corr4wks =</span> rho<span class="op">^</span><span class="dv">4</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" title="1">mod.ar1.nlme &lt;-<span class="st"> </span>nlme<span class="op">::</span><span class="kw">gls</span>(<span class="dt">model =</span> y <span class="op">~</span><span class="st"> </span>factweek <span class="op">*</span><span class="st"> </span>(variety <span class="op">+</span><span class="st"> </span>block),</a>
+<a class="sourceLine" id="cb5-2" title="2">                          <span class="dt">correlation =</span> <span class="kw">corAR1</span>(<span class="dt">form =</span> <span class="op">~</span><span class="st"> </span>varweek <span class="op">|</span><span class="st"> </span>plot),</a>
+<a class="sourceLine" id="cb5-3" title="3">                          <span class="dt">data =</span> dat)</a>
+<a class="sourceLine" id="cb5-4" title="4"></a>
+<a class="sourceLine" id="cb5-5" title="5"><span class="co"># Extract variance component estimates</span></a>
+<a class="sourceLine" id="cb5-6" title="6">mod.ar1.nlme.VC &lt;-<span class="st"> </span><span class="kw">tibble</span>(<span class="dt">varstruct =</span> <span class="st">&quot;ar(1)&quot;</span>) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb5-7" title="7"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">sigma    =</span> mod.ar1.nlme<span class="op">$</span>sigma,</a>
+<a class="sourceLine" id="cb5-8" title="8">         <span class="dt">rho      =</span> <span class="kw">coef</span>(mod.ar1.nlme<span class="op">$</span>modelStruct<span class="op">$</span>corStruct, <span class="dt">unconstrained =</span> <span class="ot">FALSE</span>)) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb5-9" title="9"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">Variance =</span> sigma<span class="op">^</span><span class="dv">2</span>,</a>
+<a class="sourceLine" id="cb5-10" title="10">         <span class="dt">Corr1wk  =</span> rho,</a>
+<a class="sourceLine" id="cb5-11" title="11">         <span class="dt">Corr2wks =</span> rho<span class="op">^</span><span class="dv">2</span>,</a>
+<a class="sourceLine" id="cb5-12" title="12">         <span class="dt">Corr3wks =</span> rho<span class="op">^</span><span class="dv">3</span>,</a>
+<a class="sourceLine" id="cb5-13" title="13">         <span class="dt">Corr4wks =</span> rho<span class="op">^</span><span class="dv">4</span>)</a></code></pre></div>
 <table class="table table-bordered table-hover table-condensed table-responsive" style="width: auto !important; margin-left: auto; margin-right: auto;">
 <thead>
 <tr>
@@ -2794,16 +2803,16 @@ ar(1)
 </div>
 <div id="glmmtmb-1" class="section level2">
 <h2>glmmTMB</h2>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" title="1">mod.ar1.glmm &lt;-<span class="st"> </span><span class="kw">glmmTMB</span>(<span class="dt">formula =</span> y <span class="op">~</span><span class="st"> </span>factweek <span class="op">*</span><span class="st"> </span>(variety <span class="op">+</span><span class="st"> </span>block)</a>
-<a class="sourceLine" id="cb7-2" title="2">                        <span class="op">+</span><span class="st"> </span><span class="kw">ar1</span>(factweek <span class="op">+</span><span class="st"> </span><span class="dv">0</span> <span class="op">|</span><span class="st"> </span>plot), <span class="co"># add ar1 structure as random term to mimic error variance</span></a>
-<a class="sourceLine" id="cb7-3" title="3">                        <span class="dt">dispformula =</span> <span class="op">~</span><span class="st"> </span><span class="dv">0</span>, <span class="co"># fix original error variance to 0</span></a>
-<a class="sourceLine" id="cb7-4" title="4">                        <span class="dt">REML =</span> <span class="ot">TRUE</span>,       <span class="co"># needs to be stated since default = ML</span></a>
-<a class="sourceLine" id="cb7-5" title="5">                        <span class="dt">data =</span> dat) </a>
-<a class="sourceLine" id="cb7-6" title="6"></a>
-<a class="sourceLine" id="cb7-7" title="7"><span class="co"># Extract variance component estimates</span></a>
-<a class="sourceLine" id="cb7-8" title="8">mod.iid.glmm.VC &lt;-<span class="st"> </span>mod.ar1.glmm <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb7-9" title="9"><span class="st">  </span><span class="kw">tidy</span>(<span class="dt">effects =</span> <span class="st">&quot;ran_pars&quot;</span>, <span class="dt">scales =</span><span class="st">&quot;sdcor&quot;</span>) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb7-10" title="10"><span class="st">  </span><span class="kw">separate</span>(term, <span class="dt">sep =</span> <span class="st">&quot;__&quot;</span>, <span class="dt">into =</span> <span class="kw">c</span>(<span class="st">&quot;term&quot;</span>, <span class="st">&quot;grp&quot;</span>))</a></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" title="1">mod.ar1.glmm &lt;-<span class="st"> </span><span class="kw">glmmTMB</span>(<span class="dt">formula =</span> y <span class="op">~</span><span class="st"> </span>factweek <span class="op">*</span><span class="st"> </span>(variety <span class="op">+</span><span class="st"> </span>block)</a>
+<a class="sourceLine" id="cb6-2" title="2">                        <span class="op">+</span><span class="st"> </span><span class="kw">ar1</span>(factweek <span class="op">+</span><span class="st"> </span><span class="dv">0</span> <span class="op">|</span><span class="st"> </span>plot), <span class="co"># add ar1 structure as random term to mimic error variance</span></a>
+<a class="sourceLine" id="cb6-3" title="3">                        <span class="dt">dispformula =</span> <span class="op">~</span><span class="st"> </span><span class="dv">0</span>, <span class="co"># fix original error variance to 0</span></a>
+<a class="sourceLine" id="cb6-4" title="4">                        <span class="dt">REML =</span> <span class="ot">TRUE</span>,       <span class="co"># needs to be stated since default = ML</span></a>
+<a class="sourceLine" id="cb6-5" title="5">                        <span class="dt">data =</span> dat) </a>
+<a class="sourceLine" id="cb6-6" title="6"></a>
+<a class="sourceLine" id="cb6-7" title="7"><span class="co"># Extract variance component estimates</span></a>
+<a class="sourceLine" id="cb6-8" title="8">mod.iid.glmm.VC &lt;-<span class="st"> </span>mod.ar1.glmm <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb6-9" title="9"><span class="st">  </span><span class="kw">tidy</span>(<span class="dt">effects =</span> <span class="st">&quot;ran_pars&quot;</span>, <span class="dt">scales =</span><span class="st">&quot;sdcor&quot;</span>) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb6-10" title="10"><span class="st">  </span><span class="kw">separate</span>(term, <span class="dt">sep =</span> <span class="st">&quot;__&quot;</span>, <span class="dt">into =</span> <span class="kw">c</span>(<span class="st">&quot;term&quot;</span>, <span class="st">&quot;grp&quot;</span>))</a></code></pre></div>
 </div>
 <div id="sommer-1" class="section level2">
 <h2>sommer</h2>
@@ -2811,11 +2820,17 @@ ar(1)
 </div>
 <div id="sas-1" class="section level2">
 <h2>SAS</h2>
-<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" title="1">proc mixed data=dat;</a>
-<a class="sourceLine" id="cb8-2" title="2">class variety block factweek plot;</a>
-<a class="sourceLine" id="cb8-3" title="3">model y=block variety factweek block<span class="op">*</span>factweek variety<span class="op">*</span>factweek <span class="op">/</span>ddfm=kr2;</a>
-<a class="sourceLine" id="cb8-4" title="4">repeated factweek<span class="op">/</span>sub=plot type=<span class="kw">ar</span>(<span class="dv">1</span>) rcorr;</a>
-<a class="sourceLine" id="cb8-5" title="5">run; </a></code></pre></div>
+
+
+<textarea id="IYQJR">
+proc mixed data=dat;
+class variety block factweek plot;
+model y=block variety factweek block*factweek variety*factweek /ddfm=kr2;
+repeated factweek/sub=plot type=ar(1) rcorr;
+run; 
+</textarea>
+<script> var codeElement = document.getElementById("IYQJR"); var editor = null; if (null != codeElement) { editor = CodeMirror.fromTextArea(codeElement, { lineNumbers: true, readOnly: true, viewportMargin: Infinity, mode: 'text/x-sas' }); } </script>
+
 </div>
 </div>
 <div id="more-on-this" class="section level1">

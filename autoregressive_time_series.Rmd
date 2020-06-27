@@ -16,6 +16,9 @@ options(knitr.kable.NA = '') # show NA as empty cells in output tables
 pacman::p_load(kableExtra, formattable, htmltools) # packages for better formatting tables for html output
 ```
 
+```{r, child="_hilang_setup.Rmd"}
+```
+
 ```{r}
 # packages
 pacman::p_load(dplyr, purrr, tibble, tidyr, stringr, # data handling

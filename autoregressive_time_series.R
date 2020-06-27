@@ -1,6 +1,45 @@
 params <-
 list(hilang = "sas")
 
+
+# take a character vector of parameters and inject
+#   the appropriate script tag for code mirror
+# ensures that the script tags are only inserted once
+for(i in seq_along(params$hilang)) {
+  js_mode <- paste0("\n<script src=\"https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.31.0/mode/", tolower(params$hilang[i]), "/", tolower(params$hilang[i]), ".min.js\"></script>\n")
+  cat(htmltools::htmlPreserve(js_mode))
+}
+
+knitr::knit_hooks$set(source = function(x, options) {
+  if (!is.null(options$hilang)) {
+    textarea_id <- paste(sample(LETTERS, 5), collapse = "")
+    code_open <- paste0("\n\n<textarea id=\"", textarea_id, "\">\n")
+    code_close <- "\n</textarea>"
+    jscript_editor <- paste0("\n<script> var codeElement = document.getElementById(\"", textarea_id, "\"); var editor = null; if (null != codeElement) { editor = CodeMirror.fromTextArea(codeElement, { lineNumbers: true, readOnly: true, viewportMargin: Infinity, mode: 'text/x-", tolower(options$hilang), "' }); } </script>\n")
+    
+    # if the option from_file is set to true then assume that
+    #   whatever is in the code chunk is a file path
+    if (!is.null(options$from_file) && options$from_file) {
+      code_body <- readLines(file.path(x))   
+    } else {
+      code_body <- x
+    }
+    
+    knitr::asis_output(
+      htmltools::htmlPreserve(
+        stringr::str_c(
+          code_open,
+          paste(code_body, collapse = "\n"),
+          code_close,
+          jscript_editor
+        )
+      )
+    )
+  } else {
+    stringr::str_c("\n\n```", tolower(options$engine), "\n", paste0(x, collapse = "\n"), "\n```\n\n")
+  }
+})
+
 # packages
 pacman::p_load(dplyr, purrr, tibble, tidyr, stringr, # data handling
                ggplot2, viridis,            # plot
@@ -70,18 +109,6 @@ mod.ar1.glmm <- glmmTMB(formula = y ~ factweek * (variety + block)
                         data = dat) 
 
 # Extract variance component estimates
-# mod.ar1.glmm %>%
-#   tidy(effects = "ran_pars", scales ="sdcor") %>%
-#   separate(term, sep = "__", into = c("term", "grp"))
-
-x <- VarCorr(mod.ar1.glmm)
-x %>% simplify %>% as.data.frame()
-
-mod.ar1.glmm %>% tidy(effects = "ran_pars", scales ="sdcor")
-
-
-purrr::map(x, diag)
-
-VarCorr(mod.ar1.glmm)$cond %>% purrr::map(., diag) %>% unlist
-
-VarCorr(mod.ar1.glmm)$cond %>% purrr::map(attr, 'correlation') %>% purrr::map(remove_parens)
+mod.iid.glmm.VC <- mod.ar1.glmm %>%
+  tidy(effects = "ran_pars", scales ="sdcor") %>%
+  separate(term, sep = "__", into = c("term", "grp"))
