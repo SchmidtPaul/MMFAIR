@@ -16,7 +16,8 @@ options(knitr.kable.NA = '') # show NA as empty cells in output tables
 pacman::p_load(kableExtra, formattable, htmltools) # packages for better formatting tables for html output
 ```
 
-```{r, child="_hilang_setup.Rmd"}
+```{r, child="_hilang_setup.Rmd", purl=FALSE}
+# required for sas syntax highlightinh
 ```
 
 ```{r}
@@ -24,7 +25,7 @@ pacman::p_load(kableExtra, formattable, htmltools) # packages for better formatt
 pacman::p_load(dplyr, purrr, tibble, tidyr, stringr, # data handling
                ggplot2, viridis,            # plot
                nlme, lme4, glmmTMB, sommer, # mixed modelling
-               AICcmodavg, broom.mixed)     # mixed model extractions
+               AICcmodavg, mixedup)         # mixed model extractions
 
 # data
 dat <- agriTutorial::sorghum %>%
@@ -92,11 +93,13 @@ mod.wk1 <- lm(formula = y ~ variety + block,
               data = dat.wk1)
 ```
 
-We could now go on and look at the ANOVA via `anova(mod.wk1)` and it would indeed not be _wrong_ by simply repeating this for each week. Yet, one may not be satisfied with obtaining multiple ANOVA results - namely one per week. This is especially likeliy in case the results contradict each other, because *e.g.* the variety effects are found to be significant in only two out for five weeks. Therefore, one may want to analyze the entire dataset *i.e.* the multiple weeks jointly.
+We could now go on and look at the ANOVA via `anova(mod.wk1)` and it would indeed not be _wrong_ to simply repeat this for each week. Yet, one may not be satisfied with obtaining multiple ANOVA results - namely one per week. This is especially likeliy in case the results contradict each other, because *e.g.* the variety effects are found to be significant in only two out of five weeks. Therefore, one may want to analyze the entire dataset *i.e.* the multiple weeks jointly.
 
 # Multiple weeks - independent errors {.tabset .tabset-fade .tabset-pills}
 
-Going from the single-week-analysis to jointly analyzing the entire dataset is more than just changing the `data =` statement in the model. This is because *"it is realistic to assume that the treatment effects evolve over time and thus are week-specific. Importantly, we must also allow for the block effects to change over time in an individual manner. For example, there could be fertility or soil type differences between blocks and these could have a smooth progressive or cumulative time-based effect on differences between the blocks dependent on factors such as temperature or rainfall"* [(Piepho & Edmondson, 2018)](https://onlinelibrary.wiley.com/doi/full/10.1111/jac.12267){target="_blank"}. We implement this by taking the model in `mod.wk1` and multipyling each effect with `factweek`. Note that this is also true for the general interecept (µ) in `mod.wk1`, meaning that we would like to include one intercept per week, which can be achieved by simply adding `factweek` as a main effect as well. This leaves us with (fixed) main effects for `factweek`, `variety`, and `block`, as well as the week-specific effects of the latter two `factweek:variety` and `factweek:block`.
+Going from the single-week-analysis to jointly analyzing the entire dataset is more than just changing the `data =` statement in the model. This is because *"it is realistic to assume that the treatment effects evolve over time and thus are week-specific. Importantly, we must also allow for the block effects to change over time in an individual manner. For example, there could be fertility or soil type differences between blocks and these could have a smooth progressive or cumulative time-based effect on differences between the blocks dependent on factors such as temperature or rainfall"* [(Piepho & Edmondson, 2018)](https://onlinelibrary.wiley.com/doi/full/10.1111/jac.12267){target="_blank"}. We implement this by taking the model in `mod.wk1` and multipyling each effect with `factweek`. Note that this is also true for the general interecept (µ) in `mod.wk1`, meaning that we would like to include one intercept per week, which can be achieved by simply adding `factweek` as a main effect as well. This leaves us with fixed main effects for `factweek`, `variety`, and `block`, as well as the week-specific effects of the latter two `factweek:variety` and `factweek:block`.
+
+Finally, note that we are not doing anything about the model's error term at this point. More specifically this means that its variance structure is still the default **iid** (independent and identically distributed) - see [our summary on correlation/variance strucutres here](variance_structures.html){target="_blank"}.
 
 ## nlme
 
@@ -145,7 +148,10 @@ In `glmmTMB()` it is -to our knowledge- not possible to adjust the variance stru
 
 We can, however, "*fix the residual variance  to  be  0  (actually  a  small  non-zero  value)*" and therefore "*force variance into the random effects*" [(glmmTMB RefMan)](https://cran.r-project.org/web/packages/glmmTMB/glmmTMB.pdf#Rfn.glmmTMB.1){target="_blank"} via adding the `dispformula = ~ 0` argument. Thus, when doing so, we need to make sure to also add a random term to the model with the desired variance structure. By taking both of these actions, we are essentially mimicing the error (variance) as a random effect (variance). We achieve this by first creating a `unit` column in the data with different entries for each data point. 
 
-Note that doing this may not be necessary for `mod.iid.glmm` with the default homoscedastic, independent error variance structure, but since it will be necessary for the following models with more sophisticated variance structures, we will apply it here, too:
+Note that doing this may not be necessary for `mod.iid.glmm` with the default homoscedastic, independent error variance structure, but since it will be necessary for the following model with a more sophisticated variance structure, we will apply it here, too.
+
+Finally, for extracting the variance component estimates from `glmmTMB` objects in this chapter, we use the `extract_vc` function from the 
+[`mixedup` helper package](https://github.com/m-clark/mixedup){target="_blank"}. 
 
 ```{r}
 dat <- dat %>%
@@ -159,11 +165,11 @@ mod.iid.glmm <- glmmTMB(formula = y ~ factweek * (variety + block)
 
 # Extract variance component estimates
 mod.iid.glmm.VC <- mod.iid.glmm %>%
-  tidy(effects = "ran_pars", scales = "vcov") %>%
-  separate(term, sep = "__", into = c("term", "grp"))
+  extract_vc(ci_scale = "var")
 ```
 ```{r, echo=FALSE, purl=FALSE}
 mod.iid.glmm.VC %>%
+  dplyr::select(-sd, -var_prop) %>% 
   mutate_if(is.double, round, 3) %>% 
   kable(escape = FALSE) %>% 
   kable_styling(bootstrap_options = c("bordered", "hover", "condensed", "responsive"), 
@@ -172,7 +178,23 @@ mod.iid.glmm.VC %>%
 
 ## sommer
 
-in progress
+It is quite easy to extract variance component estimates from `sommer` objects in a table format we are used to:
+
+```{r}
+mod.iid.somm <- mmer(fixed = y ~ factweek + variety + block + factweek:variety + factweek:block, 
+                     rcov  = ~ units, # default = iid
+                     data  = dat, verbose=F)
+
+# Extract variance component estimates
+mod.iid.somm.VC <- summary(mod.iid.somm)$varcomp 
+```
+```{r, echo=FALSE, purl=FALSE}
+mod.iid.somm.VC %>%
+  mutate_if(is.double, round, 3) %>% 
+  kable(escape = FALSE) %>% 
+  kable_styling(bootstrap_options = c("bordered", "hover", "condensed", "responsive"), 
+                full_width = FALSE)
+```
 
 ## SAS
 
@@ -239,6 +261,10 @@ not possible - see above.
 
 ## glmmTMB
 
+To model the variance structure of our mimiced error term as first order autoregressive, we replace the `(1 | unit)` from the `iid` model with `ar1(factweek + 0 | plot)`. As can be seen, subjects are identified after the `|` and the variance structure in this syntax. Further notice that leaving out the `+ 0` would by default lead to estimating an additional overall variance (see *Details* for [`glmmTMB` topic in the RefMan](https://cran.r-project.org/web/packages/glmmTMB/glmmTMB.pdf#Rfn.glmmTMB.1){target="_blank"}).
+
+Note that by adding the `show_cor = TRUE` argument to the `extract_vc` function, we obtain two outputs: The variance component estimates, as seen above for the `iid` model, as well as the correlation matrix / variance structure for a single plot.
+
 ```{r}
 mod.ar1.glmm <- glmmTMB(formula = y ~ factweek * (variety + block)
                         + ar1(factweek + 0 | plot), # add ar1 structure as random term to mimic error variance
@@ -247,20 +273,59 @@ mod.ar1.glmm <- glmmTMB(formula = y ~ factweek * (variety + block)
                         data = dat) 
 
 # Extract variance component estimates
-
+mod.ar1.glmm.VC <- mod.ar1.glmm %>%
+  extract_vc(ci_scale = "var", show_cor = TRUE)
 ```
 ```{r, echo=FALSE, purl=FALSE}
-# mod.ar1.glmm %>%
-#   mutate_if(is.double, round, 3) %>% 
-#   kable(escape = FALSE) %>% 
-#   kable_styling(bootstrap_options = c("bordered", "hover", "condensed", "responsive"), 
-#                 full_width = FALSE)
-```
+mod.ar1.glmm.VC %>%
+  pluck("Variance Components") %>% 
+  dplyr::select(-sd, -var_prop) %>% 
+  mutate_if(is.double, round, 3) %>%
+  kable(escape = FALSE) %>%
+  kable_styling(bootstrap_options = c("bordered", "hover", "condensed", "responsive"),
+                full_width = FALSE)
 
+mod.ar1.glmm.VC %>%
+  pluck("Cor") %>% pluck("plot") %>% 
+  as_tibble(rownames = "cor") %>% 
+  mutate_if(is.double, round, 3) %>% 
+  kable(escape = FALSE) %>%
+  column_spec(1, bold = T) %>% 
+  kable_styling(bootstrap_options = c("bordered", "hover", "condensed", "responsive"),
+                full_width = FALSE)
+```
 
 ## sommer
 
-in progress
+Trying to use sommer here leads to making two sacrifices and as a result it can be argued whether this analysis with sommer is still what we are aiming for in this specific example. While yes, there is an [AR1 function in sommer](https://cran.r-project.org/web/packages/sommer/sommer.pdf#Rfn.AR1.1){target="_blank"}, the two major limitations with it regarding this scenario are:
+
+* It cannot be used for the error term (*i.e.* in the `rcov=` argument), but must be applied for a random effect.
+* A fixed value for rho must actually be provided by the user via the `rho=` argument.
+
+The first point would not be such a big deal, if we could force the error variance to be 0. Then, the random term with the desired ar1-structure would simply mimic the error term, which is exactly what we do with `glmmTMB` in this chapter! However, since `sommer` does not allow us to force the error variance to be 0, we get an iid error variance **and** the desired ar1-structure for plots across weeks. Interestingly, [Piepho & Edmondson (2018)](https://onlinelibrary.wiley.com/doi/full/10.1111/jac.12267){target="_blank"} actually fit this model as well in addition to the ar1 model and refer to it as "ar1 + nugget". Strictly speaking, however, it simply is not the variance structure we were aiming for here.
+
+The second point is simply a limitation in terms of finding the optimal parameters. Since rho is fixed to a value that we as the user must provide before the model iterates, the fitted model can only be as good as our provided rho.
+
+```{r}
+fixed.rho <- 0.7
+
+mod.ar1.somm <- mmer(fixed  = y ~ factweek + variety + block + factweek:variety + factweek:block, 
+                     random = ~ vs(factweek, Gu = AR1(factweek, rho = fixed.rho)),
+                     rcov   = ~ units, # default = iid
+                     data   = dat, verbose=F)
+
+# Extract variance component estimates
+mod.ar1.somm.VC <- summary(mod.ar1.somm)$varcomp 
+```
+```{r, echo=FALSE, purl=FALSE}
+mod.ar1.somm.VC %>%
+  mutate_if(is.double, round, 3) %>% 
+  kable(escape = FALSE) %>% 
+  kable_styling(bootstrap_options = c("bordered", "hover", "condensed", "responsive"), 
+                full_width = FALSE)
+```
+
+Note that rho is not reported as part of the variance component estimates - which makes sense, as it was not estimated.
 
 ## SAS
 
@@ -271,6 +336,32 @@ model y=block variety factweek block*factweek variety*factweek /ddfm=kr2;
 repeated factweek/sub=plot type=ar(1) rcorr;
 run; 
 ```
+
+# Model fit {.tabset .tabset-fade .tabset-pills}
+
+After all, a decision must be made on whether the `ar1` variance structure for the error term was a good choice for modelling this dataset. More broadly speaking, it must be decided which of the models should be used for further investigations such as a test of fixed effects *etc*. As is standard procedure, we can do a model selection based on goodness-of-fit statistics such as the [AIC](https://www.wikiwand.com/en/Akaike_information_criterion#){target="_blank"} (Akaike information criterion).
+
+For `nlme` and `glmmTMB`, we make use of the [`aictab()` function](https://cran.r-project.org/web/packages/AICcmodavg/AICcmodavg.pdf#Rfn.aictab.1){target="_blank"} from the helper package [AICcmodavg](https://CRAN.R-project.org/package=AICcmodavg){target="_blank"}.
+
+# Summary {.tabset .tabset-fade}
+
+## Syntax
+
+package | model syntax
+---|---
+`nlme` | `correlation = corAR1(form = ~ TIME | SUBJECT)`
+`lme4` | <span style="color:red">not possible</span>
+`glmmTMB` | `random = ~ ar1(TIME + 0 | SUBJECT), dispformula =  ~ 0`
+`sommer` | in progress
+`SAS` | `repeated TIME/sub=SUBJECT type=ar(1);`
+
+## VarComp
+
+in progress
+
+## AIC
+
+in progress
 
 # More on this 
 

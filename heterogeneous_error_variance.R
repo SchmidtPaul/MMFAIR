@@ -1,45 +1,6 @@
 params <-
 list(hilang = "sas")
 
-
-# take a character vector of parameters and inject
-#   the appropriate script tag for code mirror
-# ensures that the script tags are only inserted once
-for(i in seq_along(params$hilang)) {
-  js_mode <- paste0("\n<script src=\"https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.31.0/mode/", tolower(params$hilang[i]), "/", tolower(params$hilang[i]), ".min.js\"></script>\n")
-  cat(htmltools::htmlPreserve(js_mode))
-}
-
-knitr::knit_hooks$set(source = function(x, options) {
-  if (!is.null(options$hilang)) {
-    textarea_id <- paste(sample(LETTERS, 5), collapse = "")
-    code_open <- paste0("\n\n<textarea id=\"", textarea_id, "\">\n")
-    code_close <- "\n</textarea>"
-    jscript_editor <- paste0("\n<script> var codeElement = document.getElementById(\"", textarea_id, "\"); var editor = null; if (null != codeElement) { editor = CodeMirror.fromTextArea(codeElement, { lineNumbers: true, readOnly: true, viewportMargin: Infinity, mode: 'text/x-", tolower(options$hilang), "' }); } </script>\n")
-    
-    # if the option from_file is set to true then assume that
-    #   whatever is in the code chunk is a file path
-    if (!is.null(options$from_file) && options$from_file) {
-      code_body <- readLines(file.path(x))   
-    } else {
-      code_body <- x
-    }
-    
-    knitr::asis_output(
-      htmltools::htmlPreserve(
-        stringr::str_c(
-          code_open,
-          paste(code_body, collapse = "\n"),
-          code_close,
-          jscript_editor
-        )
-      )
-    )
-  } else {
-    stringr::str_c("\n\n```", tolower(options$engine), "\n", paste0(x, collapse = "\n"), "\n```\n\n")
-  }
-})
-
 # packages
 pacman::p_load(dplyr, purrr, stringr, tibble, tidyr, # data handling
                nlme, lme4, glmmTMB, sommer, # mixed modelling
@@ -132,7 +93,10 @@ mod3.somm <- mmer(fixed  = yield ~ gen * date * densf,
                   rcov   = ~ vs(ds(densf), units), 
                   data   = dat, verbose=F)
 
-# mod4/multiplicative variance structure possible? in progress.
+mod4.somm <- mmer(fixed  = yield ~ gen * date * densf, 
+                  random = ~ block,
+                  rcov   = ~ vs(ds(date), units) + vs(ds(densf), units), 
+                  data   = dat, verbose=F)
 
 mod5.somm <- mmer(fixed  = yield ~ gen * date * densf, 
                   random = ~ block,
@@ -416,8 +380,6 @@ plyr::join_all(list(AIC.nlme %>% dplyr::select(Modnames, AICc) %>% rename(nlme=A
                     AIC.sas  %>% dplyr::select(Modnames, AICC) %>% rename(SAS=AICC)
                     ), by="Modnames", type="left") %>% 
   mutate_if(is.double, round, 3) %>% 
-  # mutate_at(vars(nlme:SAS), 
-  #           ~ cell_spec(., color=case_when(.==min(., na.rm=TRUE) ~ "#158cba", TRUE ~ "black"))) %>% 
   kable(escape = FALSE) %>% 
   kable_styling(bootstrap_options = c("bordered", "hover", "condensed", "responsive"), 
                 full_width = FALSE)

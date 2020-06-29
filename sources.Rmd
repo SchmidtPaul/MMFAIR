@@ -54,6 +54,11 @@ output:
 * [Reference manual](https://cran.r-project.org/web/packages/broom.mixed/broom.mixed.pdf){target="_blank"}
 * Vignettes
   + [introduction to broom.mixed](https://cran.r-project.org/web/packages/broom.mixed/vignettes/broom_mixed_intro.html){target="_blank"}
+  
+#### mixedup
+* [github repositroy](https://github.com/m-clark/mixedup){target="_blank"} 
+* Vignettes
+  + [For more details and examples see here](https://m-clark.github.io/mixedup/){target="_blank"} 
 
 ### Data/Examples
 

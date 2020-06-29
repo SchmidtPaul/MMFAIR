@@ -16,7 +16,8 @@ options(knitr.kable.NA = '') # show NA as empty cells in output tables
 pacman::p_load(kableExtra, formattable, htmltools) # packages for better formatting tables for html output
 ```
 
-```{r, child="_hilang_setup.Rmd"}
+```{r, child="_hilang_setup.Rmd", purl=FALSE}
+# required for sas syntax highlightinh
 ```
 
 ```{r, message=FALSE, warning=FALSE}
@@ -207,7 +208,10 @@ mod3.somm <- mmer(fixed  = yield ~ gen * date * densf,
                   rcov   = ~ vs(ds(densf), units), 
                   data   = dat, verbose=F)
 
-# mod4/multiplicative variance structure possible? in progress.
+mod4.somm <- mmer(fixed  = yield ~ gen * date * densf, 
+                  random = ~ block,
+                  rcov   = ~ vs(ds(date), units) + vs(ds(densf), units), 
+                  data   = dat, verbose=F)
 
 mod5.somm <- mmer(fixed  = yield ~ gen * date * densf, 
                   random = ~ block,
@@ -641,7 +645,7 @@ mod5.sas.VC %>%
 ```
 
 # Model Fit {.tabset .tabset-fade .tabset-pills}
-As is standard procedure, we can do a model selection based on goodness-of-fit statistics such as the AIC. In order to have a direct comparison to Table 1 in [(Piepho, 2009)](https://acsess.onlinelibrary.wiley.com/doi/abs/10.2134/agronj2008.0226x){target="_blank"}, we also calculated the deviance (*i.e.* -2*loglikelihood) for each model.
+As is standard procedure, we can do a model selection based on goodness-of-fit statistics such as the [AIC](https://www.wikiwand.com/en/Akaike_information_criterion#){target="_blank"} (Akaike information criterion). In order to have a direct comparison to Table 1 in [(Piepho, 2009)](https://acsess.onlinelibrary.wiley.com/doi/abs/10.2134/agronj2008.0226x){target="_blank"}, we also calculated the deviance (*i.e.* -2*loglikelihood) for each model.
 
 For `nlme`, `lme4` and `glmmTMB`, we make use of the [`aictab()` function](https://cran.r-project.org/web/packages/AICcmodavg/AICcmodavg.pdf#Rfn.aictab.1){target="_blank"} from the helper package [AICcmodavg](https://CRAN.R-project.org/package=AICcmodavg){target="_blank"}.
 
@@ -842,8 +846,6 @@ plyr::join_all(list(AIC.nlme %>% dplyr::select(Modnames, AICc) %>% rename(nlme=A
                     AIC.sas  %>% dplyr::select(Modnames, AICC) %>% rename(SAS=AICC)
                     ), by="Modnames", type="left") %>% 
   mutate_if(is.double, round, 3) %>% 
-  # mutate_at(vars(nlme:SAS), 
-  #           ~ cell_spec(., color=case_when(.==min(., na.rm=TRUE) ~ "#158cba", TRUE ~ "black"))) %>% 
   kable(escape = FALSE) %>% 
   kable_styling(bootstrap_options = c("bordered", "hover", "condensed", "responsive"), 
                 full_width = FALSE)

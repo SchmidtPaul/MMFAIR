@@ -104,7 +104,7 @@ mat5 <- left_join(x  = setup,
 
 Here you will find a list of variance structures (*a.k.a* covariance structures, variance-covariance-structures, correlation structures) with short explanations and possibly examples.
 
-# Identitiy
+# IID - Independent & Identically Distributed
 **This covariance structure has homogeneous variances and zero correlation between elements.**
 
 Number of parameters = 1 (*i.e.* $\sigma$)
@@ -165,7 +165,7 @@ ggplot(data=MAT, aes(x=X, y=Y)) + coord_fixed() +
                      breaks = labs %>% pull(X),
                      labels = labs %>% pull(date_densf),
                      sec.axis = sec_axis(~ .,
-                        name = "genotpye",
+                        name = "genotype",
                         breaks = labs %>% pull(X),
                         labels = labs %>% pull(gen))) +
   scale_y_continuous(name = "VarStruct date-density-combination",
@@ -251,7 +251,7 @@ ggplot(data=MAT, aes(x=X, y=Y)) + coord_fixed() +
                      breaks = labs %>% pull(X),
                      labels = labs %>% pull(date_densf),
                      sec.axis = sec_axis(~ .,
-                        name = "genotpye",
+                        name = "genotype",
                         breaks = labs %>% pull(X),
                         labels = labs %>% pull(gen))) +
   scale_y_continuous(name = "VarStruct density",
