@@ -2711,6 +2711,9 @@ Residual
 <table class="table table-bordered table-hover table-condensed table-responsive" style="width: auto !important; margin-left: auto; margin-right: auto;">
 <thead>
 <tr>
+<th style="text-align:left;">
+grp
+</th>
 <th style="text-align:right;">
 VarComp
 </th>
@@ -2727,6 +2730,9 @@ Constraint
 </thead>
 <tbody>
 <tr>
+<td style="text-align:left;">
+units.y-y
+</td>
 <td style="text-align:right;">
 0.023
 </td>
@@ -2748,14 +2754,14 @@ Positive
 <p>In SAS, there is an actual <code>subject=</code> statement that is used to identify the subjects on which repeated measurements are taken.</p>
 
 
-<textarea id="QGVOI">
+<textarea id="SWTBH">
 proc mixed data=dat;
 class variety block factweek plot;
 model y=block variety factweek block*factweek variety*factweek /ddfm=kr2;
 repeated factweek/sub=plot type=VC rcorr;
 run; 
 </textarea>
-<script> var codeElement = document.getElementById("QGVOI"); var editor = null; if (null != codeElement) { editor = CodeMirror.fromTextArea(codeElement, { lineNumbers: true, readOnly: true, viewportMargin: Infinity, mode: 'text/x-sas' }); } </script>
+<script> var codeElement = document.getElementById("SWTBH"); var editor = null; if (null != codeElement) { editor = CodeMirror.fromTextArea(codeElement, { lineNumbers: true, readOnly: true, viewportMargin: Infinity, mode: 'text/x-sas' }); } </script>
 
 </div>
 </div>
@@ -3124,7 +3130,7 @@ factweek5
 </ul>
 <p>The first point would not be such a big deal, if we could force the error variance to be 0. Then, the random term with the desired ar1-structure would simply mimic the error term, which is exactly what we do with <code>glmmTMB</code> in this chapter! However, since <code>sommer</code> does not allow us to force the error variance to be 0, we get an iid error variance <strong>and</strong> the desired ar1-structure for plots across weeks. Interestingly, <a href="https://onlinelibrary.wiley.com/doi/full/10.1111/jac.12267" target="_blank">Piepho &amp; Edmondson (2018)</a> actually fit this model as well in addition to the ar1 model and refer to it as “ar1 + nugget”. Strictly speaking, however, it simply is not the variance structure we were aiming for here.</p>
 <p>The second point is simply a limitation in terms of finding the optimal parameters. Since rho is fixed to a value that we as the user must provide before the model iterates, the fitted model can only be as good as our provided rho.</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" title="1">fixed.rho &lt;-<span class="st"> </span><span class="fl">0.7</span></a>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" title="1">fixed.rho &lt;-<span class="st"> </span><span class="fl">0.7</span> <span class="co"># random guess</span></a>
 <a class="sourceLine" id="cb8-2" title="2"></a>
 <a class="sourceLine" id="cb8-3" title="3">mod.ar1.somm &lt;-<span class="st"> </span><span class="kw">mmer</span>(<span class="dt">fixed  =</span> y <span class="op">~</span><span class="st"> </span>factweek <span class="op">+</span><span class="st"> </span>variety <span class="op">+</span><span class="st"> </span>block <span class="op">+</span><span class="st"> </span>factweek<span class="op">:</span>variety <span class="op">+</span><span class="st"> </span>factweek<span class="op">:</span>block, </a>
 <a class="sourceLine" id="cb8-4" title="4">                     <span class="dt">random =</span> <span class="op">~</span><span class="st"> </span><span class="kw">vs</span>(factweek, <span class="dt">Gu =</span> <span class="kw">AR1</span>(factweek, <span class="dt">rho =</span> fixed.rho)),</a>
@@ -3136,6 +3142,9 @@ factweek5
 <table class="table table-bordered table-hover table-condensed table-responsive" style="width: auto !important; margin-left: auto; margin-right: auto;">
 <thead>
 <tr>
+<th style="text-align:left;">
+grp
+</th>
 <th style="text-align:right;">
 VarComp
 </th>
@@ -3152,6 +3161,9 @@ Constraint
 </thead>
 <tbody>
 <tr>
+<td style="text-align:left;">
+u:factweek.y-y
+</td>
 <td style="text-align:right;">
 0.005
 </td>
@@ -3166,6 +3178,9 @@ Positive
 </td>
 </tr>
 <tr>
+<td style="text-align:left;">
+units.y-y
+</td>
 <td style="text-align:right;">
 0.023
 </td>
@@ -3181,19 +3196,20 @@ Positive
 </tr>
 </tbody>
 </table>
+<p>Note that rho is not reported as part of the variance component estimates - which makes sense, as it was not estimated.</p>
 </div>
 <div id="sas-1" class="section level2">
 <h2>SAS</h2>
 
 
-<textarea id="JSOXI">
+<textarea id="JVSWU">
 proc mixed data=dat;
 class variety block factweek plot;
 model y=block variety factweek block*factweek variety*factweek /ddfm=kr2;
 repeated factweek/sub=plot type=ar(1) rcorr;
 run; 
 </textarea>
-<script> var codeElement = document.getElementById("JSOXI"); var editor = null; if (null != codeElement) { editor = CodeMirror.fromTextArea(codeElement, { lineNumbers: true, readOnly: true, viewportMargin: Infinity, mode: 'text/x-sas' }); } </script>
+<script> var codeElement = document.getElementById("JVSWU"); var editor = null; if (null != codeElement) { editor = CodeMirror.fromTextArea(codeElement, { lineNumbers: true, readOnly: true, viewportMargin: Infinity, mode: 'text/x-sas' }); } </script>
 
 </div>
 </div>
@@ -3201,6 +3217,187 @@ run;
 <h1>Model fit</h1>
 <p>After all, a decision must be made on whether the <code>ar1</code> variance structure for the error term was a good choice for modelling this dataset. More broadly speaking, it must be decided which of the models should be used for further investigations such as a test of fixed effects <em>etc</em>. As is standard procedure, we can do a model selection based on goodness-of-fit statistics such as the <a href="https://www.wikiwand.com/en/Akaike_information_criterion#" target="_blank">AIC</a> (Akaike information criterion).</p>
 <p>For <code>nlme</code> and <code>glmmTMB</code>, we make use of the <a href="https://cran.r-project.org/web/packages/AICcmodavg/AICcmodavg.pdf#Rfn.aictab.1" target="_blank"><code>aictab()</code> function</a> from the helper package <a href="https://CRAN.R-project.org/package=AICcmodavg" target="_blank">AICcmodavg</a>.</p>
+<div id="nlme-2" class="section level2">
+<h2>nlme</h2>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" title="1">AIC.nlme &lt;-<span class="st"> </span><span class="kw">aictab</span>(<span class="kw">list</span>(mod.iid.nlme, mod.ar1.nlme), <span class="dt">modnames =</span> <span class="kw">c</span>(<span class="st">&quot;iid&quot;</span>, <span class="st">&quot;ar1&quot;</span>))</a></code></pre></div>
+<table class="table table-bordered table-hover table-condensed table-responsive" style="width: auto !important; margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Modnames
+</th>
+<th style="text-align:right;">
+K
+</th>
+<th style="text-align:right;">
+AICc
+</th>
+<th style="text-align:right;">
+Delta_AICc
+</th>
+<th style="text-align:right;">
+Res.LL
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+ar1
+</td>
+<td style="text-align:right;">
+42
+</td>
+<td style="text-align:right;">
+101.4
+</td>
+<td style="text-align:right;">
+0.0
+</td>
+<td style="text-align:right;">
+23.0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+iid
+</td>
+<td style="text-align:right;">
+41
+</td>
+<td style="text-align:right;">
+137.6
+</td>
+<td style="text-align:right;">
+36.2
+</td>
+<td style="text-align:right;">
+1.9
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="lme4-2" class="section level2">
+<h2>lme4</h2>
+<p>not possible - see above.</p>
+</div>
+<div id="glmmtmb-2" class="section level2">
+<h2>glmmTMB</h2>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" title="1">AIC.glmm &lt;-<span class="st"> </span><span class="kw">aictab</span>(<span class="kw">list</span>(mod.iid.glmm, mod.ar1.glmm), <span class="dt">modnames =</span> <span class="kw">c</span>(<span class="st">&quot;iid&quot;</span>, <span class="st">&quot;ar1&quot;</span>))</a></code></pre></div>
+<table class="table table-bordered table-hover table-condensed table-responsive" style="width: auto !important; margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Modnames
+</th>
+<th style="text-align:right;">
+K
+</th>
+<th style="text-align:right;">
+AICc
+</th>
+<th style="text-align:right;">
+Delta_AICc
+</th>
+<th style="text-align:right;">
+LL
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+ar1
+</td>
+<td style="text-align:right;">
+42
+</td>
+<td style="text-align:right;">
+101.4
+</td>
+<td style="text-align:right;">
+0.0
+</td>
+<td style="text-align:right;">
+23.0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+iid
+</td>
+<td style="text-align:right;">
+41
+</td>
+<td style="text-align:right;">
+137.6
+</td>
+<td style="text-align:right;">
+36.2
+</td>
+<td style="text-align:right;">
+1.9
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="sommer-2" class="section level2">
+<h2>sommer</h2>
+<p>Comparing AIC values from the two models once again shows that <code>sommer</code> does not really do what we are aiming for in this example. The AIC values for the two models are identical. The main reason for this is that they do not actually differ in the number of estimated parameters, since <em>rho</em> as the potentially second parameter here, was not estimated, but fixed by us.</p>
+<p>[ Is this the whole story? …in progress… ]</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" title="1">somm.mods &lt;-<span class="st"> </span><span class="kw">list</span>(mod.iid.somm, mod.ar1.somm)</a>
+<a class="sourceLine" id="cb11-2" title="2"></a>
+<a class="sourceLine" id="cb11-3" title="3">AIC.somm &lt;-<span class="st"> </span><span class="kw">tibble</span>(</a>
+<a class="sourceLine" id="cb11-4" title="4">  <span class="dt">Modnames =</span> <span class="kw">c</span>(<span class="st">&quot;iid&quot;</span>, <span class="st">&quot;ar1&quot;</span>),</a>
+<a class="sourceLine" id="cb11-5" title="5">  <span class="dt">AIC =</span> somm.mods <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">map</span>(<span class="st">&quot;AIC&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span>unlist,</a>
+<a class="sourceLine" id="cb11-6" title="6">  <span class="dt">LL  =</span> somm.mods <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">map</span>(<span class="st">&quot;monitor&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">lapply</span>(. <span class="op">%&gt;%</span><span class="st"> `</span><span class="dt">[</span><span class="st">`</span>(<span class="dv">1</span>, <span class="kw">ncol</span>(.))) <span class="op">%&gt;%</span><span class="st"> </span>unlist) <span class="op">%&gt;%</span><span class="st"> </span><span class="co"># last element in first row of &quot;monitor&quot;</span></a>
+<a class="sourceLine" id="cb11-7" title="7"><span class="st">  </span><span class="kw">arrange</span>(AIC)</a></code></pre></div>
+<table class="table table-bordered table-hover table-condensed table-responsive" style="width: auto !important; margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Modnames
+</th>
+<th style="text-align:right;">
+AIC
+</th>
+<th style="text-align:right;">
+LL
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+iid
+</td>
+<td style="text-align:right;">
+-73.3
+</td>
+<td style="text-align:right;">
+76.67347
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ar1
+</td>
+<td style="text-align:right;">
+-73.3
+</td>
+<td style="text-align:right;">
+76.67347
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="sas-2" class="section level2">
+<h2>SAS</h2>
+<p>in progress</p>
+</div>
 </div>
 <div id="summary" class="section level1 tabset tabset-fade">
 <h1>Summary</h1>
@@ -3228,7 +3425,7 @@ run;
 </tr>
 <tr class="even">
 <td><code>sommer</code></td>
-<td>in progress</td>
+<td><code>random = ~ vs(TIME, Gu = AR1(TIME, rho = FIXED.RHO))</code></td>
 </tr>
 <tr class="odd">
 <td><code>SAS</code></td>

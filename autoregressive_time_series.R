@@ -45,6 +45,14 @@ mod.iid.glmm.VC <- mod.iid.glmm %>%
   extract_vc(ci_scale = "var")
 
 
+mod.iid.somm <- mmer(fixed = y ~ factweek + variety + block + factweek:variety + factweek:block, 
+                     rcov  = ~ units, # default = iid
+                     data  = dat, verbose=F)
+
+# Extract variance component estimates
+mod.iid.somm.VC <- summary(mod.iid.somm)$varcomp 
+
+
 
 
 mod.ar1.nlme <- nlme::gls(model = y ~ factweek * (variety + block),
@@ -61,6 +69,7 @@ mod.ar1.nlme.VC <- tibble(varstruct = "ar(1)") %>%
          Corr3wks = rho^3,
          Corr4wks = rho^4)
 
+
 mod.ar1.glmm <- glmmTMB(formula = y ~ factweek * (variety + block)
                         + ar1(factweek + 0 | plot), # add ar1 structure as random term to mimic error variance
                         dispformula = ~ 0, # fix original error variance to 0
@@ -72,6 +81,32 @@ mod.ar1.glmm.VC <- mod.ar1.glmm %>%
   extract_vc(ci_scale = "var", show_cor = TRUE)
 
 
-mod.iid.somm <- mmer(fixed  = y ~ factweek + variety + block + factweek:variety + factweek:block, 
-                     rcov   = ~ vs(AR1(plot),factweek), 
+fixed.rho <- 0.7
+
+mod.ar1.somm <- mmer(fixed  = y ~ factweek + variety + block + factweek:variety + factweek:block, 
+                     random = ~ vs(factweek, Gu = AR1(factweek, rho = fixed.rho)),
+                     rcov   = ~ units, # default = iid
                      data   = dat, verbose=F)
+
+# Extract variance component estimates
+mod.ar1.somm.VC <- summary(mod.ar1.somm)$varcomp 
+
+# AIC
+aictab(list(mod.iid.nlme, mod.ar1.nlme), modnames = c("iid", "ar1"))
+aictab(list(mod.iid.glmm, mod.ar1.glmm), modnames = c("iid", "ar1"))
+
+
+mod.iid.somm$AIC
+mod.ar1.somm$AIC; mod.ar1.somm$L
+
+
+AIC.somm <- tibble(
+  Modnames = c("iid", "ar1"), 
+  AIC = somm.mods %>% map("AIC") %>% unlist) %>% 
+  arrange(AIC)
+
+AIC.somm %>%  
+  mutate_at(vars(AIC:Deviance), ~round(., 1)) %>% 
+  kable(escape = FALSE) %>% 
+  kable_styling(bootstrap_options = c("bordered", "hover", "condensed", "responsive"), 
+                full_width = FALSE)

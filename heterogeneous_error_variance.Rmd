@@ -17,7 +17,7 @@ pacman::p_load(kableExtra, formattable, htmltools) # packages for better formatt
 ```
 
 ```{r, child="_hilang_setup.Rmd", purl=FALSE}
-# required for sas syntax highlightinh
+# required for sas syntax highlightig
 ```
 
 ```{r, message=FALSE, warning=FALSE}

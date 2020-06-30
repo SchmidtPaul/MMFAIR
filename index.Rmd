@@ -48,7 +48,7 @@ In terms of R syntax, we generally try to follow the approach presented on the [
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
 contents <- rbind(
   c("R-side", "Heterogeneous err. var.", "yes", "no", "kind of", "yes", "yes"),
-  c("R-side", "First-order autoregressive", "yes", "no", "kind of", "in progress", "yes"),
+  c("R-side", "First-order autoregressive", "yes", "no", "kind of", "not really", "yes"),
   c("R-side", "Fixed scalar (Smith's weights)", "in progress", "in progress", "in progress", "in progress", "in progress"),
   c("R-side", "Fixed matrix (fully efficient weighting)", "in progress", "in progress", "in progress", "in progress", "in progress"),
   c("G-side", "Fixed matrix (kinship/pedigree)", "in progress", "in progress", "in progress", "in progress", "in progress"),
@@ -74,7 +74,8 @@ contents %>%
                        color=case_when(.=="in progress" ~ "orange", 
                                        TRUE ~ "white"),
                        background=case_when(.=="yes" ~ "green",
-                                            .=="kind of" ~ "orange",
+                                            .=="kind of" ~ "#7CB342",
+                                            .=="not really" ~ "#FB8C00",
                                             .=="no" ~ "red",
                                             TRUE ~ "white"))) %>%
   kable(escape = FALSE) %>% 

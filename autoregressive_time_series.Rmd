@@ -10,14 +10,14 @@ params:
     - sas					 
 ---
 
-```{r echo=FALSE, message=FALSE, warning=FALSE, purl=FALSE}
+```{r, echo=FALSE, message=FALSE, warning=FALSE, purl=FALSE}
 # markdown options
 options(knitr.kable.NA = '') # show NA as empty cells in output tables
 pacman::p_load(kableExtra, formattable, htmltools) # packages for better formatting tables for html output
 ```
 
 ```{r, child="_hilang_setup.Rmd", purl=FALSE}
-# required for sas syntax highlightinh
+# required for sas syntax highlighting
 ```
 
 ```{r}
@@ -190,6 +190,7 @@ mod.iid.somm.VC <- summary(mod.iid.somm)$varcomp
 ```
 ```{r, echo=FALSE, purl=FALSE}
 mod.iid.somm.VC %>%
+  as_tibble(rownames="grp") %>% 
   mutate_if(is.double, round, 3) %>% 
   kable(escape = FALSE) %>% 
   kable_styling(bootstrap_options = c("bordered", "hover", "condensed", "responsive"), 
@@ -307,7 +308,7 @@ The first point would not be such a big deal, if we could force the error varian
 The second point is simply a limitation in terms of finding the optimal parameters. Since rho is fixed to a value that we as the user must provide before the model iterates, the fitted model can only be as good as our provided rho.
 
 ```{r}
-fixed.rho <- 0.7
+fixed.rho <- 0.7 # random guess
 
 mod.ar1.somm <- mmer(fixed  = y ~ factweek + variety + block + factweek:variety + factweek:block, 
                      random = ~ vs(factweek, Gu = AR1(factweek, rho = fixed.rho)),
@@ -319,6 +320,7 @@ mod.ar1.somm.VC <- summary(mod.ar1.somm)$varcomp
 ```
 ```{r, echo=FALSE, purl=FALSE}
 mod.ar1.somm.VC %>%
+  as_tibble(rownames="grp") %>% 
   mutate_if(is.double, round, 3) %>% 
   kable(escape = FALSE) %>% 
   kable_styling(bootstrap_options = c("bordered", "hover", "condensed", "responsive"), 
@@ -343,6 +345,65 @@ After all, a decision must be made on whether the `ar1` variance structure for t
 
 For `nlme` and `glmmTMB`, we make use of the [`aictab()` function](https://cran.r-project.org/web/packages/AICcmodavg/AICcmodavg.pdf#Rfn.aictab.1){target="_blank"} from the helper package [AICcmodavg](https://CRAN.R-project.org/package=AICcmodavg){target="_blank"}.
 
+## nlme
+
+```{r, warning=FALSE}
+AIC.nlme <- aictab(list(mod.iid.nlme, mod.ar1.nlme), modnames = c("iid", "ar1"))
+```
+```{r, echo=FALSE, purl=FALSE}
+AIC.nlme %>%  
+  dplyr::select(Modnames, K, AICc, Delta_AICc, Res.LL) %>%  
+  mutate_at(vars(AICc:Res.LL), ~round(., 1)) %>% 
+  kable(escape = FALSE) %>% 
+  kable_styling(bootstrap_options = c("bordered", "hover", "condensed", "responsive"), 
+                full_width = FALSE)
+```
+
+## lme4
+
+not possible - see above.
+
+## glmmTMB
+
+```{r, warning=FALSE}
+AIC.glmm <- aictab(list(mod.iid.glmm, mod.ar1.glmm), modnames = c("iid", "ar1"))
+```
+```{r, echo=FALSE, purl=FALSE}
+AIC.glmm %>%  
+  dplyr::select(Modnames, K, AICc, Delta_AICc, LL) %>%  
+  mutate_at(vars(AICc:LL), ~round(., 1)) %>% 
+  kable(escape = FALSE) %>% 
+  kable_styling(bootstrap_options = c("bordered", "hover", "condensed", "responsive"), 
+                full_width = FALSE)
+```
+
+## sommer
+
+Comparing AIC values from the two models once again shows that `sommer` does not really do what we are aiming for in this example. The AIC values for the two models are identical. The main reason for this is that they do not actually differ in the number of estimated parameters, since *rho* as the potentially second parameter here, was not estimated, but fixed by us.
+
+[ Is this the whole story? ...in progress... ]
+
+```{r}
+somm.mods <- list(mod.iid.somm, mod.ar1.somm)
+
+AIC.somm <- tibble(
+  Modnames = c("iid", "ar1"),
+  AIC = somm.mods %>% map("AIC") %>% unlist,
+  LL  = somm.mods %>% map("monitor") %>% lapply(. %>% `[`(1, ncol(.))) %>% unlist) %>% # last element in first row of "monitor"
+  arrange(AIC)
+```
+```{r, echo=FALSE, purl=FALSE}
+AIC.somm %>%  
+  mutate_at(vars(AIC), ~round(., 1)) %>% 
+  kable(escape = FALSE) %>% 
+  kable_styling(bootstrap_options = c("bordered", "hover", "condensed", "responsive"), 
+                full_width = FALSE)
+```
+
+## SAS
+
+in progress
+
 # Summary {.tabset .tabset-fade}
 
 ## Syntax
@@ -352,7 +413,7 @@ package | model syntax
 `nlme` | `correlation = corAR1(form = ~ TIME | SUBJECT)`
 `lme4` | <span style="color:red">not possible</span>
 `glmmTMB` | `random = ~ ar1(TIME + 0 | SUBJECT), dispformula =  ~ 0`
-`sommer` | in progress
+`sommer` | `random = ~ vs(TIME, Gu = AR1(TIME, rho = FIXED.RHO))`
 `SAS` | `repeated TIME/sub=SUBJECT type=ar(1);`
 
 ## VarComp
