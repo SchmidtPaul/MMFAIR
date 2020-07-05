@@ -2117,18 +2117,21 @@ Identity
 <a class="sourceLine" id="cb12-13" title="13">                  <span class="dt">rcov   =</span> <span class="op">~</span><span class="st"> </span><span class="kw">vs</span>(<span class="kw">ds</span>(densf), units), </a>
 <a class="sourceLine" id="cb12-14" title="14">                  <span class="dt">data   =</span> dat, <span class="dt">verbose=</span>F)</a>
 <a class="sourceLine" id="cb12-15" title="15"></a>
-<a class="sourceLine" id="cb12-16" title="16"><span class="co"># mod4/multiplicative variance structure possible? in progress.</span></a>
-<a class="sourceLine" id="cb12-17" title="17"></a>
-<a class="sourceLine" id="cb12-18" title="18">mod5.somm &lt;-<span class="st"> </span><span class="kw">mmer</span>(<span class="dt">fixed  =</span> yield <span class="op">~</span><span class="st"> </span>gen <span class="op">*</span><span class="st"> </span>date <span class="op">*</span><span class="st"> </span>densf, </a>
-<a class="sourceLine" id="cb12-19" title="19">                  <span class="dt">random =</span> <span class="op">~</span><span class="st"> </span>block,</a>
-<a class="sourceLine" id="cb12-20" title="20">                  <span class="dt">rcov   =</span> <span class="op">~</span><span class="st"> </span><span class="kw">vs</span>(<span class="kw">ds</span>(date), <span class="kw">ds</span>(densf), units), </a>
-<a class="sourceLine" id="cb12-21" title="21">                  <span class="dt">data   =</span> dat, <span class="dt">verbose=</span>F)</a></code></pre></div>
+<a class="sourceLine" id="cb12-16" title="16">mod4.somm &lt;-<span class="st"> </span><span class="kw">mmer</span>(<span class="dt">fixed  =</span> yield <span class="op">~</span><span class="st"> </span>gen <span class="op">*</span><span class="st"> </span>date <span class="op">*</span><span class="st"> </span>densf, </a>
+<a class="sourceLine" id="cb12-17" title="17">                  <span class="dt">random =</span> <span class="op">~</span><span class="st"> </span>block,</a>
+<a class="sourceLine" id="cb12-18" title="18">                  <span class="dt">rcov   =</span> <span class="op">~</span><span class="st"> </span><span class="kw">vs</span>(<span class="kw">ds</span>(date), units) <span class="op">+</span><span class="st"> </span><span class="kw">vs</span>(<span class="kw">ds</span>(densf), units), </a>
+<a class="sourceLine" id="cb12-19" title="19">                  <span class="dt">data   =</span> dat, <span class="dt">verbose=</span>F)</a>
+<a class="sourceLine" id="cb12-20" title="20"></a>
+<a class="sourceLine" id="cb12-21" title="21">mod5.somm &lt;-<span class="st"> </span><span class="kw">mmer</span>(<span class="dt">fixed  =</span> yield <span class="op">~</span><span class="st"> </span>gen <span class="op">*</span><span class="st"> </span>date <span class="op">*</span><span class="st"> </span>densf, </a>
+<a class="sourceLine" id="cb12-22" title="22">                  <span class="dt">random =</span> <span class="op">~</span><span class="st"> </span>block,</a>
+<a class="sourceLine" id="cb12-23" title="23">                  <span class="dt">rcov   =</span> <span class="op">~</span><span class="st"> </span><span class="kw">vs</span>(<span class="kw">ds</span>(date), <span class="kw">ds</span>(densf), units), </a>
+<a class="sourceLine" id="cb12-24" title="24">                  <span class="dt">data   =</span> dat, <span class="dt">verbose=</span>F)</a></code></pre></div>
 </div>
 <div id="sas" class="section level2">
 <h2>SAS</h2>
 
 
-<textarea id="DXLJU">
+<textarea id="OQNFH">
 /* mod1 */
 proc mixed data=dat;
 class gen date densf block;
@@ -2173,8 +2176,9 @@ repeated / group=date*densf;
 ods output covparms=mod5sasVC FitStatistics=mod5sasAIC;
 run;
 </textarea>
-<script> var codeElement = document.getElementById("DXLJU"); var editor = null; if (null != codeElement) { editor = CodeMirror.fromTextArea(codeElement, { lineNumbers: true, readOnly: true, viewportMargin: Infinity, mode: 'text/x-sas' }); } </script>
+<script> var codeElement = document.getElementById("OQNFH"); var editor = null; if (null != codeElement) { editor = CodeMirror.fromTextArea(codeElement, { lineNumbers: true, readOnly: true, viewportMargin: Infinity, mode: 'text/x-sas' }); } </script>
 
+<p><br/></p>
 </div>
 </div>
 <div id="variance-component-extraction" class="section level1 tabset tabset-fade tabset-pills">
@@ -4151,7 +4155,7 @@ Residual
 </div>
 <div id="model-fit" class="section level1 tabset tabset-fade tabset-pills">
 <h1>Model Fit</h1>
-<p>As is standard procedure, we can do a model selection based on goodness-of-fit statistics such as the AIC. In order to have a direct comparison to Table 1 in <a href="https://acsess.onlinelibrary.wiley.com/doi/abs/10.2134/agronj2008.0226x" target="_blank">(Piepho, 2009)</a>, we also calculated the deviance (<em>i.e.</em> -2*loglikelihood) for each model.</p>
+<p>As is standard procedure, we can do a model selection based on goodness-of-fit statistics such as the <a href="https://www.wikiwand.com/en/Akaike_information_criterion#" target="_blank">AIC</a> (Akaike information criterion). In order to have a direct comparison to Table 1 in <a href="https://acsess.onlinelibrary.wiley.com/doi/abs/10.2134/agronj2008.0226x" target="_blank">(Piepho, 2009)</a>, we also calculated the deviance (<em>i.e.</em> -2*loglikelihood) for each model.</p>
 <p>For <code>nlme</code>, <code>lme4</code> and <code>glmmTMB</code>, we make use of the <a href="https://cran.r-project.org/web/packages/AICcmodavg/AICcmodavg.pdf#Rfn.aictab.1" target="_blank"><code>aictab()</code> function</a> from the helper package <a href="https://CRAN.R-project.org/package=AICcmodavg" target="_blank">AICcmodavg</a>.</p>
 <div id="nlme-2" class="section level2">
 <h2>nlme</h2>

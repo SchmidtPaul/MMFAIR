@@ -13,7 +13,7 @@ library(kableExtra); library(formattable)
 library(dplyr); library(tibble); library(tidyr)
 ```
 
-# Hi there!
+# Hi there!{.tabset .tabset-fade .tabset-pills}
 
 This is a project under constrcution. Our aim is to provide a cookbook with mixed model analyses of typical examples in life sciences (focus on agriculture/biology) and compare the possibilities or rather limitations of the R-packages
 
@@ -24,9 +24,6 @@ This is a project under constrcution. Our aim is to provide a cookbook with mixe
 
 to each other, but also to SAS' [`PROC MIXED`](https://documentation.sas.com/?docsetId=statug&docsetTarget=statug_mixed_syntax.htm&docsetVersion=14.3&locale=en){target="_blank"}.
 
-<br/>
-
-# Structure {.tabset .tabset-fade .tabset-pills}
 Find chapters by navigating the menu at the top of the page. Each chapter focuses on a certain aspect of mixed modelling. Within each chapter, switch between tabs with codes from the different packages via these buttons:
 
 ## nlme
@@ -35,15 +32,7 @@ Find chapters by navigating the menu at the top of the page. Each chapter focuse
 ## sommer
 ## SAS
 
-# {.unlisted .unnumbered}
-
-Additionally, find summaries at the top of the page for certain topics where we felt additional info may be beneficial, but should not bloat the chapters.
-
-In terms of R syntax, we generally try to follow the approach presented on the ["R for Data Science" website](https://r4ds.had.co.nz/){target="_blank"}, making use of [dplyr](https://dplyr.tidyverse.org/){target="_blank"}, [tibbles](https://r4ds.had.co.nz/tibbles.html){target="_blank"} and [`%>%`-pipes](https://r4ds.had.co.nz/pipes.html){target="_blank"}.
-
-<br/>
-
-# Table of Contents
+# Chapters
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
 contents <- rbind(
@@ -87,4 +76,21 @@ contents %>%
   add_header_above(c(" ", " ", "Possible in"=5))
 ```
 
+<br/>
 
+# Approach
+In addition to the *chapters*, there are *summaries* for certain topics where we felt additional info may be beneficial, but should not bloat the chapters themselves. Just like chapters, summaries can be found by navigating the menu at the top of the page.
+
+Where possible, we try to use example data/analyses for our chapters that have been published in peer-reviewed journals.
+
+In terms of R syntax, we generally try to follow the approach presented on the ["R for Data Science" website](https://r4ds.had.co.nz/){target="_blank"}, making use of:
+
+[<img src="img\hexdplyr.png" width="80">](https://CRAN.R-project.org/package=dplyr)
+[<img src="img\hexggplot2.png" width="80">](https://CRAN.R-project.org/package=ggplot2)
+[<img src="img\hexpipe.png" width="80">](https://r4ds.had.co.nz/pipes.html)
+[<img src="img\hexpurrr.png" width="80">](https://CRAN.R-project.org/package=purrr)
+[<img src="img\hexscales.png" width="80">](https://CRAN.R-project.org/package=scales)
+[<img src="img\hexstringr.png" width="80">](https://CRAN.R-project.org/package=stringr)
+[<img src="img\hextibble.png" width="80">](https://CRAN.R-project.org/package=tibble)
+[<img src="img\hextidyr.png" width="80">](https://CRAN.R-project.org/package=tidyr)
+[<img src="img\hextidyverse.png" width="80">](https://CRAN.R-project.org/package=tidyverse)

@@ -1,0 +1,4 @@
+CovParm	Subject	Estimate	mod
+factweek	plot	0.02318	iid
+AR(1)	plot	0.7490	ar1
+Residual		0.02216	ar1

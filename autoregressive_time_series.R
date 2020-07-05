@@ -55,6 +55,13 @@ mod.iid.somm.VC <- summary(mod.iid.somm)$varcomp
 
 
 
+sasvc <- readr::read_delim("SAS/autoregressive_time_series_results_VC.txt", delim="\t")
+
+sasvciid <- sasvc %>%
+  filter(mod=="iid")
+
+
+
 mod.ar1.nlme <- nlme::gls(model = y ~ factweek * (variety + block),
                           correlation = corAR1(form = ~ varweek | plot),
                           data = dat)
@@ -81,7 +88,7 @@ mod.ar1.glmm.VC <- mod.ar1.glmm %>%
   extract_vc(ci_scale = "var", show_cor = TRUE)
 
 
-fixed.rho <- 0.7
+fixed.rho <- 0.7 # random guess
 
 mod.ar1.somm <- mmer(fixed  = y ~ factweek + variety + block + factweek:variety + factweek:block, 
                      random = ~ vs(factweek, Gu = AR1(factweek, rho = fixed.rho)),
@@ -91,22 +98,78 @@ mod.ar1.somm <- mmer(fixed  = y ~ factweek + variety + block + factweek:variety 
 # Extract variance component estimates
 mod.ar1.somm.VC <- summary(mod.ar1.somm)$varcomp 
 
-# AIC
-aictab(list(mod.iid.nlme, mod.ar1.nlme), modnames = c("iid", "ar1"))
-aictab(list(mod.iid.glmm, mod.ar1.glmm), modnames = c("iid", "ar1"))
 
 
-mod.iid.somm$AIC
-mod.ar1.somm$AIC; mod.ar1.somm$L
 
+sasvcar1 <- sasvc %>%
+  filter(mod=="ar1")
+
+
+
+AIC.nlme <- aictab(list(mod.iid.nlme, mod.ar1.nlme), modnames = c("iid", "ar1"))
+
+
+AIC.glmm <- aictab(list(mod.iid.glmm, mod.ar1.glmm), modnames = c("iid", "ar1"))
+
+
+somm.mods <- list(mod.iid.somm, mod.ar1.somm)
 
 AIC.somm <- tibble(
-  Modnames = c("iid", "ar1"), 
-  AIC = somm.mods %>% map("AIC") %>% unlist) %>% 
+  Modnames = c("iid", "ar1"),
+  AIC = somm.mods %>% map("AIC") %>% unlist,
+  LL  = somm.mods %>% map("monitor") %>% lapply(. %>% `[`(1, ncol(.))) %>% unlist) %>% # last element in first row of "monitor"
   arrange(AIC)
 
-AIC.somm %>%  
-  mutate_at(vars(AIC:Deviance), ~round(., 1)) %>% 
+
+sasaic <- readr::read_delim("SAS/autoregressive_time_series_results_AIC.txt", delim="\t") %>% 
+  mutate(Descr = str_remove(Descr, "\\s*\\([^\\)]+\\)") %>% str_trim) %>% 
+  pivot_wider(names_from=Descr, values_from=Value)
+
+
+
+tibble(mod="iid", estimate="variance") %>%
+  cbind(., 
+        mod.iid.nlme.VC %>% dplyr::select(Variance) %>% rename(nlme=Variance),
+        mod.iid.nlme.VC %>% mutate(lme4=NA) %>% dplyr::select(lme4),
+        mod.iid.glmm.VC %>% filter(effect=="Intercept") %>% dplyr::select(variance) %>% rename(glmmTMB=variance),
+        mod.iid.somm.VC %>% dplyr::select(VarComp) %>% rename(sommer=VarComp),
+        sasvc %>% filter(mod=="iid") %>% dplyr::select(Estimate) %>% rename(SAS=Estimate)) %>% 
+  magrittr::set_rownames(NULL) %>% 
+  kable(escape = FALSE) %>% 
+  kable_styling(bootstrap_options = c("bordered", "hover", "condensed", "responsive"), 
+                full_width = FALSE)
+
+tibble(mod=c("ar1", "ar1"), estimate=c("variance", "correlation")) %>%
+  cbind(., 
+        mod.ar1.nlme.VC %>% dplyr::select(Variance, rho) %>% 
+          pivot_longer(names_to = "estimate", values_to = "nlme", cols = 1:2) %>% 
+          dplyr::select(nlme),
+        tibble(lme4=c(NA, NA)),
+        tibble(glmmTMB=
+                 c(mod.ar1.glmm.VC %>%
+                     pluck("Variance Components") %>% 
+                     filter(effect=="factweek1") %>% 
+                     dplyr::select(variance), 
+                   mod.ar1.glmm.VC %>%
+                     pluck("Cor") %>% pluck("plot") %>%  
+                     pluck(2,1))%>% unlist),
+        tibble(sommer=c(NA, NA)),
+        sasvc %>% 
+          arrange(desc(CovParm)) %>% 
+          filter(mod=="ar1") %>% 
+          dplyr::select(Estimate) %>% 
+          rename(SAS=Estimate)) %>% 
+  kable(escape = FALSE) %>% 
+  kable_styling(bootstrap_options = c("bordered", "hover", "condensed", "responsive"), 
+                full_width = FALSE)
+
+tibble(mod=c("iid", "ar1"), estimate=c("AIC", "AIC")) %>%
+  cbind(.,
+        AIC.nlme %>% dplyr::select(AICc) %>% rename(nlme=AICc),
+        tibble(lme4=c(NA, NA)),
+        AIC.glmm %>% dplyr::select(AICc) %>% rename(glmmTMB=AICc),
+        tibble(sommer=c(AIC.somm %>% filter(Modnames=="iid") %>% pull(AIC), NA)),
+        sasaic %>% dplyr::select(AIC) %>% rename(SAS=AIC)) %>% 
   kable(escape = FALSE) %>% 
   kable_styling(bootstrap_options = c("bordered", "hover", "condensed", "responsive"), 
                 full_width = FALSE)

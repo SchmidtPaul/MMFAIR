@@ -131,7 +131,7 @@ More specifically, we can read in an [`lme4` vigniette](https://cran.r-project.o
 
 Michael Clark [puts it as](https://m-clark.github.io/mixed-models-with-R/extensions.html#heterogeneous-variance){target="_blank"} *"Unfortunately, lme4 does not provide the ability to model the residual covariance structure, at least [not in a straightforward fashion](https://bbolker.github.io/mixedmodels-misc/notes/corr_braindump.html){target="_blank"}"*
 
-**Accordingly, there is no info on this package for this chapter beyond this point.**
+<span style="color:red">Accordingly, there is no info on this package for this chapter beyond this point.</span>
 
 <br/>
 
@@ -199,14 +199,36 @@ mod.iid.somm.VC %>%
 
 ## SAS
 
-In SAS, there is an actual `subject=` statement that is used to identify the subjects on which repeated measurements are taken.
+In SAS, there is an actual `subject=` statement that is used to identify the subjects on which repeated measurements are taken. This may not be necessary for the `iid` with the default homoscedastic, independent error variance structure, but since it will be necessary for the following model with a more sophisticated variance structure, we will apply it here, too. In the end, the entire `repeated` line below could also be left out as it simply explicitly states the default setting. 
 
 ```{r, eval=FALSE, hilang="sas", purl=FALSE}
 proc mixed data=dat;
 class variety block factweek plot;
 model y=block variety factweek block*factweek variety*factweek /ddfm=kr2;
-repeated factweek/sub=plot type=VC rcorr;
+repeated factweek/sub=plot type=VC rcorr; /* = default iid */
+ods output covparms=modiidsasVC FitStatistics=modiidsasAIC;
 run; 
+
+proc print data=modiidsasVC;
+run;
+```
+
+<br/>
+
+```{r, echo=FALSE, message=FALSE,}
+sasvc <- readr::read_delim("SAS/autoregressive_time_series_results_VC.txt", delim="\t")
+
+sasvciid <- sasvc %>%
+  filter(mod=="iid")
+```
+
+```{r, echo=FALSE, message=FALSE, purl=FALSE}
+sasvciid %>%
+  dplyr::select(mod, everything()) %>% 
+  mutate_if(is.double, round, 3) %>% 
+  kable(escape = FALSE) %>% 
+  kable_styling(bootstrap_options = c("bordered", "hover", "condensed", "responsive"), 
+                full_width = FALSE)
 ```
 
 # Multiple weeks - autocorrelated errors {.tabset .tabset-fade .tabset-pills}
@@ -258,7 +280,7 @@ mod.ar1.nlme.VC %>%
 
 ## lme4
 
-not possible - see above.
+<span style="color:red">not possible - see above.</span>
 
 ## glmmTMB
 
@@ -331,12 +353,34 @@ Note that rho is not reported as part of the variance component estimates - whic
 
 ## SAS
 
+Here, we write `type=ar(1)` in the `repeated` statement in order to get the desired variance structure for the error term. 
+
 ```{r, eval=FALSE, hilang="sas", purl=FALSE}
 proc mixed data=dat;
 class variety block factweek plot;
 model y=block variety factweek block*factweek variety*factweek /ddfm=kr2;
-repeated factweek/sub=plot type=ar(1) rcorr;
+repeated factweek/sub=plot type=ar(1) rcorr; /* ar1 variance structure */
+ods output covparms=modar1sasVC FitStatistics=modar1sasAIC;
 run; 
+
+proc print data=modar1sasVC;
+run;
+```
+
+<br/>
+
+```{r, echo=FALSE, message=FALSE,}
+sasvcar1 <- sasvc %>%
+  filter(mod=="ar1")
+```
+
+```{r, echo=FALSE, message=FALSE, purl=FALSE}
+sasvcar1 %>% 
+  dplyr::select(mod, everything()) %>% 
+  mutate_if(is.double, round, 3) %>% 
+  kable(escape = FALSE) %>% 
+  kable_styling(bootstrap_options = c("bordered", "hover", "condensed", "responsive"), 
+                full_width = FALSE)
 ```
 
 # Model fit {.tabset .tabset-fade .tabset-pills}
@@ -361,7 +405,7 @@ AIC.nlme %>%
 
 ## lme4
 
-not possible - see above.
+<span style="color:red">not possible - see above.</span>
 
 ## glmmTMB
 
@@ -402,7 +446,28 @@ AIC.somm %>%
 
 ## SAS
 
-in progress
+The model fit statistics have already been created via the `ods output` statement of the respective models and are displayed here jointly:
+
+```{r, echo=FALSE, message=FALSE}
+sasaic <- readr::read_delim("SAS/autoregressive_time_series_results_AIC.txt", delim="\t") %>% 
+  mutate(Descr = str_remove(Descr, "\\s*\\([^\\)]+\\)") %>% str_trim) %>% 
+  pivot_wider(names_from=Descr, values_from=Value)
+```
+
+```{r, echo=FALSE, message=FALSE, purl=FALSE}
+sasaic %>%
+  dplyr::select(mod, everything()) %>% 
+  mutate_if(is.double, round, 3) %>% 
+  kable(escape = FALSE) %>% 
+  kable_styling(bootstrap_options = c("bordered", "hover", "condensed", "responsive"), 
+                full_width = FALSE)
+```
+
+# Conclusion
+
+The `ar1` model has the smaller AIC value. Thus, we choose the `ar1` over the `iid` model, since the former has the better fit.
+
+Notice that this outcome satisfies the aim of this chapter (*i.e.* having an `ar1` variance structure for the error term) but regarding the analysis of the underlying dataset, more steps can be taken in order to get concluding results. You can find further steps in [*Example 4* in Piepho & Edmondson (2018)](https://onlinelibrary.wiley.com/doi/full/10.1111/jac.12267){target="_blank"} (see also the [Agritutorial vigniette](https://cran.r-project.org/web/packages/agriTutorial/vignettes/agriTutorialVignette.pdf#%5B%7B%22num%22%3A81%2C%22gen%22%3A0%7D%2C%7B%22name%22%3A%22XYZ%22%7D%2C28.346%2C813.543%2Cnull%5D){target="_blank"}). On one hand, they investigate more variance structure alternatives to `iid` and on the other hand, they continue selecting a suitable regression model for the time trend after selecting a sutiable variance structure.
 
 # Summary {.tabset .tabset-fade}
 
@@ -418,12 +483,63 @@ package | model syntax
 
 ## VarComp
 
-in progress
+**mod.iid**
+```{r, echo=FALSE}
+tibble(mod="iid", estimate="variance") %>%
+  cbind(., 
+        mod.iid.nlme.VC %>% dplyr::select(Variance) %>% rename(nlme=Variance),
+        mod.iid.nlme.VC %>% mutate(lme4=NA) %>% dplyr::select(lme4),
+        mod.iid.glmm.VC %>% filter(effect=="Intercept") %>% dplyr::select(variance) %>% rename(glmmTMB=variance),
+        mod.iid.somm.VC %>% dplyr::select(VarComp) %>% rename(sommer=VarComp),
+        sasvc %>% filter(mod=="iid") %>% dplyr::select(Estimate) %>% rename(SAS=Estimate)) %>% 
+  magrittr::set_rownames(NULL) %>% 
+  kable(escape = FALSE) %>% 
+  kable_styling(bootstrap_options = c("bordered", "hover", "condensed", "responsive"), 
+                full_width = FALSE)
+```
+
+**mod.ar1**
+```{r, echo=FALSE}
+tibble(mod=c("ar1", "ar1"), estimate=c("variance", "correlation")) %>%
+  cbind(., 
+        mod.ar1.nlme.VC %>% dplyr::select(Variance, rho) %>% 
+          pivot_longer(names_to = "estimate", values_to = "nlme", cols = 1:2) %>% 
+          dplyr::select(nlme),
+        tibble(lme4=c(NA, NA)),
+        tibble(glmmTMB=
+                 c(mod.ar1.glmm.VC %>%
+                     pluck("Variance Components") %>% 
+                     filter(effect=="factweek1") %>% 
+                     dplyr::select(variance), 
+                   mod.ar1.glmm.VC %>%
+                     pluck("Cor") %>% pluck("plot") %>%  
+                     pluck(2,1))%>% unlist),
+        tibble(sommer=c(NA, NA)),
+        sasvc %>% 
+          arrange(desc(CovParm)) %>% 
+          filter(mod=="ar1") %>% 
+          dplyr::select(Estimate) %>% 
+          rename(SAS=Estimate)) %>% 
+  kable(escape = FALSE) %>% 
+  kable_styling(bootstrap_options = c("bordered", "hover", "condensed", "responsive"), 
+                full_width = FALSE)
+```
 
 ## AIC
 
-in progress
+```{r, echo=FALSE}
+tibble(mod=c("iid", "ar1"), estimate=c("AIC", "AIC")) %>%
+  cbind(.,
+        AIC.nlme %>% dplyr::select(AICc) %>% rename(nlme=AICc),
+        tibble(lme4=c(NA, NA)),
+        AIC.glmm %>% dplyr::select(AICc) %>% rename(glmmTMB=AICc),
+        tibble(sommer=c(AIC.somm %>% filter(Modnames=="iid") %>% pull(AIC), NA)),
+        sasaic %>% dplyr::select(AIC) %>% rename(SAS=AIC)) %>% 
+  kable(escape = FALSE) %>% 
+  kable_styling(bootstrap_options = c("bordered", "hover", "condensed", "responsive"), 
+                full_width = FALSE)
+```
 
 # More on this 
 
-in progress
+[Relevant post by Mixed Model Academy](https://www.linkedin.com/posts/mixed-model-academy_pain-dataanalysis-activity-6684009897169833984-kZdn/){target="_blank"}

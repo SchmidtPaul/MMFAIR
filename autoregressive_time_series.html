@@ -2618,7 +2618,7 @@ iid
 <p>Since the models in this chapter do not contain any random effects, we cannot use <code>lmer()</code> or any other function of the <code>lme4</code> package. However, even if there were random effects in our models, the short answer here is that with <code>lme4</code> it is <strong>not possible</strong> to fit any variance structures.</p>
 <p>More specifically, we can read in an <a href="https://cran.r-project.org/web/packages/lme4/vignettes/lmer.pdf" target="_blank"><code>lme4</code> vigniette</a>: <em>“The main advantage of <code>nlme</code> relative to <code>lme4</code> is a user interface for fitting models with structure in the residuals (various forms of heteroscedasticity and autocorrelation) and in the random-effects covariance matrices (e.g., compound symmetric models). With some extra effort, the computational machinery of <code>lme4</code> can be used to fit structured models that the basic <code>lmer</code> function cannot handle (see <a href="https://cran.r-project.org/web/packages/lme4/vignettes/lmer.pdf#%5B%7B%22num%22%3A15%2C%22gen%22%3A0%7D%2C%7B%22name%22%3A%22XYZ%22%7D%2C81%2C733.028%2Cnull%5D" target="_blank">Appendix A</a>)”</em></p>
 <p>Michael Clark <a href="https://m-clark.github.io/mixed-models-with-R/extensions.html#heterogeneous-variance" target="_blank">puts it as</a> <em>“Unfortunately, lme4 does not provide the ability to model the residual covariance structure, at least <a href="https://bbolker.github.io/mixedmodels-misc/notes/corr_braindump.html" target="_blank">not in a straightforward fashion</a>”</em></p>
-<p><strong>Accordingly, there is no info on this package for this chapter beyond this point.</strong></p>
+<p><span style="color:red">Accordingly, there is no info on this package for this chapter beyond this point.</span></p>
 <p><br/></p>
 </div>
 <div id="glmmtmb" class="section level2">
@@ -2751,18 +2751,57 @@ Positive
 </div>
 <div id="sas" class="section level2">
 <h2>SAS</h2>
-<p>In SAS, there is an actual <code>subject=</code> statement that is used to identify the subjects on which repeated measurements are taken.</p>
+<p>In SAS, there is an actual <code>subject=</code> statement that is used to identify the subjects on which repeated measurements are taken. This may not be necessary for the <code>iid</code> with the default homoscedastic, independent error variance structure, but since it will be necessary for the following model with a more sophisticated variance structure, we will apply it here, too. In the end, the entire <code>repeated</code> line below could also be left out as it simply explicitly states the default setting.</p>
 
 
-<textarea id="SWTBH">
+<textarea id="DULTK">
 proc mixed data=dat;
 class variety block factweek plot;
 model y=block variety factweek block*factweek variety*factweek /ddfm=kr2;
-repeated factweek/sub=plot type=VC rcorr;
+repeated factweek/sub=plot type=VC rcorr; /* = default iid */
+ods output covparms=modiidsasVC FitStatistics=modiidsasAIC;
 run; 
-</textarea>
-<script> var codeElement = document.getElementById("SWTBH"); var editor = null; if (null != codeElement) { editor = CodeMirror.fromTextArea(codeElement, { lineNumbers: true, readOnly: true, viewportMargin: Infinity, mode: 'text/x-sas' }); } </script>
 
+proc print data=modiidsasVC;
+run;
+</textarea>
+<script> var codeElement = document.getElementById("DULTK"); var editor = null; if (null != codeElement) { editor = CodeMirror.fromTextArea(codeElement, { lineNumbers: true, readOnly: true, viewportMargin: Infinity, mode: 'text/x-sas' }); } </script>
+
+<p><br/></p>
+<table class="table table-bordered table-hover table-condensed table-responsive" style="width: auto !important; margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+mod
+</th>
+<th style="text-align:left;">
+CovParm
+</th>
+<th style="text-align:left;">
+Subject
+</th>
+<th style="text-align:right;">
+Estimate
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+iid
+</td>
+<td style="text-align:left;">
+factweek
+</td>
+<td style="text-align:left;">
+plot
+</td>
+<td style="text-align:right;">
+0.023
+</td>
+</tr>
+</tbody>
+</table>
 </div>
 </div>
 <div id="multiple-weeks---autocorrelated-errors" class="section level1 tabset tabset-fade tabset-pills">
@@ -2857,7 +2896,7 @@ ar(1)
 </div>
 <div id="lme4-1" class="section level2">
 <h2>lme4</h2>
-<p>not possible - see above.</p>
+<p><span style="color:red">not possible - see above.</span></p>
 </div>
 <div id="glmmtmb-1" class="section level2">
 <h2>glmmTMB</h2>
@@ -3200,17 +3239,70 @@ Positive
 </div>
 <div id="sas-1" class="section level2">
 <h2>SAS</h2>
+<p>Here, we write <code>type=ar(1)</code> in the <code>repeated</code> statement in order to get the desired variance structure for the error term.</p>
 
 
-<textarea id="JVSWU">
+<textarea id="PXYIA">
 proc mixed data=dat;
 class variety block factweek plot;
 model y=block variety factweek block*factweek variety*factweek /ddfm=kr2;
-repeated factweek/sub=plot type=ar(1) rcorr;
+repeated factweek/sub=plot type=ar(1) rcorr; /* ar1 variance structure */
+ods output covparms=modar1sasVC FitStatistics=modar1sasAIC;
 run; 
-</textarea>
-<script> var codeElement = document.getElementById("JVSWU"); var editor = null; if (null != codeElement) { editor = CodeMirror.fromTextArea(codeElement, { lineNumbers: true, readOnly: true, viewportMargin: Infinity, mode: 'text/x-sas' }); } </script>
 
+proc print data=modar1sasVC;
+run;
+</textarea>
+<script> var codeElement = document.getElementById("PXYIA"); var editor = null; if (null != codeElement) { editor = CodeMirror.fromTextArea(codeElement, { lineNumbers: true, readOnly: true, viewportMargin: Infinity, mode: 'text/x-sas' }); } </script>
+
+<p><br/></p>
+<table class="table table-bordered table-hover table-condensed table-responsive" style="width: auto !important; margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+mod
+</th>
+<th style="text-align:left;">
+CovParm
+</th>
+<th style="text-align:left;">
+Subject
+</th>
+<th style="text-align:right;">
+Estimate
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+ar1
+</td>
+<td style="text-align:left;">
+AR(1)
+</td>
+<td style="text-align:left;">
+plot
+</td>
+<td style="text-align:right;">
+0.749
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ar1
+</td>
+<td style="text-align:left;">
+Residual
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:right;">
+0.022
+</td>
+</tr>
+</tbody>
+</table>
 </div>
 </div>
 <div id="model-fit" class="section level1 tabset tabset-fade tabset-pills">
@@ -3280,7 +3372,7 @@ iid
 </div>
 <div id="lme4-2" class="section level2">
 <h2>lme4</h2>
-<p>not possible - see above.</p>
+<p><span style="color:red">not possible - see above.</span></p>
 </div>
 <div id="glmmtmb-2" class="section level2">
 <h2>glmmTMB</h2>
@@ -3396,8 +3488,70 @@ ar1
 </div>
 <div id="sas-2" class="section level2">
 <h2>SAS</h2>
-<p>in progress</p>
+<p>The model fit statistics have already been created via the <code>ods output</code> statement of the respective models and are displayed here jointly:</p>
+<table class="table table-bordered table-hover table-condensed table-responsive" style="width: auto !important; margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+mod
+</th>
+<th style="text-align:right;">
+-2 Res Log-Likelihood
+</th>
+<th style="text-align:right;">
+AIC
+</th>
+<th style="text-align:right;">
+AICC
+</th>
+<th style="text-align:right;">
+BIC
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+iid
+</td>
+<td style="text-align:right;">
+-3.7
+</td>
+<td style="text-align:right;">
+-1.7
+</td>
+<td style="text-align:right;">
+-1.7
+</td>
+<td style="text-align:right;">
+-0.7
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ar1
+</td>
+<td style="text-align:right;">
+-46.0
+</td>
+<td style="text-align:right;">
+-42.0
+</td>
+<td style="text-align:right;">
+-41.7
+</td>
+<td style="text-align:right;">
+-40.0
+</td>
+</tr>
+</tbody>
+</table>
 </div>
+</div>
+<div id="conclusion" class="section level1">
+<h1>Conclusion</h1>
+<p>The <code>ar1</code> model has the smaller AIC value. Thus, we choose the <code>ar1</code> over the <code>iid</code> model, since the former has the better fit.</p>
+<p>Notice that this outcome satisfies the aim of this chapter (<em>i.e.</em> having an <code>ar1</code> variance structure for the error term) but regarding the analysis of the underlying dataset, more steps can be taken in order to get concluding results. You can find further steps in <a href="https://onlinelibrary.wiley.com/doi/full/10.1111/jac.12267" target="_blank"><em>Example 4</em> in Piepho &amp; Edmondson (2018)</a> (see also the <a href="https://cran.r-project.org/web/packages/agriTutorial/vignettes/agriTutorialVignette.pdf#%5B%7B%22num%22%3A81%2C%22gen%22%3A0%7D%2C%7B%22name%22%3A%22XYZ%22%7D%2C28.346%2C813.543%2Cnull%5D" target="_blank">Agritutorial vigniette</a>). On one hand, they investigate more variance structure alternatives to <code>iid</code> and on the other hand, they continue selecting a suitable regression model for the time trend after selecting a sutiable variance structure.</p>
 </div>
 <div id="summary" class="section level1 tabset tabset-fade">
 <h1>Summary</h1>
@@ -3436,16 +3590,218 @@ ar1
 </div>
 <div id="varcomp" class="section level2">
 <h2>VarComp</h2>
-<p>in progress</p>
+<strong>mod.iid</strong>
+<table class="table table-bordered table-hover table-condensed table-responsive" style="width: auto !important; margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+mod
+</th>
+<th style="text-align:left;">
+estimate
+</th>
+<th style="text-align:right;">
+nlme
+</th>
+<th style="text-align:left;">
+lme4
+</th>
+<th style="text-align:right;">
+glmmTMB
+</th>
+<th style="text-align:right;">
+sommer
+</th>
+<th style="text-align:right;">
+SAS
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+iid
+</td>
+<td style="text-align:left;">
+variance
+</td>
+<td style="text-align:right;">
+0.0231758
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:right;">
+0.023
+</td>
+<td style="text-align:right;">
+0.0231758
+</td>
+<td style="text-align:right;">
+0.02318
+</td>
+</tr>
+</tbody>
+</table>
+<strong>mod.ar1</strong>
+<table class="table table-bordered table-hover table-condensed table-responsive" style="width: auto !important; margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+mod
+</th>
+<th style="text-align:left;">
+estimate
+</th>
+<th style="text-align:right;">
+nlme
+</th>
+<th style="text-align:left;">
+lme4
+</th>
+<th style="text-align:right;">
+glmmTMB
+</th>
+<th style="text-align:left;">
+sommer
+</th>
+<th style="text-align:right;">
+SAS
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+ar1
+</td>
+<td style="text-align:left;">
+variance
+</td>
+<td style="text-align:right;">
+0.0221555
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:right;">
+0.022
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:right;">
+0.02216
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ar1
+</td>
+<td style="text-align:left;">
+correlation
+</td>
+<td style="text-align:right;">
+0.7489923
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:right;">
+0.749
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:right;">
+0.74900
+</td>
+</tr>
+</tbody>
+</table>
 </div>
 <div id="aic" class="section level2">
 <h2>AIC</h2>
-<p>in progress</p>
+<table class="table table-bordered table-hover table-condensed table-responsive" style="width: auto !important; margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+</th>
+<th style="text-align:left;">
+mod
+</th>
+<th style="text-align:left;">
+estimate
+</th>
+<th style="text-align:right;">
+nlme
+</th>
+<th style="text-align:left;">
+lme4
+</th>
+<th style="text-align:right;">
+glmmTMB
+</th>
+<th style="text-align:right;">
+sommer
+</th>
+<th style="text-align:right;">
+SAS
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+2
+</td>
+<td style="text-align:left;">
+iid
+</td>
+<td style="text-align:left;">
+AIC
+</td>
+<td style="text-align:right;">
+101.4131
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:right;">
+101.4130
+</td>
+<td style="text-align:right;">
+-73.34693
+</td>
+<td style="text-align:right;">
+-1.7
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+1
+</td>
+<td style="text-align:left;">
+ar1
+</td>
+<td style="text-align:left;">
+AIC
+</td>
+<td style="text-align:right;">
+137.6407
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:right;">
+137.6407
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;">
+-42.0
+</td>
+</tr>
+</tbody>
+</table>
 </div>
 </div>
 <div id="more-on-this" class="section level1">
 <h1>More on this</h1>
-<p>in progress</p>
+<p><a href="https://www.linkedin.com/posts/mixed-model-academy_pain-dataanalysis-activity-6684009897169833984-kZdn/" target="_blank">Relevant post by Mixed Model Academy</a></p>
 </div>
 
 &nbsp;
