@@ -16,6 +16,8 @@ navbar:
       menu: 
       - text: "Variance Structures"
         href: variance_structures.html
+      - text: "Model Selection"
+        href: model_selection.html
     - text: "Sources"
       href: sources.html
   

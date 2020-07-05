@@ -38,12 +38,46 @@ blockquote:before {
 blockquote p {
   display: inline;
 }
+/*
 nav-pills>li:nth-child(2) {
     background: green;
 }
+*/
 .center {
   display: block;
   margin-left: auto;
   margin-right: auto;
   width: 10%;
 }
+
+/**************************************
+.navbar-default {
+    background-color: #141c25f2;
+}
+
+.navbar-default .navbar-nav>.open>a, 
+.navbar-default .navbar-nav>.active>a, 
+a.dropdown-toggle:hover {
+  background-color: #141c25 !important;
+}
+
+/* Dropdown menu color
+.navbar-default .dropdown-menu {
+  background-color: #141c25;
+}
+
+/* Dropdown menu hover color 
+  .navbar-default .dropdown-menu>li>a:hover {
+    background-color: #202831f2;
+  }
+
+/* Navbar Links when hovered
+.navbar-default .dropdown-menu>.active>a
+.navbar-default .navbar-nav>.active>a:hover, 
+.navbar-default .navbar-nav:hover, 
+.navbar-default .navbar-nav>li>a:hover, 
+a.navbar-brand:hover {
+  color: #ffffffab !important;
+  background-color: #141c25;
+}
+*/

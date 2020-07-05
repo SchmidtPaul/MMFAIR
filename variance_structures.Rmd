@@ -280,10 +280,10 @@ Therefore, **direct multiplication can lead to the desired structure with fewer 
 
 ```{r, echo=FALSE}
 tribble(
-  ~`Variance Structure`,         ~total, ~var, ~cor,~nlme,    ~lme4,    ~glmmTMB, ~sommer,  ~SAS,
-  "Identitiy",                   "1",    "1",  "0" ,"default","default","default","default","VC",
-  "Diagonal",                    "t",    "t",  "0" ,NA,       NA,       NA,       NA,      "UN(1)",
-  "First order autoregressive ", "2",    "1",  "1" ,NA,       NA,       NA,       NA,      "AR(1)"
+  ~`Variance Structure`,         ~total, ~var, ~cor,~nlme,     ~lme4,    ~glmmTMB, ~sommer,  ~SAS,
+  "Identitiy",                   "1",    "1",  "0" ,"default" ,"default","default","default","VC",
+  "Diagonal",                    "t",    "t",  "0" ,"varIdent",     "--",   "diag",     "ds","UN(1)",
+  "First order autoregressive ", "2",    "1",  "1" ,"corAR1"  ,     "--",    "ar1",    "AR1","AR(1)"
 ) %>% 
   kable(escape = FALSE) %>% 
   kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"), 

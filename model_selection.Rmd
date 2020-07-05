@@ -1,0 +1,67 @@
+---
+title: "Model Selection"
+output: 
+  html_document:
+    includes:
+      in_header: header.html
+      after_body: footer.html	
+params:
+  hilang:
+    - sas					 
+---
+
+It is often the case that a selection must be made on which model is suitable to analyze a given dataset. Note that "model selection" rarely means a single instant decision for a well thought out model. Instead, model selection is usually a process where *e.g.* effects (fixed and/or random), variance structures and/or data transformations are being investigated step-by-step in order to ultimately make an informed decision on which model works best for a given dataset. Several aspects go into the decision making and there is not always a single correct way of selecting a model. Depending on the perspective of the user and the goal of the analysis, the thoughts on model selection usually range somewhere between these two extremes:
+
+- Which mistakes must I avoid so that my model is appropriate for my analysis?
+- What else could I fine-tune to further improve the information gained from my analysis?
+
+Based on some experiences, we would like to emphasize a thought here: Although selecting a model is often not the last step of a statistical analysis, it must be clear that deciding for one and against another model is never merely a necessary step towards a final results (such as *e.g.* an ANOVA, a Tukey-test *etc.*), but always also in itself already knowledge gained and thus a result as well.
+
+# Fixed terms
+
+## Wald-type F tests (ANOVA)
+
+in progress
+
+## Post hoc analysis
+
+### t-test
+
+in progress
+
+### Tukey's test etc.
+
+Tukey's test, *a.k.a.* the Tukey's range test, Tukey-Kramer method, Tukey's honest significance test, or Tukey's HSD (honestly significant difference) test.
+
+in progress
+
+# Random terms
+
+## Model Fit Statistics
+
+### Log-Likelihood
+
+The likelihood function (often simply called the likelihood) measures the goodness of fit (for given values of the unknown parameters) of a model to a dataset. Thus, it measures _how likely_ it is that a certain model fits a certain dataset.
+
+As [Piepho & Edmondson (2018)](https://onlinelibrary.wiley.com/doi/full/10.1111/jac.12267){target="_blank"} point out: *"Significance tests (i.e., [likelihood ratio tests](https://www.wikiwand.com/en/Likelihood-ratio_test){target="_blank"} in this case) can also be used to select between variance structures that are hierarchically nested, but not all structures meet this requirement, hence our preference for AIC."* 
+
+### AIC
+
+In terms of model selection, the AIC is based on, and can be seen as an enhancement of the (Log-)likelihood. Selecting the model with the smaller AIC value is standard procedure when comparing REML-based models that differ only in the random/error part of the model. In other words, REML-based models must be identical regarding their fixed effects to be comparable via AIC. 
+
+_"A standard procedure is to fit a set of candidate models and to pick the best fitting one based on the **Akaike information criterion (AIC)** [(Burnham & Anderson, 2002)](https://www.springer.com/de/book/9780387953649){target="_blank"}, which is computed from_
+
+$$-2 log L_R + 2p$$
+
+_where $p$ is the number of variance–covariance parameters and $log L_R$ is the maximized residual log-likelihood. The term $2p$ acts as a penalty for model complexity and helps provide a balance between model realism on the one hand and model parsimony on the other. **The smaller the value of AIC, the better is the fit**."_ [(Piepho & Edmondson, 2018)](https://onlinelibrary.wiley.com/doi/full/10.1111/jac.12267){target="_blank"}.
+
+Notice that *"AIC could also be used to select fixed-effects model components, but this would require switching from REML to full maximum likelihood (ML) estimation. As REML is preferable to ML for variance parameter estimation [(Searle et al., 1992)](https://onlinelibrary.wiley.com/doi/book/10.1002/9780470316856){target="_blank"} and good distributional approximations are available for fixed-effects hypothesis testing [(Kenward & Roger, 1997](https://www.jstor.org/stable/2533558?origin=crossref&seq=1){target="_blank"}, 
+[2009)](https://www.sciencedirect.com/science/article/abs/pii/S0167947308005768?via%3Dihub){target="_blank"}, we prefer Wald-type F tests and t tests for inference on fixed-effects model terms"* [(Piepho & Edmondson, 2018)](https://onlinelibrary.wiley.com/doi/full/10.1111/jac.12267){target="_blank"}.
+
+### BIC
+
+in progress
+
+
+
+
