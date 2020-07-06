@@ -82,11 +82,13 @@ a.navbar-brand:hover {
 }
 */
 
-<style>
-#TOC {
-  background: url("img/logo/hexagonMMFAIR.png");
+#TOC::before {
+  content: "";
+  display: block;
+  height: 200px;
+  margin: 2em 20px 40px 20px;
+  background-image: url("img/logo/hexagonMMFAIR.png");
   background-size: contain;
-  padding-top: 80px !important;
+  background-position: center center;
   background-repeat: no-repeat;
 }
-</style>

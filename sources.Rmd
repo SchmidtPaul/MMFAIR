@@ -1,6 +1,5 @@
 ---
-name: "MMFAIR sources"
-title: null
+title: "MMFAIR sources"
 output: 
   html_document:
     includes:

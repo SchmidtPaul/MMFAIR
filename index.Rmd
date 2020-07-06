@@ -1,6 +1,5 @@
 ---
-name: "MMFAIR index"
-title: null
+title: "MMFAIR index"
 output: 
   html_document:
     includes:
