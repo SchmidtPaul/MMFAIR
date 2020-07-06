@@ -81,3 +81,12 @@ a.navbar-brand:hover {
   background-color: #141c25;
 }
 */
+
+<style>
+#TOC {
+  background: "img/logo/hexagonMMFAIR.png";
+  background-size: contain;
+  padding-top: 80px !important;
+  background-repeat: no-repeat;
+}
+</style>
