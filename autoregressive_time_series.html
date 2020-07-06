@@ -25,6 +25,18 @@
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
 <script src="site_libs/navigation-1.1/codefolding.js"></script>
 <script src="site_libs/kePrint-0.0.1/kePrint.js"></script>
+<!--All these are favicons-->
+<link rel="apple-touch-icon" sizes="180x180" href="img/logo/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="img/logo/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="img/logo/favicon-16x16.png">
+<link rel="manifest" href="img/logo/site.webmanifest">
+<link rel="mask-icon" href="img/logo/safari-pinned-tab.svg" color="#5bbad5">
+<link rel="shortcut icon" href="img/logo/favicon.ico">
+<meta name="msapplication-TileColor" content="#2d89ef">
+<meta name="msapplication-config" content="img/logo/browserconfig.xml">
+<meta name="theme-color" content="#ffffff">
+
+<!--SAS syntax highlighting-->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.31.0/codemirror.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.31.0/codemirror.min.js"></script>
 <style>
@@ -33,9 +45,6 @@
     height: auto;
   }
 </style>
-
-<link rel="shortcut icon" href="img/logo/favicon.ico" type="image/x-icon">
-<link rel="icon" href="img/logo/favicon.ico" type="image/x-icon">
 
 
 <style type="text/css">code{white-space: pre;}</style>
@@ -2760,7 +2769,7 @@ Positive
 <p>In SAS, there is an actual <code>subject=</code> statement that is used to identify the subjects on which repeated measurements are taken. This may not be necessary for the <code>iid</code> with the default homoscedastic, independent error variance structure, but since it will be necessary for the following model with a more sophisticated variance structure, we will apply it here, too. In the end, the entire <code>repeated</code> line below could also be left out as it simply explicitly states the default setting.</p>
 
 
-<textarea id="VGYNA">
+<textarea id="TUEIV">
 proc mixed data=dat;
 class variety block factweek plot;
 model y=block variety factweek block*factweek variety*factweek /ddfm=kr2;
@@ -2771,7 +2780,7 @@ run;
 proc print data=modiidsasVC;
 run;
 </textarea>
-<script> var codeElement = document.getElementById("VGYNA"); var editor = null; if (null != codeElement) { editor = CodeMirror.fromTextArea(codeElement, { lineNumbers: true, readOnly: true, viewportMargin: Infinity, mode: 'text/x-sas' }); } </script>
+<script> var codeElement = document.getElementById("TUEIV"); var editor = null; if (null != codeElement) { editor = CodeMirror.fromTextArea(codeElement, { lineNumbers: true, readOnly: true, viewportMargin: Infinity, mode: 'text/x-sas' }); } </script>
 
 <p><br/></p>
 <table class="table table-bordered table-hover table-condensed table-responsive" style="width: auto !important; margin-left: auto; margin-right: auto;">
@@ -3248,7 +3257,7 @@ Positive
 <p>Here, we write <code>type=ar(1)</code> in the <code>repeated</code> statement in order to get the desired variance structure for the error term.</p>
 
 
-<textarea id="VJFWL">
+<textarea id="UZFDQ">
 proc mixed data=dat;
 class variety block factweek plot;
 model y=block variety factweek block*factweek variety*factweek /ddfm=kr2;
@@ -3259,7 +3268,7 @@ run;
 proc print data=modar1sasVC;
 run;
 </textarea>
-<script> var codeElement = document.getElementById("VJFWL"); var editor = null; if (null != codeElement) { editor = CodeMirror.fromTextArea(codeElement, { lineNumbers: true, readOnly: true, viewportMargin: Infinity, mode: 'text/x-sas' }); } </script>
+<script> var codeElement = document.getElementById("UZFDQ"); var editor = null; if (null != codeElement) { editor = CodeMirror.fromTextArea(codeElement, { lineNumbers: true, readOnly: true, viewportMargin: Infinity, mode: 'text/x-sas' }); } </script>
 
 <p><br/></p>
 <table class="table table-bordered table-hover table-condensed table-responsive" style="width: auto !important; margin-left: auto; margin-right: auto;">

@@ -1,4 +1,5 @@
 name: "MMFAIR-website"
+share-img: "img/logo/hexagonMMFAIR.png"
 output_dir: "."    # in GitHub master folder instead of default "_site" so that GitHub Pages works
 
 navbar:
@@ -30,3 +31,4 @@ output:
     toc_float: true
     # number_sections: true
     css: 'styles.css'
+
