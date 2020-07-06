@@ -84,7 +84,7 @@ a.navbar-brand:hover {
 
 <style>
 #TOC {
-  background: "img/logo/hexagonMMFAIR.png";
+  background: url("img/logo/hexagonMMFAIR.png");
   background-size: contain;
   padding-top: 80px !important;
   background-repeat: no-repeat;
