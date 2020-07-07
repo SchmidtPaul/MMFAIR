@@ -99,7 +99,7 @@ a[target]:link {
    display: inline-block;
    padding: 5px 5px;
    overflow: hidden;
-   color: #333;
+   color: #003f75ff;
    vertical-align: bottom;
    transition: color .3s ease-out;
 }
@@ -113,6 +113,7 @@ a[target]:link::before {
    transform: translateY(calc(100% - 2px));
    width: 100%;
    height: 100%;
+   color: #003f75ff;
    background-image: linear-gradient(60deg, #003f75ff 0%, #1d5a8fff 100%);
    transition: transform .25s ease-out;
 }
