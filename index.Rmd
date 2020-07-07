@@ -1,5 +1,5 @@
 ---
-title: "MMFAIR index"
+title: "Mixed Models for Agriculture in R"
 output: 
   html_document:
     includes:
@@ -9,9 +9,6 @@ params:
   hilang:
     - sas		
 ---
-<img src="img/banner_mmfair.jpg" style="width:100%">
-**Mixed Models for Agriculture in R**
-
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
 # packages for better formatting tables for html output
 library(kableExtra); library(formattable)
@@ -65,7 +62,7 @@ contents %>%
   #mutate_at(vars(Topic:Chapter), ~cell_spec(., bold=TRUE)) %>% 
   mutate_at(vars(nlme:SAS), 
             ~cell_spec(., 
-                       color=case_when(.=="in progress" ~ "orange", 
+                       color=case_when(.=="in progress" ~ "#003f75ff", 
                                        TRUE ~ "white"),
                        background=case_when(.=="yes" ~ "green",
                                             .=="kind of" ~ "#7CB342",

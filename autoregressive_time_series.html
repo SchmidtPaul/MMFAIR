@@ -2769,7 +2769,7 @@ Positive
 <p>In SAS, there is an actual <code>subject=</code> statement that is used to identify the subjects on which repeated measurements are taken. This may not be necessary for the <code>iid</code> with the default homoscedastic, independent error variance structure, but since it will be necessary for the following model with a more sophisticated variance structure, we will apply it here, too. In the end, the entire <code>repeated</code> line below could also be left out as it simply explicitly states the default setting.</p>
 
 
-<textarea id="IBVQE">
+<textarea id="VGYNA">
 proc mixed data=dat;
 class variety block factweek plot;
 model y=block variety factweek block*factweek variety*factweek /ddfm=kr2;
@@ -2780,7 +2780,7 @@ run;
 proc print data=modiidsasVC;
 run;
 </textarea>
-<script> var codeElement = document.getElementById("IBVQE"); var editor = null; if (null != codeElement) { editor = CodeMirror.fromTextArea(codeElement, { lineNumbers: true, readOnly: true, viewportMargin: Infinity, mode: 'text/x-sas' }); } </script>
+<script> var codeElement = document.getElementById("VGYNA"); var editor = null; if (null != codeElement) { editor = CodeMirror.fromTextArea(codeElement, { lineNumbers: true, readOnly: true, viewportMargin: Infinity, mode: 'text/x-sas' }); } </script>
 
 <p><br/></p>
 <table class="table table-bordered table-hover table-condensed table-responsive" style="width: auto !important; margin-left: auto; margin-right: auto;">
@@ -3257,7 +3257,7 @@ Positive
 <p>Here, we write <code>type=ar(1)</code> in the <code>repeated</code> statement in order to get the desired variance structure for the error term.</p>
 
 
-<textarea id="DIEKR">
+<textarea id="VJFWL">
 proc mixed data=dat;
 class variety block factweek plot;
 model y=block variety factweek block*factweek variety*factweek /ddfm=kr2;
@@ -3268,7 +3268,7 @@ run;
 proc print data=modar1sasVC;
 run;
 </textarea>
-<script> var codeElement = document.getElementById("DIEKR"); var editor = null; if (null != codeElement) { editor = CodeMirror.fromTextArea(codeElement, { lineNumbers: true, readOnly: true, viewportMargin: Infinity, mode: 'text/x-sas' }); } </script>
+<script> var codeElement = document.getElementById("VJFWL"); var editor = null; if (null != codeElement) { editor = CodeMirror.fromTextArea(codeElement, { lineNumbers: true, readOnly: true, viewportMargin: Infinity, mode: 'text/x-sas' }); } </script>
 
 <p><br/></p>
 <table class="table table-bordered table-hover table-condensed table-responsive" style="width: auto !important; margin-left: auto; margin-right: auto;">
@@ -3822,17 +3822,17 @@ AIC
 &nbsp;
 <hr />
 <p style="text-align: center;">Please feel free to contact us about any of this! </p>
-<p style="text-align: center;"><span style="color: #808080;"><em>schmidtpaul@hotmail.de</em></span></p>
+<p style="text-align: center;"><span style="color: #003f75ff;"><em>schmidtpaul@hotmail.de</em></span></p>
 
 <!-- Add icon library -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
 <!-- Add font awesome icons -->
 <p style="text-align: center;">
-    <a href="https://www.researchgate.net/project/MMFAIR-Mixed-Models-for-Agriculture-in-R" class="fa fa-pencil"></a>
-    <a href="https://www.linkedin.com/in/schmidtpaul1989/" class="fa fa-linkedin"></a>
-    <a href="https://www.xing.com/profile/Paul_Schmidt203/cv/" class="fa fa-xing"></a>
-    <a href="https://github.com/SchmidtPaul/" class="fa fa-github"></a>
+    <a href="https://www.researchgate.net/project/MMFAIR-Mixed-Models-for-Agriculture-in-R" class="fa fa-pencil" style="color: #003f75ff;"></a>
+    <a href="https://www.linkedin.com/in/schmidtpaul1989/" class="fa fa-linkedin" style="color: #003f75ff;"></a>
+    <a href="https://www.xing.com/profile/Paul_Schmidt203/cv/" class="fa fa-xing" style="color: #003f75ff;"></a>
+    <a href="https://github.com/SchmidtPaul/" class="fa fa-github" style="color: #003f75ff;"></a>
 </p>
 
 <img src="https://hitcounter.pythonanywhere.com/count/tag.svg?url=https%3A%2F%2Fschmidtpaul.github.io%2FMMFAIR%2Findex.html" alt="Hits" class="center">

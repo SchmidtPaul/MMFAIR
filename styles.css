@@ -1,7 +1,7 @@
-h1 {
+title {
   font-size: 30px;
 }
-title {
+h1 {
   font-size: 30px;
 }
 h2 {
@@ -19,6 +19,9 @@ h5 {
 h6 {
   font-size: 12px;
 }
+
+/***********************/
+/* Side note box start */
 blockquote {
   background: #f9f9f9;
   border-left: 10px solid #ccc;
@@ -38,11 +41,7 @@ blockquote:before {
 blockquote p {
   display: inline;
 }
-/*
-nav-pills>li:nth-child(2) {
-    background: green;
-}
-*/
+
 .center {
   display: block;
   margin-left: auto;
@@ -50,37 +49,12 @@ nav-pills>li:nth-child(2) {
   width: 10%;
 }
 
-/**************************************
-.navbar-default {
-    background-color: #141c25f2;
-}
+/* Side note box end */
+/*********************/
 
-.navbar-default .navbar-nav>.open>a, 
-.navbar-default .navbar-nav>.active>a, 
-a.dropdown-toggle:hover {
-  background-color: #141c25 !important;
-}
 
-/* Dropdown menu color
-.navbar-default .dropdown-menu {
-  background-color: #141c25;
-}
-
-/* Dropdown menu hover color 
-  .navbar-default .dropdown-menu>li>a:hover {
-    background-color: #202831f2;
-  }
-
-/* Navbar Links when hovered
-.navbar-default .dropdown-menu>.active>a
-.navbar-default .navbar-nav>.active>a:hover, 
-.navbar-default .navbar-nav:hover, 
-.navbar-default .navbar-nav>li>a:hover, 
-a.navbar-brand:hover {
-  color: #ffffffab !important;
-  background-color: #141c25;
-}
-*/
+/***************************/
+/* Table of contents start */
 
 #TOC::before {
   content: "";
@@ -92,3 +66,85 @@ a.navbar-brand:hover {
   background-position: center center;
   background-repeat: no-repeat;
 }
+
+.list-group-item.active, .list-group-item.active:focus, .list-group-item.active:hover {
+    z-index: 2;
+    color: #fff;
+    background-color: #003f75ff;
+    border-color: #003f75ff;
+}
+
+/* Table of contents end */
+/*************************/
+
+
+  .nav-pills>li>a {
+     color: #003f75ff;
+     }
+  .nav-pills>li>a:hover, .nav-pills>li>a:focus, .nav-pills>li.active>a, .nav-pills>li.active>a:hover, .nav-pills>li.active>a:focus{
+     color: white;
+     background-color: #003f75ff;
+     }
+
+
+/********************************************/
+/* Hyperlinks with a target attribute start */
+
+a[target]:link {
+   text-decoration: none;
+   line-height: 1;
+   
+   position: relative;
+   z-index: 0;
+   display: inline-block;
+   padding: 5px 5px;
+   overflow: hidden;
+   color: #333;
+   vertical-align: bottom;
+   transition: color .3s ease-out;
+}
+
+a[target]:link::before {
+   content: "";
+   position: absolute;
+   z-index: -1;
+   top: 0;
+   left: 0;
+   transform: translateY(calc(100% - 2px));
+   width: 100%;
+   height: 100%;
+   background-image: linear-gradient(60deg, #003f75ff 0%, #1d5a8fff 100%);
+   transition: transform .25s ease-out;
+}
+
+a[target]:link:hover { 
+   color: #fff; 
+}
+
+a[target]:link:hover::before {
+   transform: translateY(0);
+   transition: transform .25s ease-out;
+}
+
+.credits {
+   position: fixed;
+   top: 0;
+   left: 0;
+   width: 100vw;
+   height: 20px;
+   background-image: linear-gradient(60deg, #003f75ff 0%, #1d5a8fff 100%);
+   text-align: center;
+   font-size: 10px;
+   line-height: 20px;
+   color: white;
+   letter-spacing: 1px;
+}
+
+.credits > a {
+   text-decoration: none;
+   color: #fff;
+   letter-spacing: 1px;
+}
+
+/* Hyperlinks with a target attribute end */
+/******************************************/
