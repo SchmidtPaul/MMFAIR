@@ -56,7 +56,7 @@ boxplot(yield ~ density, data = dat)
 </div> </div>
 
 # 5 Models {.tabset .tabset-fade .tabset-pills}
-We therefore set up 5 models, which only differ in the variance structure in the error term. More specifically, we allow for different heterogeneous error variances / heteroscedascity per group for the effect levels of Date and Density. This type of variance structure is sometimes also referred to as [*diagonal*](variance_structures.html){target="_blank"}. 
+We therefore set up 5 models, which only differ in the variance structure in the error term. More specifically, we allow for different heterogeneous error variances / heteroscedascity per group for the effect levels of Date and Density. This type of variance structure is sometimes also referred to as [*diagonal*](variance_structures.html#diagonal){target="_blank"}. 
 
 Regarding the effects in the model, we take the same approach as [Piepho (2009)](https://acsess.onlinelibrary.wiley.com/doi/abs/10.2134/agronj2008.0226x){target="_blank"}, which calls for fixed main effects for `gen`, `date` and `densf` as well as all their interaction effects, plus random `block` effects.
 
@@ -856,3 +856,5 @@ plyr::join_all(list(AIC.nlme %>% dplyr::select(Modnames, AICc) %>% rename(nlme=A
 
 # More on this
 [Similar chapter on Michael Clark's Website "Mixed Models with R"](https://m-clark.github.io/mixed-models-with-R/extensions.html#heterogeneous-variance){target="_blank"}
+
+["SAS and R" blog post](http://sas-and-r.blogspot.com/2014/02/example-20143-allow-different-variances.html?m=1){target="_blank"}
