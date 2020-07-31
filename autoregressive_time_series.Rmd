@@ -23,7 +23,7 @@ pacman::p_load(kableExtra, formattable, htmltools) # packages for better formatt
 ```{r}
 # packages
 pacman::p_load(dplyr, purrr, tibble, tidyr, stringr, # data handling
-               ggplot2, viridis,            # plot
+               gganimate, ggplot2, gifski, viridis,  # plot
                nlme, lme4, glmmTMB, sommer, # mixed modelling
                AICcmodavg, mixedup)         # mixed model extractions
 
@@ -45,22 +45,19 @@ dat %>%
 
 # Motivation
 
-<div class = "row"> <div class = "col-md-6">
-
 The example in this chapter is taken from [*Example 4* in Piepho & Edmondson (2018)](https://onlinelibrary.wiley.com/doi/full/10.1111/jac.12267){target="_blank"} (see also the [Agritutorial vigniette](https://cran.r-project.org/web/packages/agriTutorial/vignettes/agriTutorialVignette.pdf#%5B%7B%22num%22%3A81%2C%22gen%22%3A0%7D%2C%7B%22name%22%3A%22XYZ%22%7D%2C28.346%2C813.543%2Cnull%5D){target="_blank"}). It considers data from a sorghum trial laid out as a randomized complete `block` design (5 blocks) with `variety` (4 sorghum varities) being the only treatment factor. Thus, we have a total of 20 `plot`s. It is important to note that our response variable (`y`), **the leaf area index, was assessed in five consecutive weeks on each plot** starting 2 weeks after emergence. Therefore, the dataset contains a total of 100 values and what we have here is longitudinal data, *a.k.a.* repeated measurements over time, *a.k.a.* a time series analysis.
 
 As [Piepho & Edmondson (2018)](https://onlinelibrary.wiley.com/doi/full/10.1111/jac.12267){target="_blank"} put it: *"the week factor is not a treatment factor that can be randomized. Instead, repeated measurements are taken on each plot on five consecutive occasions. Successive measurements on the same plot are likely to be serially correlated, and this means that for a reliable and efficient analysis of repeated-measures data we need to take proper account of the serial correlations between the repeated measures ([Piepho, Büchse & Richter, 2004](https://onlinelibrary.wiley.com/doi/abs/10.1111/j.1439-037X.2004.00097.x){target="_blank"}; [Pinheiro & Bates, 2000](http://library.mpib-berlin.mpg.de/toc/z2008_18.pdf){target="_blank"})."*
 
 
-</div> <div class = "col-md-6">
-
-```{r, echo=FALSE, fig.height=3.5, fig.width=4, purl=FALSE}
-ggplot(data = dat, aes(
+```{r, echo=FALSE, purl=FALSE}
+gganimate_plot <- ggplot(data = dat, aes(
   y = y,
-  x = factweek,
+  x = varweek,
   group = variety,
   color = variety
 )) +
+  geom_boxplot(outlier.shape = NA) +
   geom_point(alpha = 0.5, size = 3) +
   scale_color_viridis(option = "D",
                       discrete = TRUE,
@@ -73,10 +70,12 @@ ggplot(data = dat, aes(
   ) +
   xlab("Week") +
   theme_bw() +
-  theme(legend.position = "bottom")
-```
+  theme(legend.position = "bottom") +
+  transition_time(varweek) +
+  shadow_mark(exclude_layer = 2)
 
-</div> </div>
+animate(gganimate_plot, renderer = gifski_renderer())
+```
 
 # Modelling
 

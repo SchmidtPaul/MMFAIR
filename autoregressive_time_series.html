@@ -46,6 +46,27 @@
   }
 </style>
 
+<!--Metatags = preview image when linking to social media-->
+
+<!-- Primary Meta Tags -->
+<!-- <title>Mixed Models for Agriculture in R</title> -->
+<!-- <meta name="title" content="Mixed Models for Agriculture in R">  -->
+<meta name="description" content="Our aim is to provide a cookbook with mixed model analyses of typical examples in life sciences (focus on agriculture/biology) and compare the possibilities or rather limitations of the R-packages nlme, lme4, glmmTMB and sommer to each other, but also to SAS’ PROC MIXED.">
+
+<!-- Open Graph / Facebook -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://schmidtpaul.github.io/MMFAIR/index.html">
+<meta property="og:title" content="Mixed Models for Agriculture in R">
+<meta property="og:description" content="Our aim is to provide a cookbook with mixed model analyses of typical examples in life sciences (focus on agriculture/biology) and compare the possibilities or rather limitations of the R-packages nlme, lme4, glmmTMB and sommer to each other, but also to SAS’ PROC MIXED.">
+<meta property="og:image" content="img/logo/ScreenshotIndex.PNG">
+
+<!-- Twitter -->
+<meta property="twitter:card" content="summary_large_image">
+<meta property="twitter:url" content="https://schmidtpaul.github.io/MMFAIR/index.html">
+<meta property="twitter:title" content="Mixed Models for Agriculture in R">
+<meta property="twitter:description" content="Our aim is to provide a cookbook with mixed model analyses of typical examples in life sciences (focus on agriculture/biology) and compare the possibilities or rather limitations of the R-packages nlme, lme4, glmmTMB and sommer to each other, but also to SAS’ PROC MIXED.">
+<meta property="twitter:image" content="img/logo/ScreenshotIndex.PNG">
+
 
 <style type="text/css">code{white-space: pre;}</style>
 <style type="text/css" data-origin="pandoc">
@@ -521,7 +542,7 @@ div.tocify {
 
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" title="1"><span class="co"># packages</span></a>
 <a class="sourceLine" id="cb1-2" title="2">pacman<span class="op">::</span><span class="kw">p_load</span>(dplyr, purrr, tibble, tidyr, stringr, <span class="co"># data handling</span></a>
-<a class="sourceLine" id="cb1-3" title="3">               ggplot2, viridis,            <span class="co"># plot</span></a>
+<a class="sourceLine" id="cb1-3" title="3">               gganimate, ggplot2, gifski, viridis,  <span class="co"># plot</span></a>
 <a class="sourceLine" id="cb1-4" title="4">               nlme, lme4, glmmTMB, sommer, <span class="co"># mixed modelling</span></a>
 <a class="sourceLine" id="cb1-5" title="5">               AICcmodavg, mixedup)         <span class="co"># mixed model extractions</span></a>
 <a class="sourceLine" id="cb1-6" title="6"></a>
@@ -2561,15 +2582,9 @@ varweek
 <p><br/></p>
 <div id="motivation" class="section level1">
 <h1>Motivation</h1>
-<div class="row">
-<div class="col-md-6">
 <p>The example in this chapter is taken from <a href="https://onlinelibrary.wiley.com/doi/full/10.1111/jac.12267" target="_blank"><em>Example 4</em> in Piepho &amp; Edmondson (2018)</a> (see also the <a href="https://cran.r-project.org/web/packages/agriTutorial/vignettes/agriTutorialVignette.pdf#%5B%7B%22num%22%3A81%2C%22gen%22%3A0%7D%2C%7B%22name%22%3A%22XYZ%22%7D%2C28.346%2C813.543%2Cnull%5D" target="_blank">Agritutorial vigniette</a>). It considers data from a sorghum trial laid out as a randomized complete <code>block</code> design (5 blocks) with <code>variety</code> (4 sorghum varities) being the only treatment factor. Thus, we have a total of 20 <code>plot</code>s. It is important to note that our response variable (<code>y</code>), <strong>the leaf area index, was assessed in five consecutive weeks on each plot</strong> starting 2 weeks after emergence. Therefore, the dataset contains a total of 100 values and what we have here is longitudinal data, <em>a.k.a.</em> repeated measurements over time, <em>a.k.a.</em> a time series analysis.</p>
 <p>As <a href="https://onlinelibrary.wiley.com/doi/full/10.1111/jac.12267" target="_blank">Piepho &amp; Edmondson (2018)</a> put it: <em>“the week factor is not a treatment factor that can be randomized. Instead, repeated measurements are taken on each plot on five consecutive occasions. Successive measurements on the same plot are likely to be serially correlated, and this means that for a reliable and efficient analysis of repeated-measures data we need to take proper account of the serial correlations between the repeated measures (<a href="https://onlinelibrary.wiley.com/doi/abs/10.1111/j.1439-037X.2004.00097.x" target="_blank">Piepho, Büchse &amp; Richter, 2004</a>; <a href="http://library.mpib-berlin.mpg.de/toc/z2008_18.pdf" target="_blank">Pinheiro &amp; Bates, 2000</a>).”</em></p>
-</div>
-<div class="col-md-6">
-<p><img src="autoregressive_time_series_files/figure-html/unnamed-chunk-5-1.png" width="384" /></p>
-</div>
-</div>
+<p><img src="autoregressive_time_series_files/figure-html/unnamed-chunk-5-1.gif" /><!-- --></p>
 </div>
 <div id="modelling" class="section level1">
 <h1>Modelling</h1>
@@ -2769,7 +2784,7 @@ Positive
 <p>In SAS, there is an actual <code>subject=</code> statement that is used to identify the subjects on which repeated measurements are taken. This may not be necessary for the <code>iid</code> with the default homoscedastic, independent error variance structure, but since it will be necessary for the following model with a more sophisticated variance structure, we will apply it here, too. In the end, the entire <code>repeated</code> line below could also be left out as it simply explicitly states the default setting.</p>
 
 
-<textarea id="VGYNA">
+<textarea id="FQPNT">
 proc mixed data=dat;
 class variety block factweek plot;
 model y=block variety factweek block*factweek variety*factweek /ddfm=kr2;
@@ -2780,7 +2795,7 @@ run;
 proc print data=modiidsasVC;
 run;
 </textarea>
-<script> var codeElement = document.getElementById("VGYNA"); var editor = null; if (null != codeElement) { editor = CodeMirror.fromTextArea(codeElement, { lineNumbers: true, readOnly: true, viewportMargin: Infinity, mode: 'text/x-sas' }); } </script>
+<script> var codeElement = document.getElementById("FQPNT"); var editor = null; if (null != codeElement) { editor = CodeMirror.fromTextArea(codeElement, { lineNumbers: true, readOnly: true, viewportMargin: Infinity, mode: 'text/x-sas' }); } </script>
 
 <p><br/></p>
 <table class="table table-bordered table-hover table-condensed table-responsive" style="width: auto !important; margin-left: auto; margin-right: auto;">
@@ -3257,7 +3272,7 @@ Positive
 <p>Here, we write <code>type=ar(1)</code> in the <code>repeated</code> statement in order to get the desired variance structure for the error term.</p>
 
 
-<textarea id="VJFWL">
+<textarea id="LSAOF">
 proc mixed data=dat;
 class variety block factweek plot;
 model y=block variety factweek block*factweek variety*factweek /ddfm=kr2;
@@ -3268,7 +3283,7 @@ run;
 proc print data=modar1sasVC;
 run;
 </textarea>
-<script> var codeElement = document.getElementById("VJFWL"); var editor = null; if (null != codeElement) { editor = CodeMirror.fromTextArea(codeElement, { lineNumbers: true, readOnly: true, viewportMargin: Infinity, mode: 'text/x-sas' }); } </script>
+<script> var codeElement = document.getElementById("LSAOF"); var editor = null; if (null != codeElement) { editor = CodeMirror.fromTextArea(codeElement, { lineNumbers: true, readOnly: true, viewportMargin: Infinity, mode: 'text/x-sas' }); } </script>
 
 <p><br/></p>
 <table class="table table-bordered table-hover table-condensed table-responsive" style="width: auto !important; margin-left: auto; margin-right: auto;">
