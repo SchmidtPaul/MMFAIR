@@ -45,6 +45,27 @@
   }
 </style>
 
+<!--Metatags = preview image when linking to social media-->
+
+<!-- Primary Meta Tags -->
+<!-- <title>Mixed Models for Agriculture in R</title> -->
+<!-- <meta name="title" content="Mixed Models for Agriculture in R">  -->
+<meta name="description" content="Our aim is to provide a cookbook with mixed model analyses of typical examples in life sciences (focus on agriculture/biology) and compare the possibilities or rather limitations of the R-packages nlme, lme4, glmmTMB and sommer to each other, but also to SAS’ PROC MIXED.">
+
+<!-- Open Graph / Facebook -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://schmidtpaul.github.io/MMFAIR/index.html">
+<meta property="og:title" content="Mixed Models for Agriculture in R">
+<meta property="og:description" content="Our aim is to provide a cookbook with mixed model analyses of typical examples in life sciences (focus on agriculture/biology) and compare the possibilities or rather limitations of the R-packages nlme, lme4, glmmTMB and sommer to each other, but also to SAS’ PROC MIXED.">
+<meta property="og:image" content="img/logo/ScreenshotIndex.PNG">
+
+<!-- Twitter -->
+<meta property="twitter:card" content="summary_large_image">
+<meta property="twitter:url" content="https://schmidtpaul.github.io/MMFAIR/index.html">
+<meta property="twitter:title" content="Mixed Models for Agriculture in R">
+<meta property="twitter:description" content="Our aim is to provide a cookbook with mixed model analyses of typical examples in life sciences (focus on agriculture/biology) and compare the possibilities or rather limitations of the R-packages nlme, lme4, glmmTMB and sommer to each other, but also to SAS’ PROC MIXED.">
+<meta property="twitter:image" content="img/logo/ScreenshotIndex.PNG">
+
 
 
 
@@ -371,6 +392,9 @@ div.tocify {
     <li>
       <a href="autoregressive_time_series.html">First-order autoregressive</a>
     </li>
+    <li>
+      <a href="weighted_two_stage.html">Weighted two-stage analyses</a>
+    </li>
   </ul>
 </li>
 <li class="dropdown">
@@ -539,7 +563,7 @@ $(document).ready(function ()  {
       theme: "bootstrap3",
       context: '.toc-content',
       hashGenerator: function (text) {
-        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_').toLowerCase();
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
       },
       ignoreSelector: ".toc-ignore",
       scrollTo: 0

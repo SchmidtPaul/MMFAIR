@@ -3,7 +3,7 @@ list(hilang = "sas")
 
 # packages
 pacman::p_load(dplyr, purrr, tibble, tidyr, stringr, # data handling
-               ggplot2, viridis,            # plot
+               gganimate, ggplot2, gifski, viridis,  # plot
                nlme, lme4, glmmTMB, sommer, # mixed modelling
                AICcmodavg, mixedup)         # mixed model extractions
 

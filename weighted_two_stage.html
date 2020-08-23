@@ -26157,7 +26157,7 @@ North
 <p>In order to obtain the adjusted cultivar means, we take <code>Cultivar</code> as a fixed effect in the model and add the <code>LSMEANS Cultivar;</code> statement. Furthermore, adding <code>ODS OUTPUT LSMeans = stageIout_CultivarMeans;</code> saves the means into an object called <code>stageIout_CultivarMeans</code>.</p>
 
 
-<textarea id="FQXCS">
+<textarea id="SGZVA">
 PROC SORT  DATA=winterwheat; BY Zone Location Cultivar Rep Alpha; RUN;
 PROC MIXED DATA=winterwheat LOGNOTE;
 BY 			Zone Location;
@@ -26168,7 +26168,7 @@ LSMEANS 	Cultivar / COV;
 ODS OUTPUT 	LSMeans = stageIout_CultivarMeans;
 RUN;
 </textarea>
-<script> var codeElement = document.getElementById("FQXCS"); var editor = null; if (null != codeElement) { editor = CodeMirror.fromTextArea(codeElement, { lineNumbers: true, readOnly: true, viewportMargin: Infinity, mode: 'text/x-sas' }); } </script>
+<script> var codeElement = document.getElementById("SGZVA"); var editor = null; if (null != codeElement) { editor = CodeMirror.fromTextArea(codeElement, { lineNumbers: true, readOnly: true, viewportMargin: Infinity, mode: 'text/x-sas' }); } </script>
 
 <p>Notice that we also add <code>/COV;</code> to the <code>LSMEANS</code> statement. This is necessary for the Smith’s weights weighting approach, as it provides us with the estimated covariance matrix of the adjusted means and saves it, together with the means, into the <code>stageIout_CultivarMeans</code> object.</p>
 </div>
@@ -26221,7 +26221,7 @@ RUN;
 <p>At this point we can conveniently make use of a <a href="https://blogs.sas.com/content/sgf/2020/04/22/how-to-create-and-use-sas-macro-functions/" target="_blank">SAS-macro</a> that is described in more detail in <a href="https://acsess.onlinelibrary.wiley.com/doi/abs/10.2134/agronj2016.07.0395" target="_blank">Damesa et al., 2017</a> and can be found in their supplemental material. Note that a copy of it can also be found <a href="https://github.com/SchmidtPaul/utilities/tree/master/SAS%20macros" target="_blank">on github</a> which makes its use in SAS via URL very convenient:</p>
 
 
-<textarea id="ERSYF">
+<textarea id="JQVFC">
 FILENAME smith URL 
    "https://raw.githubusercontent.com/SchmidtPaul/utilities/master/SAS%20macros/get_Smith_weights.sas";
 %INCLUDE smith;
@@ -26230,7 +26230,7 @@ FILENAME smith URL
                    entry=Cultivar, by=Zone, by2=Location, 
                    outL=stageIIin_CultivarMeans);
 </textarea>
-<script> var codeElement = document.getElementById("ERSYF"); var editor = null; if (null != codeElement) { editor = CodeMirror.fromTextArea(codeElement, { lineNumbers: true, readOnly: true, viewportMargin: Infinity, mode: 'text/x-sas' }); } </script>
+<script> var codeElement = document.getElementById("JQVFC"); var editor = null; if (null != codeElement) { editor = CodeMirror.fromTextArea(codeElement, { lineNumbers: true, readOnly: true, viewportMargin: Infinity, mode: 'text/x-sas' }); } </script>
 
 <p>As can be seen, the macro <code>%get_smith_weights</code> basically needs the <code>stageIout_CultivarMeans</code> object as input, the name of the (main) effect for which means were calculated (<em>i.e.</em> <code>Cultivar</code>), as well as the variables that were used in the <code>BY</code> statement in Stage I. It then produces a <code>stageIIin_CultivarMeans</code> object that serves as the dataset in Stage II with an additional column <code>weight_Smith</code> with the desired weights.</p>
 <p>There are three things to consider when modelling the Smith’s weights approach in SAS:</p>
@@ -26241,7 +26241,7 @@ FILENAME smith URL
 </ol>
 
 
-<textarea id="LFWOV">
+<textarea id="SIAQF">
 PROC MIXED DATA=stageIIin_CultivarMeans;
 CLASS		Cultivar Zone Location;
 MODEL 		Estimate = Zone;
@@ -26252,7 +26252,7 @@ REPEATED;
 PARMS		(1)(1)(1)(1)(1) / HOLD=5;
 RUN;
 </textarea>
-<script> var codeElement = document.getElementById("LFWOV"); var editor = null; if (null != codeElement) { editor = CodeMirror.fromTextArea(codeElement, { lineNumbers: true, readOnly: true, viewportMargin: Infinity, mode: 'text/x-sas' }); } </script>
+<script> var codeElement = document.getElementById("SIAQF"); var editor = null; if (null != codeElement) { editor = CodeMirror.fromTextArea(codeElement, { lineNumbers: true, readOnly: true, viewportMargin: Infinity, mode: 'text/x-sas' }); } </script>
 
 <p>This model then provides us with the Cultivar-BLUPs across all environments obtained in a two-stage analyses using Smith’s weights.</p>
 </div>
@@ -26280,7 +26280,7 @@ RUN;
 <p>At this point we can conveniently make use of a <a href="https://blogs.sas.com/content/sgf/2020/04/22/how-to-create-and-use-sas-macro-functions/" target="_blank">SAS-macro</a> that is described in more detail in <a href="https://acsess.onlinelibrary.wiley.com/doi/abs/10.2134/agronj2016.07.0395" target="_blank">Damesa et al., 2017</a> and can be found in their supplemental material. Note that a copy of it can also be found <a href="https://github.com/SchmidtPaul/utilities/tree/master/SAS%20macros" target="_blank">on github</a> which makes its use in SAS via URL very convenient:</p>
 
 
-<textarea id="PMWLZ">
+<textarea id="TUEIV">
 FILENAME fullyeff URL 
    "https://raw.githubusercontent.com/SchmidtPaul/utilities/master/SAS%20macros/get_one_big_omega.sas";
 %INCLUDE fullyeff;
@@ -26289,7 +26289,7 @@ FILENAME fullyeff URL
                    entry=Cultivar, by=Zone, by2=Location,
                    outL=stageIIin_CultivarMeans);
 </textarea>
-<script> var codeElement = document.getElementById("PMWLZ"); var editor = null; if (null != codeElement) { editor = CodeMirror.fromTextArea(codeElement, { lineNumbers: true, readOnly: true, viewportMargin: Infinity, mode: 'text/x-sas' }); } </script>
+<script> var codeElement = document.getElementById("TUEIV"); var editor = null; if (null != codeElement) { editor = CodeMirror.fromTextArea(codeElement, { lineNumbers: true, readOnly: true, viewportMargin: Infinity, mode: 'text/x-sas' }); } </script>
 
 <p>As can be seen, the macro <code>%get_one_big_omega</code> basically needs the <code>stageIout_CultivarMeans</code> object as input, the name of the (main) effect for which means were calculated (<em>i.e.</em> <code>Cultivar</code>), as well as the variables that were used in the <code>BY</code> statement in Stage I. It then produces a <code>stageIIin_CultivarMeans</code> object that serves as the dataset in Stage II ….</p>
 <p>There are two things to consider when modelling the fully efficient weighting approach in SAS:</p>
@@ -26299,7 +26299,7 @@ FILENAME fullyeff URL
 </ol>
 
 
-<textarea id="PZRNF">
+<textarea id="UZFDQ">
 PROC MIXED DATA=stageIIin_CultivarMeans;
 CLASS		Cultivar Zone Location row;
 MODEL 		Estimate = Zone /NOTEST;
@@ -26309,7 +26309,7 @@ REPEATED 	row / SUB=Zone*Location TYPE=lin(1) LDATA=stageIIin_CultivarMeans;
 PARMS		(1)(1)(1)(1)(1) / HOLD=5;
 RUN;
 </textarea>
-<script> var codeElement = document.getElementById("PZRNF"); var editor = null; if (null != codeElement) { editor = CodeMirror.fromTextArea(codeElement, { lineNumbers: true, readOnly: true, viewportMargin: Infinity, mode: 'text/x-sas' }); } </script>
+<script> var codeElement = document.getElementById("UZFDQ"); var editor = null; if (null != codeElement) { editor = CodeMirror.fromTextArea(codeElement, { lineNumbers: true, readOnly: true, viewportMargin: Infinity, mode: 'text/x-sas' }); } </script>
 
 </div>
 </div>

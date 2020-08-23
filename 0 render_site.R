@@ -7,3 +7,4 @@ rmarkdown::render_site(encoding="UTF-8") # render all files new; UTF-8 for Ã¤, Ã
 # get r files from rmd files
 knitr::purl("heterogeneous_error_variance.Rmd", documentation = 0)
 knitr::purl("autoregressive_time_series.Rmd", documentation = 0)
+# knitr::purl("weighted_two_stage.Rmd", documentation = 0)

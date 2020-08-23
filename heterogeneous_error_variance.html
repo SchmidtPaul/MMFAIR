@@ -46,6 +46,27 @@
   }
 </style>
 
+<!--Metatags = preview image when linking to social media-->
+
+<!-- Primary Meta Tags -->
+<!-- <title>Mixed Models for Agriculture in R</title> -->
+<!-- <meta name="title" content="Mixed Models for Agriculture in R">  -->
+<meta name="description" content="Our aim is to provide a cookbook with mixed model analyses of typical examples in life sciences (focus on agriculture/biology) and compare the possibilities or rather limitations of the R-packages nlme, lme4, glmmTMB and sommer to each other, but also to SAS’ PROC MIXED.">
+
+<!-- Open Graph / Facebook -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://schmidtpaul.github.io/MMFAIR/index.html">
+<meta property="og:title" content="Mixed Models for Agriculture in R">
+<meta property="og:description" content="Our aim is to provide a cookbook with mixed model analyses of typical examples in life sciences (focus on agriculture/biology) and compare the possibilities or rather limitations of the R-packages nlme, lme4, glmmTMB and sommer to each other, but also to SAS’ PROC MIXED.">
+<meta property="og:image" content="img/logo/ScreenshotIndex.PNG">
+
+<!-- Twitter -->
+<meta property="twitter:card" content="summary_large_image">
+<meta property="twitter:url" content="https://schmidtpaul.github.io/MMFAIR/index.html">
+<meta property="twitter:title" content="Mixed Models for Agriculture in R">
+<meta property="twitter:description" content="Our aim is to provide a cookbook with mixed model analyses of typical examples in life sciences (focus on agriculture/biology) and compare the possibilities or rather limitations of the R-packages nlme, lme4, glmmTMB and sommer to each other, but also to SAS’ PROC MIXED.">
+<meta property="twitter:image" content="img/logo/ScreenshotIndex.PNG">
+
 
 <style type="text/css">code{white-space: pre;}</style>
 <style type="text/css" data-origin="pandoc">
@@ -470,6 +491,9 @@ div.tocify {
     </li>
     <li>
       <a href="autoregressive_time_series.html">First-order autoregressive</a>
+    </li>
+    <li>
+      <a href="weighted_two_stage.html">Weighted two-stage analyses</a>
     </li>
   </ul>
 </li>
@@ -1853,7 +1877,7 @@ B4
 </div>
 <div id="models" class="section level1 tabset tabset-fade tabset-pills">
 <h1>5 Models</h1>
-<p>We therefore set up 5 models, which only differ in the variance structure in the error term. More specifically, we allow for different heterogeneous error variances / heteroscedascity per group for the effect levels of Date and Density. This type of variance structure is sometimes also referred to as <a href="variance_structures.html" target="_blank"><em>diagonal</em></a>.</p>
+<p>We therefore set up 5 models, which only differ in the variance structure in the error term. More specifically, we allow for different heterogeneous error variances / heteroscedascity per group for the effect levels of Date and Density. This type of variance structure is sometimes also referred to as <a href="variance_structures.html#diagonal" target="_blank"><em>diagonal</em></a>.</p>
 <p>Regarding the effects in the model, we take the same approach as <a href="https://acsess.onlinelibrary.wiley.com/doi/abs/10.2134/agronj2008.0226x" target="_blank">Piepho (2009)</a>, which calls for fixed main effects for <code>gen</code>, <code>date</code> and <code>densf</code> as well as all their interaction effects, plus random <code>block</code> effects.</p>
 <p>The different variance structures in the error term of the 5 models are summarised in the table below (only mods 1-4 can be found in <a href="https://acsess.onlinelibrary.wiley.com/doi/abs/10.2134/agronj2008.0226x" target="_blank">Piepho (2009)</a>). Further notice the difference between <em>mod4</em> and <em>mod5</em>: <em>mod4</em> includes the direct product (<em>a.k.a.</em> Kronecker product) structure of the two diag-structures of <em>Date</em> and <em>Density</em>. <em>mod5</em> simply includes a diag-structure for the <em>Date</em>-<em>Density</em>-combinations (see our <a href="variance_structures.html" target="_blank">summary on variance structures</a> for more info).</p>
 <table class="table table-striped table-hover table-condensed table-responsive" style="width: auto !important; margin-left: auto; margin-right: auto;">
@@ -5451,6 +5475,7 @@ Mod5
 <div id="more-on-this" class="section level1">
 <h1>More on this</h1>
 <p><a href="https://m-clark.github.io/mixed-models-with-R/extensions.html#heterogeneous-variance" target="_blank">Similar chapter on Michael Clark’s Website “Mixed Models with R”</a></p>
+<p><a href="http://sas-and-r.blogspot.com/2014/02/example-20143-allow-different-variances.html?m=1" target="_blank">“SAS and R” blog post</a></p>
 </div>
 
 &nbsp;
@@ -5527,7 +5552,7 @@ $(document).ready(function ()  {
       theme: "bootstrap3",
       context: '.toc-content',
       hashGenerator: function (text) {
-        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_').toLowerCase();
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
       },
       ignoreSelector: ".toc-ignore",
       scrollTo: 0

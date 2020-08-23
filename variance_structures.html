@@ -352,6 +352,9 @@ div.tocify {
     <li>
       <a href="autoregressive_time_series.html">First-order autoregressive</a>
     </li>
+    <li>
+      <a href="weighted_two_stage.html">Weighted two-stage analyses</a>
+    </li>
   </ul>
 </li>
 <li class="dropdown">
@@ -728,7 +731,7 @@ $(document).ready(function ()  {
       theme: "bootstrap3",
       context: '.toc-content',
       hashGenerator: function (text) {
-        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_').toLowerCase();
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
       },
       ignoreSelector: ".toc-ignore",
       scrollTo: 0
