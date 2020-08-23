@@ -1,0 +1,233 @@
+---
+title: "Weighted two-stage analyses"
+output: 
+  html_document:
+    includes:
+      in_header: header.html
+      after_body: footer.html	
+params:
+  hilang:
+    - sas					 
+---
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, purl=FALSE}
+# markdown options
+options(knitr.kable.NA = '') # show NA as empty cells in output tables
+pacman::p_load(kableExtra, formattable, htmltools) # packages for better formatting tables for html output
+```
+
+```{r, child="_hilang_setup.Rmd", purl=FALSE}
+# required for sas syntax highlighting
+```
+
+```{r, message=FALSE}
+# packages
+pacman::p_load(dplyr, purrr, tibble, tidyr, stringr, # data handling
+               gganimate, ggplot2, gifski, viridis,  # plot
+               nlme, lme4, glmmTMB, sommer, # mixed modelling
+               AICcmodavg, mixedup)         # mixed model extractions
+
+# data
+dat <- readr::read_csv("data/Winter Wheat 2016.csv") %>% 
+  dplyr::select(Year, everything()) %>% 
+  mutate_at(vars(Year:Cultivar), as.factor)
+```
+```{r, echo=FALSE, purl=FALSE}
+dat %>%
+  kable(escape = FALSE) %>% 
+  kable_styling(bootstrap_options = c("bordered", "hover", "condensed", "responsive"), 
+                full_width = FALSE) %>% 
+  scroll_box(height = "200px")
+```
+
+# Motivation
+
+This chapter deals with a topic that may not be familiar to many readers, but it was very important to us before and during our PhD, which was in the field of biostatistics/data science for plant breeding and other agricultural fields. Therefore, we here give a very brief summary:
+
+A **two-stage analysis** is really just that: Trying to analyze a dataset not via a single model (in a single step), but in two separate stages/steps, where the output of the first stage/model is the input for the second stage/model. The motivation for doing a two-stage analysis for us was ever so often that data from a multi-environment-trial (MET) needed to be analyzed. An environment here refers to a year-location-combination, so that when multiple trials are set up at multiple locations and/or over multiple years we have a MET. Strictly speaking, data from a MET does not necessarily call for a two-stage analysis, but can indeed often just be analyzed in a single-stage analysis. However, there are arguments that speak for a two-stage analysis, such as the lower amount of required computational power and more dynamic/intuitive analyses of the single environments. For more info see SOURCES.
+
+## Example
+
+The example in this chapter is taken from [Buntaran et al. (2020)](https://acsess.onlinelibrary.wiley.com/doi/full/10.1002/csc2.20177){target="_blank"}. It considers data from a multi-environment trial with winter wheat varieties. The trial took place in 2016 across 18 locations in Sweden. Dry matter yield was analyzed. All trials were laid out as $\alpha$-designs with two replicates. Within each replicate, there were five to seven incomplete blocks. Sweden is divided into three different agricultural zones: South, Middle, and North. A zone is represented by a number of locations. The set of cultivars was the same across locations.
+
+# Modelling in two stages
+
+In Stage I, the cultivar means per location are estimated via best linear unbiased estimation (BLUE). This is done via fitting a linear mixed model separately for each location and taking the cultivar effect as fixed. Thus, we obtain one adjusted mean yield value for each cultivar at each location. 
+
+In Stage II, the cultivar means obtained in Stage II serve as the response and 
+
+> In such a two-stage approach, the cultivar main effect should be taken as fixed in Stage I in order to avoid double shrinkage ([Damesa et al., 2017](https://acsess.onlinelibrary.wiley.com/doi/abs/10.2134/agronj2016.07.0395){target="_blank"}; [Piepho et al., 2012](https://onlinelibrary.wiley.com/doi/abs/10.1002/bimj.201100219){target="_blank"}).
+
+## Stage I {.tabset .tabset-fade .tabset-pills}
+
+### nlme
+
+in progress, but probably not possible (?)
+
+### lme4
+
+in progress, but probably not possible (?)
+
+### glmmTMB
+
+in progress, but probably not possible (?)
+
+### sommer
+
+in progress, but probably not possible (?)
+
+### SAS {.active}
+
+In order to analyze each location separately in SAS, we can use the `BY` statement. However, the dataset must then also be sorted accordingly - in this case by `Zone Location`.
+
+In order to obtain the adjusted cultivar means, we take `Cultivar` as a fixed effect in the model and add the `LSMEANS Cultivar;` statement. Furthermore, adding `ODS OUTPUT LSMeans = stageIout_CultivarMeans;` saves the means into an object called `stageIout_CultivarMeans`.
+
+```{r, eval=FALSE, hilang="sas", purl=FALSE}
+PROC SORT  DATA=winterwheat; BY Zone Location Cultivar Rep Alpha; RUN;
+PROC MIXED DATA=winterwheat LOGNOTE;
+BY 			Zone Location;
+CLASS 		Cultivar Rep Alpha;
+MODEL 		Yield = Cultivar / DDFM=KR;
+RANDOM		Rep Rep*Alpha;
+LSMEANS 	Cultivar / COV;
+ODS OUTPUT 	LSMeans = stageIout_CultivarMeans;
+RUN;
+```
+
+Notice that we also add `/COV;` to the `LSMEANS` statement. This is necessary for the Smith's weights weighting approach, as it provides us with the estimated covariance matrix of the adjusted means and saves it, together with the means, into the `stageIout_CultivarMeans` object.
+
+## Stage II {.tabset .tabset-fade}
+
+### Unweighted (not recommended) {.tabset .tabset-fade .tabset-pills}
+
+#### nlme
+
+in progress
+
+#### lme4
+
+in progress
+
+#### glmmTMB
+
+in progress
+
+#### sommer
+
+in progress
+
+#### SAS
+
+in progress
+
+### Smith's Weights {.tabset .tabset-fade .tabset-pills .active}
+
+#### nlme
+
+in progress, but probably not possible (?)
+
+#### lme4
+
+in progress, but probably not possible (?)
+
+#### glmmTMB
+
+in progress, but probably not possible (?)
+
+#### sommer
+
+in progress, but probably not possible (?)
+
+#### SAS {.active}
+
+At this point we can conveniently make use of a  [SAS-macro](https://blogs.sas.com/content/sgf/2020/04/22/how-to-create-and-use-sas-macro-functions/){target="_blank"} that is described in more detail in [Damesa et al., 2017](https://acsess.onlinelibrary.wiley.com/doi/abs/10.2134/agronj2016.07.0395){target="_blank"} and can be found in their supplemental material. Note that a copy of it can also be found [on github](https://github.com/SchmidtPaul/utilities/tree/master/SAS%20macros){target="_blank"} which makes its use in SAS via URL very convenient:
+
+```{r, eval=FALSE, hilang="sas", purl=FALSE}
+FILENAME smith URL 
+   "https://raw.githubusercontent.com/SchmidtPaul/utilities/master/SAS%20macros/get_Smith_weights.sas";
+%INCLUDE smith;
+
+%get_smith_weights(data=stageIout_CultivarMeans, 
+                   entry=Cultivar, by=Zone, by2=Location, 
+                   outL=stageIIin_CultivarMeans);
+```
+
+As can be seen, the macro `%get_smith_weights` basically needs the `stageIout_CultivarMeans` object as input, the name of the (main) effect for which means were calculated (*i.e.* `Cultivar`), as well as the variables that were used in the `BY` statement in Stage I. It then produces a `stageIIin_CultivarMeans` object that serves as the dataset in Stage II with an additional column `weight_Smith` with the desired weights. 
+
+There are three things to consider when modelling the Smith's weights approach in SAS:
+
+  1. The `WEIGHT weight_Smith;` statement, which provides the name of the column that holds the weights
+  
+  2. The `REPEATED;` statement must be provided, as it [directly changes how](https://support.sas.com/documentation/cdl/en/statug/63033/HTML/default/viewer.htm#statug_mixed_sect020.htm){target="_blank"} the `WEIGHT` statement operates 
+  
+  3. The `PARMS ...(1) /HOLD=n` statement makes sure that the error variance is forced to be equal to 1. Notice that the number of parameters (and thus the number of `(1)` that are required in the statement) differ between models. However, there must always at least be one, *i.e.* the error variance, and it will always be the last one in the `PARMS` statement. In this case the model has 5 parameters, *i.e.* variance components for the random effects `Cultivar`, `Zone:Cultivar`, `Zone:Location:Cultivar` and `Zone:Location` and for the error term.  
+
+```{r, eval=FALSE, hilang="sas", purl=FALSE}
+PROC MIXED DATA=stageIIin_CultivarMeans;
+CLASS		Cultivar Zone Location;
+MODEL 		Estimate = Zone;
+WEIGHT 		weight_Smith;
+RANDOM		Int Zone Zone*Location / SUB=Cultivar;
+RANDOM		Zone*Location;
+REPEATED; 
+PARMS		(1)(1)(1)(1)(1) / HOLD=5;
+RUN;
+```
+
+This model then provides us with the Cultivar-BLUPs across all environments obtained in a two-stage analyses using Smith's weights.
+
+### Fully Efficient Weighting {.tabset .tabset-fade .tabset-pills}
+
+#### nlme
+
+in progress, but probably not possible (?)
+
+#### lme4
+
+in progress, but probably not possible (?)
+
+#### glmmTMB
+
+in progress, but probably not possible (?)
+
+#### sommer
+
+in progress, but probably not possible (?)
+
+#### SAS {.active}
+
+At this point we can conveniently make use of a  [SAS-macro](https://blogs.sas.com/content/sgf/2020/04/22/how-to-create-and-use-sas-macro-functions/){target="_blank"} that is described in more detail in [Damesa et al., 2017](https://acsess.onlinelibrary.wiley.com/doi/abs/10.2134/agronj2016.07.0395){target="_blank"} and can be found in their supplemental material. Note that a copy of it can also be found [on github](https://github.com/SchmidtPaul/utilities/tree/master/SAS%20macros){target="_blank"} which makes its use in SAS via URL very convenient:
+
+```{r, eval=FALSE, hilang="sas", purl=FALSE}
+FILENAME fullyeff URL 
+   "https://raw.githubusercontent.com/SchmidtPaul/utilities/master/SAS%20macros/get_one_big_omega.sas";
+%INCLUDE fullyeff;
+
+%get_one_big_omega(data=stageIout_CultivarMeans, 
+                   entry=Cultivar, by=Zone, by2=Location,
+                   outL=stageIIin_CultivarMeans);
+```
+
+As can be seen, the macro `%get_one_big_omega` basically needs the `stageIout_CultivarMeans` object as input, the name of the (main) effect for which means were calculated (*i.e.* `Cultivar`), as well as the variables that were used in the `BY` statement in Stage I. It then produces a `stageIIin_CultivarMeans` object that serves as the dataset in Stage II .... 
+
+There are two things to consider when modelling the fully efficient weighting approach in SAS:
+
+  1. The `REPEATED;` statement ...
+
+  2. The `PARMS ...(1) /HOLD=n` statement makes sure that the error variance is forced to be equal to 1. Notice that the number of parameters (and thus the number of `(1)` that are required in the statement) differ between models. However, there must always at least be one, *i.e.* the error variance, and it will always be the last one in the `PARMS` statement. In this case the model has 5 parameters, *i.e.* variance components for the random effects `Cultivar`, `Zone:Cultivar`, `Zone:Location:Cultivar` and `Zone:Location` and for the error term. 
+
+```{r, eval=FALSE, hilang="sas", purl=FALSE}
+PROC MIXED DATA=stageIIin_CultivarMeans;
+CLASS		Cultivar Zone Location row;
+MODEL 		Estimate = Zone /NOTEST;
+RANDOM		Int Zone Zone*Location / SUB=Cultivar;
+RANDOM		Zone*Location;
+REPEATED 	row / SUB=Zone*Location TYPE=lin(1) LDATA=stageIIin_CultivarMeans;
+PARMS		(1)(1)(1)(1)(1) / HOLD=5;
+RUN;
+```
+
+
+
+
+

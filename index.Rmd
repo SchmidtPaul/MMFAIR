@@ -40,8 +40,8 @@ Find chapters by navigating the menu at the top of the page. Each chapter focuse
 contents <- rbind(
   c("R-side", "Heterogeneous err. var.", "yes", "no", "kind of", "yes", "yes"),
   c("R-side", "First-order autoregressive", "yes", "no", "kind of", "not really", "yes"),
-  c("R-side", "Fixed scalar (Smith's weights)", "in progress", "in progress", "in progress", "in progress", "in progress"),
-  c("R-side", "Fixed matrix (fully efficient weighting)", "in progress", "in progress", "in progress", "in progress", "in progress"),
+  c("R-side", "Fixed scalar (Smith's weights)", "in progress", "in progress", "in progress", "in progress", "yes"),
+  c("R-side", "Fixed matrix (fully efficient weighting)", "in progress", "in progress", "in progress", "in progress", "yes"),
   c("G-side", "Fixed matrix (kinship/pedigree)", "in progress", "in progress", "in progress", "in progress", "in progress"),
   c("G-side", "Unstructured", "in progress", "in progress", "in progress", "in progress", "in progress"),
   c("G-side", "First-order factor analytic", "in progress", "in progress", "in progress", "in progress", "in progress"),

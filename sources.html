@@ -45,6 +45,27 @@
   }
 </style>
 
+<!--Metatags = preview image when linking to social media-->
+
+<!-- Primary Meta Tags -->
+<!-- <title>Mixed Models for Agriculture in R</title> -->
+<!-- <meta name="title" content="Mixed Models for Agriculture in R">  -->
+<meta name="description" content="Our aim is to provide a cookbook with mixed model analyses of typical examples in life sciences (focus on agriculture/biology) and compare the possibilities or rather limitations of the R-packages nlme, lme4, glmmTMB and sommer to each other, but also to SAS’ PROC MIXED.">
+
+<!-- Open Graph / Facebook -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://schmidtpaul.github.io/MMFAIR/index.html">
+<meta property="og:title" content="Mixed Models for Agriculture in R">
+<meta property="og:description" content="Our aim is to provide a cookbook with mixed model analyses of typical examples in life sciences (focus on agriculture/biology) and compare the possibilities or rather limitations of the R-packages nlme, lme4, glmmTMB and sommer to each other, but also to SAS’ PROC MIXED.">
+<meta property="og:image" content="img/logo/ScreenshotIndex.PNG">
+
+<!-- Twitter -->
+<meta property="twitter:card" content="summary_large_image">
+<meta property="twitter:url" content="https://schmidtpaul.github.io/MMFAIR/index.html">
+<meta property="twitter:title" content="Mixed Models for Agriculture in R">
+<meta property="twitter:description" content="Our aim is to provide a cookbook with mixed model analyses of typical examples in life sciences (focus on agriculture/biology) and compare the possibilities or rather limitations of the R-packages nlme, lme4, glmmTMB and sommer to each other, but also to SAS’ PROC MIXED.">
+<meta property="twitter:image" content="img/logo/ScreenshotIndex.PNG">
+
 
 
 
@@ -371,6 +392,9 @@ div.tocify {
     <li>
       <a href="autoregressive_time_series.html">First-order autoregressive</a>
     </li>
+    <li>
+      <a href="weighted_two_stage.html">Weighted two-stage analyses</a>
+    </li>
   </ul>
 </li>
 <li class="dropdown">
@@ -531,6 +555,7 @@ div.tocify {
 </div>
 <div id="publications" class="section level2">
 <h2>Publications</h2>
+<p><a href="https://acsess.onlinelibrary.wiley.com/doi/full/10.1002/csc2.20177" target="_blank">Buntaran, Harimurti, et al. (2020). Cross‐validation of stage‐wise mixed‐model analysis of Swedish variety trials with winter wheat and spring barley. Crop Science.</a></p>
 <p><a href="https://acsess.onlinelibrary.wiley.com/doi/abs/10.2134/agronj2008.0226x" target="_blank">Piepho, H. P. (2009). Data transformation in statistical analysis of field trials with changing treatment variance. Agronomy Journal, 101(4), 865-869.</a></p>
 <p><a href="https://onlinelibrary.wiley.com/doi/full/10.1111/jac.12267" target="_blank">Piepho, H. P. &amp; Edmondson, R. N. (2018). A tutorial on the statistical analysis of factorial experiments with qualitative and quantitative treatment factor levels. Journal of Agronomy and Crop Science 204(5): 429-455.</a></p>
 </div>
@@ -556,30 +581,18 @@ div.tocify {
 ## Matrix products: default
 ## 
 ## locale:
-## [1] LC_COLLATE=German_Germany.1252  LC_CTYPE=German_Germany.1252    LC_MONETARY=German_Germany.1252 LC_NUMERIC=C                   
+## [1] LC_COLLATE=German_Germany.1252  LC_CTYPE=German_Germany.1252   
+## [3] LC_MONETARY=German_Germany.1252 LC_NUMERIC=C                   
 ## [5] LC_TIME=German_Germany.1252    
 ## 
 ## attached base packages:
 ## [1] stats     graphics  grDevices utils     datasets  methods   base     
 ## 
-## other attached packages:
-##  [1] broom.mixed_0.2.5   mixedup_0.3.7       AICcmodavg_2.2-2    sommer_4.1.0        crayon_1.3.4        lattice_0.20-41     MASS_7.3-51.6      
-##  [8] glmmTMB_1.0.1       lme4_1.1-23         Matrix_1.2-18       nlme_3.1-148        viridis_0.5.1       viridisLite_0.3.0   ggplot2_3.3.0      
-## [15] stringr_1.4.0       tidyr_1.1.0         tibble_3.0.1        purrr_0.3.4         dplyr_1.0.0         htmltools_0.4.0     formattable_0.2.0.1
-## [22] kableExtra_1.1.0    rmarkdown_2.1      
-## 
 ## loaded via a namespace (and not attached):
-##  [1] httr_1.4.1          VGAM_1.1-3          splines_4.0.2       statmod_1.4.34      sp_1.4-1            stats4_4.0.2        selectr_0.4-2      
-##  [8] yaml_2.2.1          backports_1.1.6     numDeriv_2016.8-1.1 pillar_1.4.4        glue_1.4.0          digest_0.6.25       rvest_0.3.5        
-## [15] minqa_1.2.4         colorspace_1.4-1    sandwich_2.5-1      plyr_1.8.6          pkgconfig_2.0.3     broom_0.5.6         raster_3.1-5       
-## [22] xtable_1.8-4        mvtnorm_1.1-0       scales_1.1.0        webshot_0.5.2       emmeans_1.4.6       farver_2.0.3        generics_0.0.2     
-## [29] ellipsis_0.3.0      TH.data_1.0-10      pacman_0.5.1        withr_2.2.0         TMB_1.7.16          pbkrtest_0.4-8.6    survival_3.1-12    
-## [36] magrittr_1.5        estimability_1.3    evaluate_0.14       xml2_1.3.1          rsconnect_0.8.16    tools_4.0.2         hms_0.5.3          
-## [43] lifecycle_0.2.0     multcomp_1.4-13     munsell_0.5.0       packrat_0.5.0       compiler_4.0.2      rlang_0.4.6         grid_4.0.2         
-## [50] nloptr_1.2.2.1      rstudioapi_0.11     htmlwidgets_1.5.1   boot_1.3-25         lmerTest_3.1-2      gtable_0.3.0        codetools_0.2-16   
-## [57] agridat_1.16        reshape2_1.4.4      R6_2.4.1            gridExtra_2.3       zoo_1.8-7           knitr_1.28          readr_1.3.1        
-## [64] stringi_1.4.6       agriTutorial_0.1.5  parallel_4.0.2      unmarked_1.0.0      Rcpp_1.0.4.6        vctrs_0.3.1         tidyselect_1.1.0   
-## [71] xfun_0.13           coda_0.19-3</code></pre>
+##  [1] compiler_4.0.2  magrittr_1.5    tools_4.0.2     htmltools_0.4.0
+##  [5] yaml_2.2.1      Rcpp_1.0.4.6    stringi_1.4.6   rmarkdown_2.3  
+##  [9] knitr_1.28      stringr_1.4.0   xfun_0.13       digest_0.6.25  
+## [13] rlang_0.4.6     evaluate_0.14</code></pre>
 </div>
 </div>
 
@@ -657,7 +670,7 @@ $(document).ready(function ()  {
       theme: "bootstrap3",
       context: '.toc-content',
       hashGenerator: function (text) {
-        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_').toLowerCase();
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
       },
       ignoreSelector: ".toc-ignore",
       scrollTo: 0

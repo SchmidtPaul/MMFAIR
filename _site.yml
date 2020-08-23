@@ -13,6 +13,8 @@ navbar:
         href: heterogeneous_error_variance.html
       - text: "First-order autoregressive"
         href: autoregressive_time_series.html
+      - text: "Weighted two-stage analyses"
+        href: weighted_two_stage.html
     - text: "Summaries"
       menu: 
       - text: "Variance Structures"
