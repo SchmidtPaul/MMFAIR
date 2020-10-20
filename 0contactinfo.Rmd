@@ -85,12 +85,12 @@ Contact </br>
 Websites </br>
 <a href="https://schmidtpaul.github.io/crashcouRse/">
 <i class="fa fa-window-maximize" style="color: #003f75ff;">
-</i> CrashcouRse </a> </br>
+</i> CrashcouRse: R für Bio- und Agrarwissenschaftler </a> </br>
 <a href="https://schmidtpaul.github.io/DSFAIR/">
-<i class="fa fa-window-maximize" style="color: #003f75ff;">
+<img src="https://raw.githubusercontent.com/SchmidtPaul/DSFAIR/master/img/logo/favicon-32x32.png" width=16 height=16/>
 </i> DSFAIR: Data Science for Agriculture in R </a> </br>
 <a href="https://schmidtpaul.github.io/MMFAIR/">
-<i class="fa fa-window-maximize" style="color: #003f75ff;">
+<img src="https://raw.githubusercontent.com/SchmidtPaul/MMFAIR/master/img/logo/favicon-32x32.png" width=16 height=16/>
 </i> MMFAIR: Mixed Models for Agriculture in R </a> </br>
 
 </p>
