@@ -23,7 +23,6 @@ pacman::p_load(kableExtra, formattable, htmltools) # packages for better formatt
 ```{r, message=FALSE}
 # packages
 pacman::p_load(dplyr, purrr, tibble, tidyr, stringr, # data handling
-               gganimate, ggplot2, gifski, viridis,  # plot
                nlme, lme4, glmmTMB, sommer, # mixed modelling
                AICcmodavg, mixedup)         # mixed model extractions
 

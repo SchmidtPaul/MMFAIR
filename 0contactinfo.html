@@ -11,7 +11,7 @@
 
 
 
-<title>MMFAIR sources</title>
+<title>Dr. Paul Schmidt</title>
 
 <script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -24,6 +24,8 @@
 <script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
 <script src="site_libs/navigation-1.1/codefolding.js"></script>
+<script src="site_libs/kePrint-0.0.1/kePrint.js"></script>
+<link href="site_libs/lightable-0.0.1/lightable.css" rel="stylesheet" />
 <!--All these are favicons-->
 <link rel="apple-touch-icon" sizes="180x180" href="img/logo/apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="32x32" href="img/logo/favicon-32x32.png">
@@ -447,204 +449,360 @@ div.tocify {
 
 
 
-<h1 class="title toc-ignore">MMFAIR sources</h1>
+<h1 class="title toc-ignore">Dr. Paul Schmidt</h1>
 
 </div>
 
 
-<div id="links-references" class="section level1 tabset tabset-fade tabset-pills">
-<h1>Links &amp; References</h1>
-<div id="packages" class="section level2">
-<h2>Packages</h2>
-<div id="mixed-model" class="section level3">
-<h3>Mixed Model</h3>
-<div id="lme4" class="section level4">
-<h4>lme4</h4>
-<ul>
-<li><a href="https://cran.r-project.org/web/packages/lme4/lme4.pdf" target="_blank">Reference manual</a></li>
-<li>Vignettes
-<ul>
-<li><a href="https://cran.r-project.org/web/packages/lme4/vignettes/lmerperf.html" target="_blank">lmer Performance Tips</a></li>
-<li><a href="https://cran.r-project.org/web/packages/lme4/vignettes/lmer.pdf" target="_blank">Fitting Linear Mixed-Effects Models using lme4</a></li>
-<li><a href="https://cran.r-project.org/web/packages/lme4/vignettes/PLSvGLS.pdf" target="_blank">PLS vs GLS for LMMs</a></li>
-<li><a href="https://cran.r-project.org/web/packages/lme4/vignettes/Theory.pdf" target="_blank">Computational Methods</a></li>
-</ul></li>
-</ul>
-</div>
-<div id="glmmtmb" class="section level4">
-<h4>glmmTMB</h4>
-<ul>
-<li><a href="https://cran.r-project.org/web/packages/glmmTMB/glmmTMB.pdf" target="_blank">Reference manual</a></li>
-<li>Vignettes
-<ul>
-<li><a href="https://cran.r-project.org/web/packages/glmmTMB/vignettes/covstruct.html" target="_blank">random effect structures</a></li>
-<li><a href="https://cran.r-project.org/web/packages/glmmTMB/vignettes/mcmc.html" target="_blank">post-hoc MCMC</a></li>
-<li><a href="https://cran.r-project.org/web/packages/glmmTMB/vignettes/miscEx.html" target="_blank">miscellaneous examples</a></li>
-<li><a href="https://cran.r-project.org/web/packages/glmmTMB/vignettes/parallel.html" target="_blank">parallel optimization</a></li>
-<li><a href="https://cran.r-project.org/web/packages/glmmTMB/vignettes/sim.html" target="_blank">simulate</a></li>
-<li><a href="https://cran.r-project.org/web/packages/glmmTMB/vignettes/troubleshooting.html" target="_blank">troubleshooting</a></li>
-<li><a href="https://cran.r-project.org/web/packages/glmmTMB/vignettes/glmmTMB.pdf" target="_blank">basic examples of glmmTMB usage</a></li>
-<li><a href="https://cran.r-project.org/web/packages/glmmTMB/vignettes/model_evaluation.pdf" target="_blank">model evaluation</a></li>
-</ul></li>
-</ul>
-</div>
-<div id="nlme" class="section level4">
-<h4>nlme</h4>
-<ul>
-<li><a href="https://cran.r-project.org/web/packages/nlme/nlme.pdf" target="_blank">Reference manual</a></li>
-<li>Vignettes: none</li>
-</ul>
-</div>
-<div id="sommer" class="section level4">
-<h4>sommer</h4>
-<ul>
-<li><a href="https://cran.r-project.org/web/packages/sommer/sommer.pdf" target="_blank">Reference manual</a></li>
-<li>Vignettes
-<ul>
-<li><a href="https://cran.r-project.org/web/packages/sommer/vignettes/sommer.FAQ.pdf" target="_blank">FAQ for the sommer package</a></li>
-<li><a href="https://cran.r-project.org/web/packages/sommer/vignettes/sommer.pdf" target="_blank">Quantitative genetics using the sommer package</a></li>
-<li><a href="https://cran.r-project.org/web/packages/sommer/vignettes/sommer.changes.pdf" target="_blank">Moving to newer versions of sommer</a></li>
-<li><a href="https://cran.r-project.org/web/packages/sommer/vignettes/sommer.start.pdf" target="_blank">Quick start for the sommer package</a></li>
-</ul></li>
-</ul>
-</div>
-</div>
-<div id="helper-packages" class="section level3">
-<h3>Helper Packages</h3>
-<div id="aiccmodavg" class="section level4">
-<h4>AICcmodavg</h4>
-<ul>
-<li><a href="https://cran.r-project.org/web/packages/AICcmodavg/AICcmodavg.pdf" target="_blank">Reference manual</a></li>
-<li>Vignettes: none</li>
-</ul>
-</div>
-<div id="broom.mixed" class="section level4">
-<h4>broom.mixed</h4>
-<ul>
-<li><a href="https://cran.r-project.org/web/packages/broom.mixed/broom.mixed.pdf" target="_blank">Reference manual</a></li>
-<li>Vignettes
-<ul>
-<li><a href="https://cran.r-project.org/web/packages/broom.mixed/vignettes/broom_mixed_intro.html" target="_blank">introduction to broom.mixed</a></li>
-</ul></li>
-</ul>
-</div>
-<div id="mixedup" class="section level4">
-<h4>mixedup</h4>
-<ul>
-<li><a href="https://github.com/m-clark/mixedup" target="_blank">github repositroy</a></li>
-<li>Vignettes
-<ul>
-<li><a href="https://m-clark.github.io/mixedup/" target="_blank">For more details and examples see here</a></li>
-</ul></li>
-</ul>
-</div>
-</div>
-<div id="dataexamples" class="section level3">
-<h3>Data/Examples</h3>
-<div id="agridat" class="section level4">
-<h4>agridat</h4>
-<ul>
-<li><a href="https://cran.r-project.org/web/packages/agridat/agridat.pdf" target="_blank">Reference manual</a></li>
-<li>Vignettes
-<ul>
-<li><a href="https://cran.r-project.org/web/packages/agridat/vignettes/agridat_data.html" target="_blank">Additional agricultural data</a></li>
-<li><a href="https://cran.r-project.org/web/packages/agridat/vignettes/agridat_examples.html" target="_blank">Graphical Gems in the agridat Package</a></li>
-<li><a href="https://cran.r-project.org/web/packages/agridat/vignettes/agridat_papadakis.html" target="_blank">Using Papadakis covariates for nearest neighbor analysis</a></li>
-</ul></li>
-</ul>
-</div>
-<div id="agritutorial" class="section level4">
-<h4>agritutorial</h4>
-<ul>
-<li><a href="https://cran.r-project.org/web/packages/agriTutorial/agriTutorial.pdf" target="_blank">Reference manual</a></li>
-<li>Vignettes
-<ul>
-<li><a href="https://cran.r-project.org/web/packages/agriTutorial/vignettes/agriTutorialVignette.pdf" target="_blank">Tutorial Analysis of Some Agricultural Experiments</a></li>
-</ul></li>
-</ul>
-</div>
-</div>
-</div>
-<div id="publications" class="section level2">
-<h2>Publications</h2>
-<p><a href="https://acsess.onlinelibrary.wiley.com/doi/full/10.1002/csc2.20177" target="_blank">Buntaran, Harimurti, et al. (2020). Cross‐validation of stage‐wise mixed‐model analysis of Swedish variety trials with winter wheat and spring barley. Crop Science.</a></p>
-<p><a href="https://acsess.onlinelibrary.wiley.com/doi/abs/10.2134/agronj2008.0226x" target="_blank">Piepho, H. P. (2009). Data transformation in statistical analysis of field trials with changing treatment variance. Agronomy Journal, 101(4), 865-869.</a></p>
-<p><a href="https://onlinelibrary.wiley.com/doi/full/10.1111/jac.12267" target="_blank">Piepho, H. P. &amp; Edmondson, R. N. (2018). A tutorial on the statistical analysis of factorial experiments with qualitative and quantitative treatment factor levels. Journal of Agronomy and Crop Science 204(5): 429-455.</a></p>
-</div>
-<div id="websites" class="section level2">
-<h2>Websites</h2>
-<p><a href="http://bbolker.github.io/mixedmodels-misc/glmmFAQ.html" target="_blank">“GLMM FAQ”</a> by Ben Bolker and others</p>
-<p><a href="https://m-clark.github.io/mixed-models-with-R/introduction.html" target="_blank">“Mixed Models with R”</a> by Michael Clark</p>
-</div>
-<div id="contributions" class="section level2">
-<h2>Contributions</h2>
-<p><strong>Proofreader</strong></p>
-<ul>
-<li><a href="https://www.linkedin.com/in/mafzal2/" target="_blank">Muhammad Afzal</a></li>
-<li><a href="https://www.linkedin.com/in/harimurti-buntaran/" target="_blank">Harimurti Buntaran</a></li>
-</ul>
-</div>
-<div id="session-info" class="section level2">
-<h2>Session Info</h2>
-<pre><code>## R version 4.0.2 (2020-06-22)
-## Platform: x86_64-w64-mingw32/x64 (64-bit)
-## Running under: Windows 10 x64 (build 18362)
-## 
-## Matrix products: default
-## 
-## locale:
-## [1] LC_COLLATE=German_Germany.1252  LC_CTYPE=German_Germany.1252   
-## [3] LC_MONETARY=German_Germany.1252 LC_NUMERIC=C                   
-## [5] LC_TIME=German_Germany.1252    
-## 
-## attached base packages:
-## [1] stats     graphics  grDevices utils     datasets  methods   base     
-## 
-## other attached packages:
-##  [1] broom.mixed_0.2.6     mixedup_0.3.7         AICcmodavg_2.3-1     
-##  [4] sommer_4.1.1          crayon_1.3.4          lattice_0.20-41      
-##  [7] MASS_7.3-51.6         glmmTMB_1.0.2.1       lme4_1.1-23          
-## [10] Matrix_1.2-18         nlme_3.1-148          viridis_0.5.1        
-## [13] viridisLite_0.3.0     gifski_0.8.6          gganimate_1.0.7      
-## [16] forcats_0.5.0         stringr_1.4.0         dplyr_1.0.2          
-## [19] purrr_0.3.4           readr_1.4.0           tidyr_1.1.2          
-## [22] tibble_3.0.4          ggplot2_3.3.2         tidyverse_1.3.0      
-## [25] htmltools_0.5.0       formattable_0.2.0.1   kableExtra_1.2.1.9000
-## [28] rmarkdown_2.4        
-## 
-## loaded via a namespace (and not attached):
-##  [1] TH.data_1.0-10      VGAM_1.1-3          minqa_1.2.4        
-##  [4] colorspace_1.4-1    selectr_0.4-2       ellipsis_0.3.1     
-##  [7] estimability_1.3    fs_1.5.0            rstudioapi_0.11    
-## [10] farver_2.0.3        fansi_0.4.1         mvtnorm_1.1-1      
-## [13] lubridate_1.7.9     xml2_1.3.2          codetools_0.2-16   
-## [16] splines_4.0.2       knitr_1.30          jsonlite_1.7.1     
-## [19] nloptr_1.2.2.2      pbkrtest_0.4-8.6    packrat_0.5.0      
-## [22] broom_0.7.1         dbplyr_1.4.4        compiler_4.0.2     
-## [25] httr_1.4.2          emmeans_1.5.1       backports_1.1.10   
-## [28] assertthat_0.2.1    cli_2.1.0           tweenr_1.0.1       
-## [31] prettyunits_1.1.1   tools_4.0.2         lmerTest_3.1-2     
-## [34] coda_0.19-4         gtable_0.3.0        glue_1.4.2         
-## [37] reshape2_1.4.4      Rcpp_1.0.5          cellranger_1.1.0   
-## [40] raster_3.3-13       vctrs_0.3.4         xfun_0.18          
-## [43] rvest_0.3.6         lifecycle_0.2.0     pacman_0.5.1       
-## [46] statmod_1.4.34      zoo_1.8-8           scales_1.1.1       
-## [49] hms_0.5.3           parallel_4.0.2      sandwich_3.0-0     
-## [52] TMB_1.7.18          yaml_2.2.1          gridExtra_2.3      
-## [55] stringi_1.5.3       highr_0.8           boot_1.3-25        
-## [58] agriTutorial_0.1.5  rlang_0.4.8         pkgconfig_2.0.3    
-## [61] evaluate_0.14       labeling_0.3        htmlwidgets_1.5.2  
-## [64] tidyselect_1.1.0    plyr_1.8.6          magrittr_1.5       
-## [67] R6_2.4.1            generics_0.0.2      multcomp_1.4-14    
-## [70] DBI_1.1.0           pillar_1.4.6        haven_2.3.1        
-## [73] withr_2.3.0         survival_3.1-12     sp_1.4-4           
-## [76] modelr_0.1.8        progress_1.2.2      agridat_1.17       
-## [79] grid_4.0.2          readxl_1.3.1        blob_1.2.1         
-## [82] reprex_0.3.0        digest_0.6.26       webshot_0.5.2      
-## [85] xtable_1.8-4        numDeriv_2016.8-1.1 stats4_4.0.2       
-## [88] munsell_0.5.0       unmarked_1.0.1</code></pre>
-</div>
-</div>
+<!-- hyperlink style -->
+<style>
+a:link {
+  color: #003f75ff;
+  background-color: transparent;
+  text-decoration: none;
+}
+
+a:visited {
+  color: #003f75ff;
+  background-color: transparent;
+  text-decoration: none;
+}
+
+a:hover {
+  color: #003f75ff;
+  background-color: transparent;
+  text-decoration: underline;
+}
+
+a:active {
+  color: #003f75ff;
+  background-color: transparent;
+  text-decoration: underline;
+}
+</style>
+<!-- Image -->
+<style>
+img {border-radius: 50%;}
+</style>
+<p><img src="https://avatars3.githubusercontent.com/u/31928213?s=400&u=d5ca44cc7f39c7f4e2e79b4cffeeb3d0d0a321fb&v=4" style="width:33%; margin-left: 20px" align="right" alt="Avatar"></p>
+<!-- Contact symbols -->
+<style>
+p.small {line-height: 1;}
+</style>
+<p class="small">
+<p><i class="fa fa-home" style="color: #003f75ff;"> </i> Hamburg, Germany </br></p>
+<p>Contact </br> <a href="mailto:schmidtpaul1989@outlook.com"> <i class="fa fa-envelope" style="color: #003f75ff;"> </i> schmidtpaul1989@outlook.com </a> </br> <a href="https://github.com/SchmidtPaul/"> <i class="fa fa-github" style="color: #003f75ff;"> </i> GitHub </a> </br> <a href="https://www.linkedin.com/in/schmidtpaul1989/"> <i class="fa fa-linkedin" style="color: #003f75ff;"> </i> LinkedIn </a> </br> <a href="https://www.researchgate.net/profile/Paul_Schmidt17"> <i class="fa fa-pencil" style="color: #003f75ff;"> </i> ResearchGate </a> </br> <a href="https://www.xing.com/profile/Paul_Schmidt393/cv"> <i class="fa fa-xing" style="color: #003f75ff;"> </i> Xing </a></p>
+<p>Websites </br> <a href="https://schmidtpaul.github.io/crashcouRse/"> <i class="fa fa-window-maximize" style="color: #003f75ff;"> </i> CrashcouRse </a> </br> <a href="https://schmidtpaul.github.io/DSFAIR/"> <i class="fa fa-window-maximize" style="color: #003f75ff;"> </i> DSFAIR: Data Science for Agriculture in R </a> </br> <a href="https://schmidtpaul.github.io/MMFAIR/"> <i class="fa fa-window-maximize" style="color: #003f75ff;"> </i> MMFAIR: Mixed Models for Agriculture in R </a> </br></p>
+</p>
+<table class="table" style="margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;color: lightgrey !important;">
+English
+</th>
+<th style="text-align:left;color: lightgrey !important;">
+Deutsch
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+I completed my <strong>PhD</strong> in biostatistics at the University of Hohenheim in 2019 and have been working as a <strong>data scientist</strong> in life sciences at <a href="https://www.biomath.de/">BioMath</a> since then. I also give beginner and advanced <strong>workshops</strong> in R.
+</td>
+<td style="text-align:left;">
+Ich habe 2019 meine <strong>Promotion</strong> im Fachgebiet Biostatistik an der Universität Hohenheim abgeschlossen und arbeite seitdem als <strong>Data Scientist</strong> in den Life Sciences bei <a href="https://www.biomath.de/">BioMath</a>. Außerdem gebe ich <strong>Workshops</strong> in R für Einsteiger und Fortgeschrittene.
+</td>
+</tr>
+</tbody>
+</table>
+<table class=" lightable-minimal" style='font-size: 10px; font-family: "Trebuchet MS", verdana, sans-serif; margin-left: auto; margin-right: auto;'>
+<thead>
+<tr>
+<th style="text-align:left;">
+Time
+</th>
+<th style="text-align:left;">
+Title
+</th>
+<th style="text-align:left;">
+Language
+</th>
+<th style="text-align:left;">
+Location
+</th>
+<th style="text-align:left;">
+Duration
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Nov 2020
+</td>
+<td style="text-align:left;">
+Planning experimental designs, repeated measurements, and their analyses in R
+</td>
+<td style="text-align:left;">
+Eng
+<html>
+<body>
+<img src="https://cdn.countryflags.com/thumbs/united-states-of-america/flag-round-250.png" width="16" height="16">
+</body>
+</html>
+</td>
+<td style="text-align:left;">
+Universität Kassel
+</td>
+<td style="text-align:left;">
+2d
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Nov 2020
+</td>
+<td style="text-align:left;">
+Data science for life sciences with R (part 1)
+</td>
+<td style="text-align:left;">
+Ger
+<html>
+<body>
+<img src="https://cdn.countryflags.com/thumbs/germany/flag-round-250.png" width="16" height="16">
+</body>
+</html>
+</td>
+<td style="text-align:left;">
+Thünen-Institut, Braunschweig
+</td>
+<td style="text-align:left;">
+3d
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Oct 2020
+</td>
+<td style="text-align:left;">
+Experimental Design - Practicals in R
+</td>
+<td style="text-align:left;">
+Eng
+<html>
+<body>
+<img src="https://cdn.countryflags.com/thumbs/united-states-of-america/flag-round-250.png" width="16" height="16">
+</body>
+</html>
+</td>
+<td style="text-align:left;">
+CIHEAM Zaragoza via zoom
+</td>
+<td style="text-align:left;">
+5d
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Mar 2020
+</td>
+<td style="text-align:left;">
+Real-time consultation on statistics and mixed models in R
+</td>
+<td style="text-align:left;">
+Eng
+<html>
+<body>
+<img src="https://cdn.countryflags.com/thumbs/united-states-of-america/flag-round-250.png" width="16" height="16">
+</body>
+</html>
+</td>
+<td style="text-align:left;">
+Universität Kassel
+</td>
+<td style="text-align:left;">
+2d
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Dec 2019
+</td>
+<td style="text-align:left;">
+Basics of applied statistics
+</td>
+<td style="text-align:left;">
+Ger
+<html>
+<body>
+<img src="https://cdn.countryflags.com/thumbs/germany/flag-round-250.png" width="16" height="16">
+</body>
+</html>
+</td>
+<td style="text-align:left;">
+Universität Rostock
+</td>
+<td style="text-align:left;">
+2d
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Nov 2019
+</td>
+<td style="text-align:left;">
+Data science for life sciences with R (part 2)
+</td>
+<td style="text-align:left;">
+Ger
+<html>
+<body>
+<img src="https://cdn.countryflags.com/thumbs/germany/flag-round-250.png" width="16" height="16">
+</body>
+</html>
+</td>
+<td style="text-align:left;">
+Thünen-Institut, Braunschweig
+</td>
+<td style="text-align:left;">
+3d
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Oct 2019
+</td>
+<td style="text-align:left;">
+Data science for life sciences with R (part 1)
+</td>
+<td style="text-align:left;">
+Ger
+<html>
+<body>
+<img src="https://cdn.countryflags.com/thumbs/germany/flag-round-250.png" width="16" height="16">
+</body>
+</html>
+</td>
+<td style="text-align:left;">
+Thünen-Institut, Braunschweig
+</td>
+<td style="text-align:left;">
+3d
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Sep 2019
+</td>
+<td style="text-align:left;">
+Essential basics of statistics
+</td>
+<td style="text-align:left;">
+Ger
+<html>
+<body>
+<img src="https://cdn.countryflags.com/thumbs/germany/flag-round-250.png" width="16" height="16">
+</body>
+</html>
+</td>
+<td style="text-align:left;">
+Universität Rostock
+</td>
+<td style="text-align:left;">
+2d
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Nov 2018
+</td>
+<td style="text-align:left;">
+Mixed models with R
+</td>
+<td style="text-align:left;">
+Ger
+<html>
+<body>
+<img src="https://cdn.countryflags.com/thumbs/germany/flag-round-250.png" width="16" height="16">
+</body>
+</html>
+</td>
+<td style="text-align:left;">
+Thünen-Institut, Braunschweig
+</td>
+<td style="text-align:left;">
+3d
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+May 2018
+</td>
+<td style="text-align:left;">
+Implementation of yield stability assessment with ASReml-R
+</td>
+<td style="text-align:left;">
+Eng
+<html>
+<body>
+<img src="https://cdn.countryflags.com/thumbs/united-states-of-america/flag-round-250.png" width="16" height="16">
+</body>
+</html>
+</td>
+<td style="text-align:left;">
+Bangladesh Rice Research Institute, Gazipur
+</td>
+<td style="text-align:left;">
+1d
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2016-2018
+</td>
+<td style="text-align:left;">
+Statistical analysis with SAS (monthly)
+</td>
+<td style="text-align:left;">
+Eng
+<html>
+<body>
+<img src="https://cdn.countryflags.com/thumbs/united-states-of-america/flag-round-250.png" width="16" height="16">
+</body>
+</html>
+</td>
+<td style="text-align:left;">
+Universität Hohenheim, Stuttgart
+</td>
+<td style="text-align:left;">
+3d
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2016-2018
+</td>
+<td style="text-align:left;">
+Statistical analysis with R (monthly)
+</td>
+<td style="text-align:left;">
+Eng
+<html>
+<body>
+<img src="https://cdn.countryflags.com/thumbs/united-states-of-america/flag-round-250.png" width="16" height="16">
+</body>
+</html>
+</td>
+<td style="text-align:left;">
+Universität Hohenheim, Stuttgart
+</td>
+<td style="text-align:left;">
+3d
+</td>
+</tr>
+</tbody>
+</table>
 
 &nbsp;
 <hr />

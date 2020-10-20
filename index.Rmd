@@ -17,7 +17,7 @@ library(dplyr); library(tibble); library(tidyr)
 
 # Hi there!{.tabset .tabset-fade .tabset-pills}
 
-This is a project under constrcution. Our aim is to provide a cookbook with mixed model analyses of typical examples in life sciences (focus on agriculture/biology) and compare the possibilities or rather limitations of the R-packages
+This is a project under construction. Our aim is to provide a cookbook with mixed model analyses of typical examples in life sciences (focus on agriculture/biology) and compare the possibilities or rather limitations of the R-packages
 
 * [`nlme`](https://CRAN.R-project.org/package=nlme){target="_blank"}
 * [`lme4`](https://CRAN.R-project.org/package=lme4){target="_blank"}
@@ -87,12 +87,12 @@ Where possible, we try to use example data/analyses for our chapters that have b
 
 In terms of R syntax, we generally try to follow the approach presented on the ["R for Data Science" website](https://r4ds.had.co.nz/){target="_blank"}, making use of:
 
-[<img src="img\hexdplyr.png" width="80">](https://CRAN.R-project.org/package=dplyr)
-[<img src="img\hexggplot2.png" width="80">](https://CRAN.R-project.org/package=ggplot2)
-[<img src="img\hexpipe.png" width="80">](https://r4ds.had.co.nz/pipes.html)
-[<img src="img\hexpurrr.png" width="80">](https://CRAN.R-project.org/package=purrr)
-[<img src="img\hexscales.png" width="80">](https://CRAN.R-project.org/package=scales)
-[<img src="img\hexstringr.png" width="80">](https://CRAN.R-project.org/package=stringr)
-[<img src="img\hextibble.png" width="80">](https://CRAN.R-project.org/package=tibble)
-[<img src="img\hextidyr.png" width="80">](https://CRAN.R-project.org/package=tidyr)
-[<img src="img\hextidyverse.png" width="80">](https://CRAN.R-project.org/package=tidyverse)
+[<img src="https://raw.githubusercontent.com/rstudio/hex-stickers/master/PNG/dplyr.png" width="80">](https://CRAN.R-project.org/package=dplyr)
+[<img src="https://raw.githubusercontent.com/rstudio/hex-stickers/master/PNG/ggplot2.png" width="80">](https://CRAN.R-project.org/package=ggplot2)
+[<img src="https://raw.githubusercontent.com/rstudio/hex-stickers/master/PNG/pipe.png" width="80">](https://r4ds.had.co.nz/pipes.html)
+[<img src="https://raw.githubusercontent.com/rstudio/hex-stickers/master/PNG/purrr.png" width="80">](https://CRAN.R-project.org/package=purrr)
+[<img src="https://raw.githubusercontent.com/rstudio/hex-stickers/master/PNG/scales.png" width="80">](https://CRAN.R-project.org/package=scales)
+[<img src="https://raw.githubusercontent.com/rstudio/hex-stickers/master/PNG/stringr.png" width="80">](https://CRAN.R-project.org/package=stringr)
+[<img src="https://raw.githubusercontent.com/rstudio/hex-stickers/master/PNG/tibble.png" width="80">](https://CRAN.R-project.org/package=tibble)
+[<img src="https://raw.githubusercontent.com/rstudio/hex-stickers/master/PNG/tidyr.png" width="80">](https://CRAN.R-project.org/package=tidyr)
+[<img src="https://raw.githubusercontent.com/rstudio/hex-stickers/master/PNG/tidyverse.png" width="80">](https://CRAN.R-project.org/package=tidyverse)

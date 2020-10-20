@@ -25,6 +25,7 @@
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
 <script src="site_libs/navigation-1.1/codefolding.js"></script>
 <script src="site_libs/kePrint-0.0.1/kePrint.js"></script>
+<link href="site_libs/lightable-0.0.1/lightable.css" rel="stylesheet" />
 <!--All these are favicons-->
 <link rel="apple-touch-icon" sizes="180x180" href="img/logo/apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="32x32" href="img/logo/favicon-32x32.png">
@@ -66,6 +67,75 @@
 <meta property="twitter:title" content="Mixed Models for Agriculture in R">
 <meta property="twitter:description" content="Our aim is to provide a cookbook with mixed model analyses of typical examples in life sciences (focus on agriculture/biology) and compare the possibilities or rather limitations of the R-packages nlme, lme4, glmmTMB and sommer to each other, but also to SAS’ PROC MIXED.">
 <meta property="twitter:image" content="img/logo/ScreenshotIndex.PNG">
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+      a.sourceLine { display: inline-block; line-height: 1.25; }
+  a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+  a.sourceLine:empty { height: 1.2em; }
+  .sourceCode { overflow: visible; }
+  code.sourceCode { white-space: pre; position: relative; }
+  div.sourceCode { margin: 1em 0; }
+  pre.sourceCode { margin: 0; }
+  @media screen {
+  div.sourceCode { overflow: auto; }
+  }
+  @media print {
+  code.sourceCode { white-space: pre-wrap; }
+  a.sourceLine { text-indent: -1em; padding-left: 1em; }
+  }
+  pre.numberSource a.sourceLine
+    { position: relative; left: -4em; }
+  pre.numberSource a.sourceLine::before
+    { content: attr(title);
+      position: relative; left: -1em; text-align: right; vertical-align: baseline;
+      border: none; pointer-events: all; display: inline-block;
+      -webkit-touch-callout: none; -webkit-user-select: none;
+      -khtml-user-select: none; -moz-user-select: none;
+      -ms-user-select: none; user-select: none;
+      padding: 0 4px; width: 4em;
+      color: #aaaaaa;
+    }
+  pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+  div.sourceCode
+    { background-color: #f8f8f8; }
+  @media screen {
+  a.sourceLine::before { text-decoration: underline; }
+  }
+  code span.al { color: #ef2929; } /* Alert */
+  code span.an { color: #8f5902; font-weight: bold; font-style: italic; } /* Annotation */
+  code span.at { color: #c4a000; } /* Attribute */
+  code span.bn { color: #0000cf; } /* BaseN */
+  code span.cf { color: #204a87; font-weight: bold; } /* ControlFlow */
+  code span.ch { color: #4e9a06; } /* Char */
+  code span.cn { color: #000000; } /* Constant */
+  code span.co { color: #8f5902; font-style: italic; } /* Comment */
+  code span.cv { color: #8f5902; font-weight: bold; font-style: italic; } /* CommentVar */
+  code span.do { color: #8f5902; font-weight: bold; font-style: italic; } /* Documentation */
+  code span.dt { color: #204a87; } /* DataType */
+  code span.dv { color: #0000cf; } /* DecVal */
+  code span.er { color: #a40000; font-weight: bold; } /* Error */
+  code span.ex { } /* Extension */
+  code span.fl { color: #0000cf; } /* Float */
+  code span.fu { color: #000000; } /* Function */
+  code span.im { } /* Import */
+  code span.in { color: #8f5902; font-weight: bold; font-style: italic; } /* Information */
+  code span.kw { color: #204a87; font-weight: bold; } /* Keyword */
+  code span.op { color: #ce5c00; font-weight: bold; } /* Operator */
+  code span.ot { color: #8f5902; } /* Other */
+  code span.pp { color: #8f5902; font-style: italic; } /* Preprocessor */
+  code span.sc { color: #000000; } /* SpecialChar */
+  code span.ss { color: #4e9a06; } /* SpecialString */
+  code span.st { color: #4e9a06; } /* String */
+  code span.va { color: #000000; } /* Variable */
+  code span.vs { color: #4e9a06; } /* VerbatimString */
+  code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warning */
+    </style>
 
 
 <style type="text/css">code{white-space: pre;}</style>
@@ -514,6 +584,9 @@ div.tocify {
 </li>
 <li>
   <a href="sources.html">Sources</a>
+</li>
+<li>
+  <a href="0contactinfo.html">Contact</a>
 </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
@@ -2588,88 +2661,72 @@ varweek
 <p>The example in this chapter is taken from <a href="https://onlinelibrary.wiley.com/doi/full/10.1111/jac.12267" target="_blank"><em>Example 4</em> in Piepho &amp; Edmondson (2018)</a> (see also the <a href="https://cran.r-project.org/web/packages/agriTutorial/vignettes/agriTutorialVignette.pdf#%5B%7B%22num%22%3A81%2C%22gen%22%3A0%7D%2C%7B%22name%22%3A%22XYZ%22%7D%2C28.346%2C813.543%2Cnull%5D" target="_blank">Agritutorial vigniette</a>). It considers data from a sorghum trial laid out as a randomized complete <code>block</code> design (5 blocks) with <code>variety</code> (4 sorghum varities) being the only treatment factor. Thus, we have a total of 20 <code>plot</code>s. It is important to note that our response variable (<code>y</code>), <strong>the leaf area index, was assessed in five consecutive weeks on each plot</strong> starting 2 weeks after emergence. Therefore, the dataset contains a total of 100 values and what we have here is longitudinal data, <em>a.k.a.</em> repeated measurements over time, <em>a.k.a.</em> a time series analysis.</p>
 <p>As <a href="https://onlinelibrary.wiley.com/doi/full/10.1111/jac.12267" target="_blank">Piepho &amp; Edmondson (2018)</a> put it: <em>“the week factor is not a treatment factor that can be randomized. Instead, repeated measurements are taken on each plot on five consecutive occasions. Successive measurements on the same plot are likely to be serially correlated, and this means that for a reliable and efficient analysis of repeated-measures data we need to take proper account of the serial correlations between the repeated measures (<a href="https://onlinelibrary.wiley.com/doi/abs/10.1111/j.1439-037X.2004.00097.x" target="_blank">Piepho, Büchse &amp; Richter, 2004</a>; <a href="http://library.mpib-berlin.mpg.de/toc/z2008_18.pdf" target="_blank">Pinheiro &amp; Bates, 2000</a>).”</em></p>
 <pre><code>## 
-Rendering [&gt;----------------------------------------------------------------------] at 5.8 fps ~ eta: 17s
-Rendering [=&gt;-----------------------------------------------------------------------] at 6 fps ~ eta: 16s
-Rendering [==&gt;--------------------------------------------------------------------] at 6.1 fps ~ eta: 16s
-Rendering [===&gt;-------------------------------------------------------------------] at 6.2 fps ~ eta: 15s
-Rendering [====&gt;------------------------------------------------------------------] at 6.2 fps ~ eta: 15s
-Rendering [=====&gt;-----------------------------------------------------------------] at 6.3 fps ~ eta: 15s
-Rendering [======&gt;----------------------------------------------------------------] at 6.2 fps ~ eta: 14s
-Rendering [=======&gt;---------------------------------------------------------------] at 6.2 fps ~ eta: 14s
-Rendering [========&gt;--------------------------------------------------------------] at 6.3 fps ~ eta: 14s
-Rendering [=========&gt;-------------------------------------------------------------] at 6.3 fps ~ eta: 14s
-Rendering [==========&gt;------------------------------------------------------------] at 6.3 fps ~ eta: 14s
-Rendering [==========&gt;------------------------------------------------------------] at 6.3 fps ~ eta: 13s
-Rendering [===========&gt;-----------------------------------------------------------] at 6.3 fps ~ eta: 13s
-Rendering [============&gt;----------------------------------------------------------] at 6.3 fps ~ eta: 13s
-Rendering [=============&gt;---------------------------------------------------------] at 6.3 fps ~ eta: 13s
-Rendering [==============&gt;--------------------------------------------------------] at 6.3 fps ~ eta: 12s
-Rendering [===============&gt;-------------------------------------------------------] at 6.3 fps ~ eta: 12s
-Rendering [================&gt;------------------------------------------------------] at 6.3 fps ~ eta: 12s
-Rendering [=================&gt;-----------------------------------------------------] at 6.3 fps ~ eta: 12s
-Rendering [==================&gt;----------------------------------------------------] at 6.3 fps ~ eta: 12s
-Rendering [===================&gt;---------------------------------------------------] at 6.3 fps ~ eta: 12s
-Rendering [====================&gt;--------------------------------------------------] at 6.2 fps ~ eta: 11s
-Rendering [=====================&gt;-------------------------------------------------] at 6.2 fps ~ eta: 11s
-Rendering [======================&gt;------------------------------------------------] at 6.2 fps ~ eta: 11s
-Rendering [=======================&gt;-----------------------------------------------] at 6.1 fps ~ eta: 11s
-Rendering [========================&gt;----------------------------------------------] at 6.1 fps ~ eta: 11s
-Rendering [=========================&gt;---------------------------------------------] at 6.1 fps ~ eta: 11s
-Rendering [=========================&gt;---------------------------------------------] at 6.1 fps ~ eta: 10s
-Rendering [==========================&gt;--------------------------------------------] at 6.1 fps ~ eta: 10s
-Rendering [===========================&gt;---------------------------------------------] at 6 fps ~ eta: 10s
-Rendering [============================&gt;--------------------------------------------] at 6 fps ~ eta: 10s
-Rendering [=============================&gt;-------------------------------------------] at 6 fps ~ eta: 10s
-Rendering [==============================&gt;------------------------------------------] at 6 fps ~ eta: 10s
-Rendering [===============================&gt;-----------------------------------------] at 6 fps ~ eta:  9s
-Rendering [================================&gt;----------------------------------------] at 6 fps ~ eta:  9s
-Rendering [=================================&gt;---------------------------------------] at 6 fps ~ eta:  9s
-Rendering [================================&gt;--------------------------------------] at 5.9 fps ~ eta:  9s
-Rendering [=================================&gt;-------------------------------------] at 5.9 fps ~ eta:  9s
-Rendering [==================================&gt;------------------------------------] at 5.9 fps ~ eta:  9s
-Rendering [===================================&gt;-----------------------------------] at 5.9 fps ~ eta:  8s
-Rendering [====================================&gt;----------------------------------] at 5.9 fps ~ eta:  8s
-Rendering [=====================================&gt;---------------------------------] at 5.9 fps ~ eta:  8s
-Rendering [=====================================&gt;---------------------------------] at 5.8 fps ~ eta:  8s
-Rendering [======================================&gt;--------------------------------] at 5.8 fps ~ eta:  8s
-Rendering [=======================================&gt;-------------------------------] at 5.8 fps ~ eta:  8s
-Rendering [=======================================&gt;-------------------------------] at 5.8 fps ~ eta:  7s
-Rendering [========================================&gt;------------------------------] at 5.8 fps ~ eta:  7s
-Rendering [=========================================&gt;-----------------------------] at 5.7 fps ~ eta:  7s
-Rendering [==========================================&gt;----------------------------] at 5.7 fps ~ eta:  7s
-Rendering [===========================================&gt;---------------------------] at 5.7 fps ~ eta:  7s
-Rendering [============================================&gt;--------------------------] at 5.7 fps ~ eta:  7s
-Rendering [============================================&gt;--------------------------] at 5.7 fps ~ eta:  6s
-Rendering [=============================================&gt;-------------------------] at 5.7 fps ~ eta:  6s
-Rendering [==============================================&gt;------------------------] at 5.7 fps ~ eta:  6s
-Rendering [===============================================&gt;-----------------------] at 5.6 fps ~ eta:  6s
-Rendering [================================================&gt;----------------------] at 5.6 fps ~ eta:  6s
-Rendering [=================================================&gt;---------------------] at 5.6 fps ~ eta:  5s
-Rendering [==================================================&gt;--------------------] at 5.6 fps ~ eta:  5s
-Rendering [===================================================&gt;-------------------] at 5.6 fps ~ eta:  5s
-Rendering [====================================================&gt;------------------] at 5.6 fps ~ eta:  5s
-Rendering [====================================================&gt;------------------] at 5.6 fps ~ eta:  4s
-Rendering [=====================================================&gt;-----------------] at 5.5 fps ~ eta:  4s
-Rendering [======================================================&gt;----------------] at 5.5 fps ~ eta:  4s
-Rendering [=======================================================&gt;---------------] at 5.5 fps ~ eta:  4s
-Rendering [========================================================&gt;--------------] at 5.5 fps ~ eta:  4s
-Rendering [=========================================================&gt;-------------] at 5.5 fps ~ eta:  3s
-Rendering [=========================================================&gt;-------------] at 5.4 fps ~ eta:  3s
-Rendering [==========================================================&gt;------------] at 5.4 fps ~ eta:  3s
-Rendering [===========================================================&gt;-----------] at 5.4 fps ~ eta:  3s
-Rendering [============================================================&gt;----------] at 5.4 fps ~ eta:  3s
-Rendering [=============================================================&gt;---------] at 5.4 fps ~ eta:  2s
-Rendering [=============================================================&gt;---------] at 5.3 fps ~ eta:  2s
-Rendering [==============================================================&gt;--------] at 5.3 fps ~ eta:  2s
-Rendering [===============================================================&gt;-------] at 5.3 fps ~ eta:  2s
-Rendering [================================================================&gt;------] at 5.3 fps ~ eta:  2s
-Rendering [=================================================================&gt;-----] at 5.3 fps ~ eta:  1s
-Rendering [==================================================================&gt;----] at 5.3 fps ~ eta:  1s
-Rendering [===================================================================&gt;---] at 5.3 fps ~ eta:  1s
-Rendering [====================================================================&gt;--] at 5.2 fps ~ eta:  1s
-Rendering [=====================================================================&gt;-] at 5.2 fps ~ eta:  0s
-Rendering [=======================================================================] at 5.2 fps ~ eta:  0s
-                                                                                                         </code></pre>
+Rendering [&gt;--------------------------------------------] at 6.7 fps ~ eta: 15s
+Rendering [&gt;--------------------------------------------] at 6.5 fps ~ eta: 15s
+Rendering [=&gt;-------------------------------------------] at 6.5 fps ~ eta: 15s
+Rendering [=&gt;-------------------------------------------] at 6.4 fps ~ eta: 15s
+Rendering [==&gt;------------------------------------------] at 6.4 fps ~ eta: 15s
+Rendering [==&gt;--------------------------------------------] at 6 fps ~ eta: 15s
+Rendering [===&gt;-----------------------------------------] at 6.1 fps ~ eta: 15s
+Rendering [===&gt;-------------------------------------------] at 6 fps ~ eta: 15s
+Rendering [===&gt;-----------------------------------------] at 6.1 fps ~ eta: 15s
+Rendering [====&gt;----------------------------------------] at 6.1 fps ~ eta: 15s
+Rendering [====&gt;----------------------------------------] at 6.1 fps ~ eta: 14s
+Rendering [=====&gt;---------------------------------------] at 6.1 fps ~ eta: 14s
+Rendering [======&gt;--------------------------------------] at 6.1 fps ~ eta: 14s
+Rendering [=======&gt;-------------------------------------] at 6.1 fps ~ eta: 14s
+Rendering [=======&gt;-------------------------------------] at 6.1 fps ~ eta: 13s
+Rendering [========&gt;------------------------------------] at 6.2 fps ~ eta: 13s
+Rendering [========&gt;------------------------------------] at 6.1 fps ~ eta: 13s
+Rendering [=========&gt;-----------------------------------] at 6.1 fps ~ eta: 13s
+Rendering [==========&gt;----------------------------------] at 6.1 fps ~ eta: 12s
+Rendering [===========&gt;---------------------------------] at 6.1 fps ~ eta: 12s
+Rendering [============&gt;----------------------------------] at 6 fps ~ eta: 12s
+Rendering [=============&gt;---------------------------------] at 6 fps ~ eta: 12s
+Rendering [==============&gt;--------------------------------] at 6 fps ~ eta: 12s
+Rendering [==============&gt;--------------------------------] at 6 fps ~ eta: 11s
+Rendering [==============&gt;------------------------------] at 5.9 fps ~ eta: 11s
+Rendering [===============&gt;-----------------------------] at 5.9 fps ~ eta: 11s
+Rendering [================&gt;----------------------------] at 5.8 fps ~ eta: 11s
+Rendering [=================&gt;---------------------------] at 5.8 fps ~ eta: 10s
+Rendering [==================&gt;--------------------------] at 5.8 fps ~ eta: 10s
+Rendering [===================&gt;-------------------------] at 5.8 fps ~ eta: 10s
+Rendering [====================&gt;------------------------] at 5.7 fps ~ eta:  9s
+Rendering [=====================&gt;-----------------------] at 5.7 fps ~ eta:  9s
+Rendering [======================&gt;----------------------] at 5.7 fps ~ eta:  9s
+Rendering [======================&gt;----------------------] at 5.7 fps ~ eta:  8s
+Rendering [=======================&gt;---------------------] at 5.6 fps ~ eta:  8s
+Rendering [========================&gt;--------------------] at 5.6 fps ~ eta:  8s
+Rendering [=========================&gt;-------------------] at 5.6 fps ~ eta:  8s
+Rendering [=========================&gt;-------------------] at 5.5 fps ~ eta:  8s
+Rendering [==========================&gt;------------------] at 5.5 fps ~ eta:  7s
+Rendering [===========================&gt;-----------------] at 5.5 fps ~ eta:  7s
+Rendering [===========================&gt;-----------------] at 5.4 fps ~ eta:  7s
+Rendering [============================&gt;----------------] at 5.4 fps ~ eta:  7s
+Rendering [============================&gt;----------------] at 5.4 fps ~ eta:  6s
+Rendering [=============================&gt;---------------] at 5.4 fps ~ eta:  6s
+Rendering [==============================&gt;--------------] at 5.4 fps ~ eta:  6s
+Rendering [==============================&gt;--------------] at 5.3 fps ~ eta:  6s
+Rendering [===============================&gt;-------------] at 5.3 fps ~ eta:  5s
+Rendering [================================&gt;------------] at 5.3 fps ~ eta:  5s
+Rendering [=================================&gt;-----------] at 5.3 fps ~ eta:  5s
+Rendering [==================================&gt;----------] at 5.2 fps ~ eta:  4s
+Rendering [===================================&gt;---------] at 5.2 fps ~ eta:  4s
+Rendering [====================================&gt;--------] at 5.1 fps ~ eta:  4s
+Rendering [====================================&gt;--------] at 5.1 fps ~ eta:  3s
+Rendering [=====================================&gt;-------] at 5.1 fps ~ eta:  3s
+Rendering [=======================================&gt;-------] at 5 fps ~ eta:  3s
+Rendering [========================================&gt;------] at 5 fps ~ eta:  3s
+Rendering [========================================&gt;------] at 5 fps ~ eta:  2s
+Rendering [=========================================&gt;-----] at 5 fps ~ eta:  2s
+Rendering [========================================&gt;----] at 4.9 fps ~ eta:  2s
+Rendering [=========================================&gt;---] at 4.9 fps ~ eta:  1s
+Rendering [==========================================&gt;--] at 4.9 fps ~ eta:  1s
+Rendering [===========================================&gt;-] at 4.9 fps ~ eta:  1s
+Rendering [===========================================&gt;-] at 4.9 fps ~ eta:  0s
+Rendering [============================================&gt;] at 4.9 fps ~ eta:  0s
+Rendering [=============================================] at 4.9 fps ~ eta:  0s
+                                                                               </code></pre>
 <pre><code>## 
 Frame 1 (1%)
 Frame 2 (2%)
@@ -3460,7 +3517,7 @@ Positive
 <p>Here, we write <code>type=ar(1)</code> in the <code>repeated</code> statement in order to get the desired variance structure for the error term.</p>
 
 
-<textarea id="VJFWL">
+<textarea id="OQNFH">
 proc mixed data=dat;
 class variety block factweek plot;
 model y=block variety factweek block*factweek variety*factweek /ddfm=kr2;
@@ -3471,7 +3528,7 @@ run;
 proc print data=modar1sasVC;
 run;
 </textarea>
-<script> var codeElement = document.getElementById("VJFWL"); var editor = null; if (null != codeElement) { editor = CodeMirror.fromTextArea(codeElement, { lineNumbers: true, readOnly: true, viewportMargin: Infinity, mode: 'text/x-sas' }); } </script>
+<script> var codeElement = document.getElementById("OQNFH"); var editor = null; if (null != codeElement) { editor = CodeMirror.fromTextArea(codeElement, { lineNumbers: true, readOnly: true, viewportMargin: Infinity, mode: 'text/x-sas' }); } </script>
 
 <p><br/></p>
 <table class="table table-bordered table-hover table-condensed table-responsive" style="width: auto !important; margin-left: auto; margin-right: auto;">
@@ -4025,7 +4082,7 @@ AIC
 &nbsp;
 <hr />
 <p style="text-align: center;">Please feel free to contact us about any of this! </p>
-<p style="text-align: center;"><span style="color: #003f75ff;"><em>schmidtpaul@hotmail.de</em></span></p>
+<p style="text-align: center;"><span style="color: #003f75ff;"><em>schmidtpaul1989@outlook.com</em></span></p>
 
 <!-- Add icon library -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
@@ -4034,7 +4091,7 @@ AIC
 <p style="text-align: center;">
     <a href="https://www.researchgate.net/project/MMFAIR-Mixed-Models-for-Agriculture-in-R" class="fa fa-pencil" style="color: #003f75ff;"></a>
     <a href="https://www.linkedin.com/in/schmidtpaul1989/" class="fa fa-linkedin" style="color: #003f75ff;"></a>
-    <a href="https://www.xing.com/profile/Paul_Schmidt203/cv/" class="fa fa-xing" style="color: #003f75ff;"></a>
+    <a href="https://www.xing.com/profile/Paul_Schmidt393/cv" class="fa fa-xing" style="color: #003f75ff;"></a>
     <a href="https://github.com/SchmidtPaul/" class="fa fa-github" style="color: #003f75ff;"></a>
 </p>
 

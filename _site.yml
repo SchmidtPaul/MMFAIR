@@ -23,6 +23,8 @@ navbar:
         href: model_selection.html
     - text: "Sources"
       href: sources.html
+    - text: "Contact"
+      href: 0contactinfo.html
   
 output:
   html_document:

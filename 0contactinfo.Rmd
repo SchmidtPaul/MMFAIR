@@ -1,0 +1,122 @@
+---
+title: "Dr. Paul Schmidt"
+output: 
+  html_document:
+    includes:
+      in_header: header.html
+      after_body: footer.html
+---
+
+```{r setup, echo=FALSE, warning=FALSE, message=FALSE}
+# formatting tables for html output
+options(knitr.kable.NA = '')
+pacman::p_load(kableExtra, formattable ,htmltools)
+pacman::p_load(tidyverse)
+```
+
+```{r import, echo=FALSE, warning=FALSE, message=FALSE}
+text <-  read.table(file = "https://raw.githubusercontent.com/SchmidtPaul/CV/master/contactinfo/infotext.csv", sep = ";", header = T, encoding = "UTF-8") %>%
+  rename(English = 1) %>% 
+  tibble
+
+workshops <- read.table(file = "https://raw.githubusercontent.com/SchmidtPaul/CV/master/contactinfo/workshophistory.csv", sep = ";", header = T, encoding = "UTF-8") %>%
+  rename(Time = 1) %>% tibble
+```
+
+<!-- hyperlink style -->
+<style>
+a:link {
+  color: #003f75ff;
+  background-color: transparent;
+  text-decoration: none;
+}
+
+a:visited {
+  color: #003f75ff;
+  background-color: transparent;
+  text-decoration: none;
+}
+
+a:hover {
+  color: #003f75ff;
+  background-color: transparent;
+  text-decoration: underline;
+}
+
+a:active {
+  color: #003f75ff;
+  background-color: transparent;
+  text-decoration: underline;
+}
+</style> 
+
+<!-- Image -->
+<style>
+img {border-radius: 50%;}
+</style>
+<img src="https://avatars3.githubusercontent.com/u/31928213?s=400&u=d5ca44cc7f39c7f4e2e79b4cffeeb3d0d0a321fb&v=4" style="width:33%; margin-left: 20px" align="right" alt="Avatar">
+
+<!-- Contact symbols -->
+<style>
+p.small {line-height: 1;}
+</style>
+
+<p class="small">
+<i class="fa fa-home" style="color: #003f75ff;">
+</i> Hamburg, Germany </br>
+
+Contact </br>
+<a href="mailto:schmidtpaul1989@outlook.com">
+<i class="fa fa-envelope" style="color: #003f75ff;">
+</i> schmidtpaul1989@outlook.com </a> </br>
+<a href="https://github.com/SchmidtPaul/">
+<i class="fa fa-github" style="color: #003f75ff;">
+</i> GitHub </a> </br>
+<a href="https://www.linkedin.com/in/schmidtpaul1989/">
+<i class="fa fa-linkedin" style="color: #003f75ff;">
+</i> LinkedIn </a> </br>
+<a href="https://www.researchgate.net/profile/Paul_Schmidt17">
+<i class="fa fa-pencil" style="color: #003f75ff;">
+</i> ResearchGate </a> </br>
+<a href="https://www.xing.com/profile/Paul_Schmidt393/cv">
+<i class="fa fa-xing" style="color: #003f75ff;">
+</i> Xing </a> 
+
+Websites </br>
+<a href="https://schmidtpaul.github.io/crashcouRse/">
+<i class="fa fa-window-maximize" style="color: #003f75ff;">
+</i> CrashcouRse </a> </br>
+<a href="https://schmidtpaul.github.io/DSFAIR/">
+<i class="fa fa-window-maximize" style="color: #003f75ff;">
+</i> DSFAIR: Data Science for Agriculture in R </a> </br>
+<a href="https://schmidtpaul.github.io/MMFAIR/">
+<i class="fa fa-window-maximize" style="color: #003f75ff;">
+</i> MMFAIR: Mixed Models for Agriculture in R </a> </br>
+
+</p>
+
+```{r text, echo=FALSE, warning=FALSE, message=FALSE}
+text %>% 
+  kbl() %>%
+  kable_styling() %>% 
+  row_spec(0, color = "lightgrey")
+```
+
+```{r workshops, echo=FALSE, warning=FALSE, message=FALSE}
+GerFlagURL <- "https://cdn.countryflags.com/thumbs/germany/flag-round-250.png"
+USAFlagURL <- "https://cdn.countryflags.com/thumbs/united-states-of-america/flag-round-250.png"
+
+LangFlags <- workshops %>% 
+  select(Language) %>% 
+  mutate(LangURL = case_when(Language == "Ger" ~ GerFlagURL,
+                             Language == "Eng" ~ USAFlagURL,
+                             T ~ NA_character_)) %>% 
+  pull(LangURL)
+
+workshops %>% 
+  select(-URL) %>% 
+  kbl() %>%
+  kable_minimal(full_width = T, font_size = 10, 
+                bootstrap_options = c("hover", "condensed")) %>% 
+  column_spec(3, image = spec_image(LangFlags, 50, 50))
+```
