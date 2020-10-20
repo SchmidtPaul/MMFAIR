@@ -51,10 +51,7 @@ a:active {
 </style> 
 
 <!-- Image -->
-<style>
-img {border-radius: 50%;}
-</style>
-<img src="https://avatars3.githubusercontent.com/u/31928213?s=400&u=d5ca44cc7f39c7f4e2e79b4cffeeb3d0d0a321fb&v=4" style="width:33%; margin-left: 20px" align="right" alt="Avatar">
+<img src="https://avatars3.githubusercontent.com/u/31928213?s=400&u=d5ca44cc7f39c7f4e2e79b4cffeeb3d0d0a321fb&v=4" style="width:33%; border-radius: 50%; margin-left: 20px" align="right" alt="Avatar">
 
 <!-- Contact symbols -->
 <style>
