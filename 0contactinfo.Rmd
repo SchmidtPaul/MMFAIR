@@ -80,15 +80,15 @@ Contact </br>
 </i> Xing </a> 
 
 Websites </br>
-<a href="https://schmidtpaul.github.io/crashcouRse/">
-<i class="fa fa-window-maximize" style="color: #003f75ff;">
-</i> CrashcouRse: R für Bio- und Agrarwissenschaftler </a> </br>
 <a href="https://schmidtpaul.github.io/DSFAIR/">
 <img src="https://raw.githubusercontent.com/SchmidtPaul/DSFAIR/master/img/logo/favicon-32x32.png" width=16 height=16/>
 </i> DSFAIR: Data Science for Agriculture in R </a> </br>
 <a href="https://schmidtpaul.github.io/MMFAIR/">
 <img src="https://raw.githubusercontent.com/SchmidtPaul/MMFAIR/master/img/logo/favicon-32x32.png" width=16 height=16/>
 </i> MMFAIR: Mixed Models for Agriculture in R </a> </br>
+<a href="https://schmidtpaul.github.io/crashcouRse/">
+<i class="fa fa-window-maximize" style="color: #003f75ff;">
+</i> CrashcouRse: R für Bio- und Agrarwissenschaftler </a> </br>
 
 </p>
 
@@ -102,18 +102,28 @@ text %>%
 ```{r workshops, echo=FALSE, warning=FALSE, message=FALSE}
 GerFlagURL <- "https://cdn.countryflags.com/thumbs/germany/flag-round-250.png"
 USAFlagURL <- "https://cdn.countryflags.com/thumbs/united-states-of-america/flag-round-250.png"
+zoomLogoURL <- "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7b/Zoom_Communications_Logo.svg/1200px-Zoom_Communications_Logo.svg.png"
 
 LangFlags <- workshops %>% 
   select(Language) %>% 
   mutate(LangURL = case_when(Language == "Ger" ~ GerFlagURL,
                              Language == "Eng" ~ USAFlagURL,
-                             T ~ NA_character_)) %>% 
-  pull(LangURL)
+                             T ~ NA_character_)) %>% pull(LangURL)
+
+LocZoom <- workshops %>% 
+  select(Location) %>% 
+  mutate(LogoURL = case_when(str_detect(Location, "via") == T ~ zoomLogoURL,
+                             T ~ NA_character_)) %>% pull(LogoURL)
 
 workshops %>% 
   select(-URL) %>% 
-  kbl() %>%
+  kbl(align = c("r", "l", "r", "r", "r"), ) %>%
   kable_minimal(full_width = T, font_size = 10, 
                 bootstrap_options = c("hover", "condensed")) %>% 
-  column_spec(3, image = spec_image(LangFlags, 50, 50))
+  column_spec(1, width = "5em") %>% 
+  column_spec(3, width = "5em",
+              image = spec_image(LangFlags, 50, 50)) %>% 
+  column_spec(4, width = "20em",
+              image = spec_image(LocZoom, 100, 20)) %>% 
+  column_spec(5, width = "5em")
 ```
