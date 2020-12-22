@@ -103,6 +103,7 @@ text %>%
 GerFlagURL <- "https://cdn.countryflags.com/thumbs/germany/flag-round-250.png"
 USAFlagURL <- "https://cdn.countryflags.com/thumbs/united-states-of-america/flag-round-250.png"
 zoomLogoURL <- "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7b/Zoom_Communications_Logo.svg/1200px-Zoom_Communications_Logo.svg.png"
+whiteURL <- "https://www.ict-solutions-events.com/wp-content/uploads/2020/03/plain-white-background-300x200.jpg"
 
 LangFlags <- workshops %>% 
   select(Language) %>% 
@@ -113,7 +114,7 @@ LangFlags <- workshops %>%
 LocZoom <- workshops %>% 
   select(Location) %>% 
   mutate(LogoURL = case_when(str_detect(Location, "via") == T ~ zoomLogoURL,
-                             T ~ NA_character_)) %>% pull(LogoURL)
+                             T ~ whiteURL)) %>% pull(LogoURL)
 
 workshops %>% 
   select(-URL) %>% 
