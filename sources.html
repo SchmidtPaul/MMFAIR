@@ -23,7 +23,6 @@
 <link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
 <script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
-<script src="site_libs/navigation-1.1/codefolding.js"></script>
 <!--All these are favicons-->
 <link rel="apple-touch-icon" sizes="180x180" href="img/logo/apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="32x32" href="img/logo/favicon-32x32.png">
@@ -34,6 +33,9 @@
 <meta name="msapplication-TileColor" content="#2d89ef">
 <meta name="msapplication-config" content="img/logo/browserconfig.xml">
 <meta name="theme-color" content="#ffffff">
+
+<!--Github Corner-->
+<a href="https://github.com/SchmidtPaul/MMFAIR" class="github-corner" aria-label="View source on GitHub"><svg width="80" height="80" viewBox="0 0 250 250" style="fill:#003f75ff; color:#fff; position: absolute; top: 50; border: 0; right: 0;" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a><style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}</style>
 
 <!--SAS syntax highlighting-->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.31.0/codemirror.min.css">
@@ -73,7 +75,7 @@
   div.column{display: inline-block; vertical-align: top; width: 50%;}
   div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
   ul.task-list{list-style: none;}
-      </style>
+    </style>
 
 
 
@@ -104,6 +106,7 @@ h6 {
   text-align: left;
 }
 </style>
+
 
 <link rel="stylesheet" href="styles.css" type="text/css" />
 
@@ -283,9 +286,6 @@ $(document).ready(function () {
 </style>
 
 <!-- code folding -->
-<style type="text/css">
-.code-folding-btn { margin-bottom: 4px; }
-</style>
 
 
 
@@ -419,6 +419,9 @@ div.tocify {
     <li>
       <a href="model_selection.html">Model Selection</a>
     </li>
+    <li>
+      <a href="glmmtmbdispformula0.html">Error varcov struct with glmmTMB</a>
+    </li>
   </ul>
 </li>
 <li>
@@ -436,14 +439,6 @@ div.tocify {
 </div><!--/.navbar -->
 
 <div class="fluid-row" id="header">
-
-<div class="btn-group pull-right">
-<button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span>Code</span> <span class="caret"></span></button>
-<ul class="dropdown-menu" style="min-width: 50px;">
-<li><a id="rmd-show-all-code" href="#">Show All Code</a></li>
-<li><a id="rmd-hide-all-code" href="#">Hide All Code</a></li>
-</ul>
-</div>
 
 
 
@@ -586,63 +581,47 @@ div.tocify {
 </div>
 <div id="session-info" class="section level2">
 <h2>Session Info</h2>
-<pre><code>## R version 4.0.2 (2020-06-22)
+<pre><code>## R version 4.0.3 (2020-10-10)
 ## Platform: x86_64-w64-mingw32/x64 (64-bit)
-## Running under: Windows 10 x64 (build 18362)
+## Running under: Windows 10 x64 (build 18363)
 ## 
 ## Matrix products: default
 ## 
 ## locale:
-## [1] LC_COLLATE=German_Germany.1252  LC_CTYPE=German_Germany.1252   
-## [3] LC_MONETARY=German_Germany.1252 LC_NUMERIC=C                   
-## [5] LC_TIME=German_Germany.1252    
+## [1] LC_COLLATE=German_Germany.1252  LC_CTYPE=German_Germany.1252    LC_MONETARY=German_Germany.1252
+## [4] LC_NUMERIC=C                    LC_TIME=German_Germany.1252    
 ## 
 ## attached base packages:
 ## [1] stats     graphics  grDevices utils     datasets  methods   base     
 ## 
 ## other attached packages:
-##  [1] broom.mixed_0.2.6     mixedup_0.3.7         AICcmodavg_2.3-1     
-##  [4] sommer_4.1.1          crayon_1.3.4          lattice_0.20-41      
-##  [7] MASS_7.3-51.6         glmmTMB_1.0.2.1       lme4_1.1-23          
-## [10] Matrix_1.2-18         nlme_3.1-148          viridis_0.5.1        
-## [13] viridisLite_0.3.0     gifski_0.8.6          gganimate_1.0.7      
-## [16] forcats_0.5.0         stringr_1.4.0         dplyr_1.0.2          
-## [19] purrr_0.3.4           readr_1.4.0           tidyr_1.1.2          
-## [22] tibble_3.0.4          ggplot2_3.3.2         tidyverse_1.3.0      
-## [25] htmltools_0.5.0       formattable_0.2.0.1   kableExtra_1.2.1.9000
-## [28] rmarkdown_2.4        
+##  [1] mixedup_0.3.7       viridis_0.5.1       viridisLite_0.3.0   gifski_0.8.6        gganimate_1.0.7    
+##  [6] htmltools_0.5.0     formattable_0.2.0.1 kableExtra_1.3.1    rmarkdown_2.6       AICcmodavg_2.3-1   
+## [11] sommer_4.1.1        crayon_1.3.4        lattice_0.20-41     MASS_7.3-53         lme4_1.1-26        
+## [16] Matrix_1.2-18       flair_0.0.2         emo_0.0.0.9000      broom.mixed_0.2.6   glmmTMB_1.0.2.1    
+## [21] nlme_3.1-149        forcats_0.5.0       stringr_1.4.0       dplyr_1.0.2         purrr_0.3.4        
+## [26] readr_1.4.0         tidyr_1.1.2         tibble_3.0.4        ggplot2_3.3.2       tidyverse_1.3.0    
+## [31] conflicted_1.0.4   
 ## 
 ## loaded via a namespace (and not attached):
-##  [1] TH.data_1.0-10      VGAM_1.1-3          minqa_1.2.4        
-##  [4] colorspace_1.4-1    selectr_0.4-2       ellipsis_0.3.1     
-##  [7] estimability_1.3    fs_1.5.0            rstudioapi_0.11    
-## [10] farver_2.0.3        fansi_0.4.1         mvtnorm_1.1-1      
-## [13] lubridate_1.7.9     xml2_1.3.2          codetools_0.2-16   
-## [16] splines_4.0.2       knitr_1.30          jsonlite_1.7.1     
-## [19] nloptr_1.2.2.2      pbkrtest_0.4-8.6    packrat_0.5.0      
-## [22] broom_0.7.1         dbplyr_1.4.4        compiler_4.0.2     
-## [25] httr_1.4.2          emmeans_1.5.1       backports_1.1.10   
-## [28] assertthat_0.2.1    cli_2.1.0           tweenr_1.0.1       
-## [31] prettyunits_1.1.1   tools_4.0.2         lmerTest_3.1-2     
-## [34] coda_0.19-4         gtable_0.3.0        glue_1.4.2         
-## [37] reshape2_1.4.4      Rcpp_1.0.5          cellranger_1.1.0   
-## [40] raster_3.3-13       vctrs_0.3.4         xfun_0.18          
-## [43] rvest_0.3.6         lifecycle_0.2.0     pacman_0.5.1       
-## [46] statmod_1.4.34      zoo_1.8-8           scales_1.1.1       
-## [49] hms_0.5.3           parallel_4.0.2      sandwich_3.0-0     
-## [52] TMB_1.7.18          yaml_2.2.1          gridExtra_2.3      
-## [55] stringi_1.5.3       highr_0.8           boot_1.3-25        
-## [58] agriTutorial_0.1.5  rlang_0.4.8         pkgconfig_2.0.3    
-## [61] evaluate_0.14       labeling_0.3        htmlwidgets_1.5.2  
-## [64] tidyselect_1.1.0    plyr_1.8.6          magrittr_1.5       
-## [67] R6_2.4.1            generics_0.0.2      multcomp_1.4-14    
-## [70] DBI_1.1.0           pillar_1.4.6        haven_2.3.1        
-## [73] withr_2.3.0         survival_3.1-12     sp_1.4-4           
-## [76] modelr_0.1.8        progress_1.2.2      agridat_1.17       
-## [79] grid_4.0.2          readxl_1.3.1        blob_1.2.1         
-## [82] reprex_0.3.0        digest_0.6.26       webshot_0.5.2      
-## [85] xtable_1.8-4        numDeriv_2016.8-1.1 stats4_4.0.2       
-## [88] munsell_0.5.0       unmarked_1.0.1</code></pre>
+##  [1] TH.data_1.0-10      VGAM_1.1-4          minqa_1.2.4         colorspace_2.0-0    selectr_0.4-2      
+##  [6] ellipsis_0.3.1      rsconnect_0.8.16    estimability_1.3    fs_1.5.0            rstudioapi_0.13    
+## [11] farver_2.0.3        fansi_0.4.1         mvtnorm_1.1-1       lubridate_1.7.9.2   xml2_1.3.2         
+## [16] codetools_0.2-16    splines_4.0.3       knitr_1.30          jsonlite_1.7.2      nloptr_1.2.2.2     
+## [21] pbkrtest_0.5-0.1    packrat_0.5.0       broom_0.7.3         dbplyr_2.0.0        compiler_4.0.3     
+## [26] httr_1.4.2          emmeans_1.5.3       backports_1.2.1     assertthat_0.2.1    cli_2.2.0          
+## [31] tweenr_1.0.1        prettyunits_1.1.1   tools_4.0.3         lmerTest_3.1-3      coda_0.19-4        
+## [36] gtable_0.3.0        glue_1.4.2          reshape2_1.4.4      Rcpp_1.0.5          cellranger_1.1.0   
+## [41] raster_3.4-5        vctrs_0.3.6         xfun_0.19           rvest_0.3.6         lifecycle_0.2.0    
+## [46] pacman_0.5.1        statmod_1.4.35      zoo_1.8-8           scales_1.1.1        hms_0.5.3          
+## [51] parallel_4.0.3      sandwich_3.0-0      TMB_1.7.18          yaml_2.2.1          gridExtra_2.3      
+## [56] memoise_1.1.0       stringi_1.5.3       highr_0.8           agriTutorial_0.1.5  boot_1.3-25        
+## [61] rlang_0.4.9         pkgconfig_2.0.3     evaluate_0.14       labeling_0.4.2      htmlwidgets_1.5.3  
+## [66] tidyselect_1.1.0    plyr_1.8.6          magrittr_2.0.1      R6_2.5.0            generics_0.1.0     
+## [71] multcomp_1.4-15     DBI_1.1.0           pillar_1.4.7        haven_2.3.1         withr_2.3.0        
+## [76] survival_3.2-7      sp_1.4-4            modelr_0.1.8        progress_1.2.2      agridat_1.17       
+## [81] grid_4.0.3          readxl_1.3.1        reprex_0.3.0        digest_0.6.27       webshot_0.5.2      
+## [86] xtable_1.8-4        numDeriv_2016.8-1.1 stats4_4.0.3        munsell_0.5.0       unmarked_1.0.1</code></pre>
 </div>
 </div>
 
@@ -676,7 +655,7 @@ div.tocify {
 
 // add bootstrap table styles to pandoc tables
 function bootstrapStylePandocTables() {
-  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
 }
 $(document).ready(function () {
   bootstrapStylePandocTables();
@@ -700,11 +679,6 @@ $(document).ready(function () {
 </script>
 
 <!-- code folding -->
-<script>
-$(document).ready(function () {
-  window.initializeCodeFolding("show" === "show");
-});
-</script>
 
 <script>
 $(document).ready(function ()  {

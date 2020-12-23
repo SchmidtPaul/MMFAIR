@@ -2,9 +2,13 @@ params <-
 list(hilang = "sas")
 
 # packages
-pacman::p_load(dplyr, purrr, stringr, tibble, tidyr, # data handling
+pacman::p_load(conflicted, # package function conflicts
+               dplyr, purrr, stringr, tibble, tidyr, # data handling
                nlme, lme4, glmmTMB, sommer, # mixed modelling
                AICcmodavg, broom.mixed)     # mixed model extractions
+
+# package function conflicts
+conflict_prefer("filter", "dplyr")
 
 # data
 dat <- agridat::mcconway.turnip %>%

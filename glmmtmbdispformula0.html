@@ -1,0 +1,1141 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+
+<title>Covariance structures for the error term with glmmTMB - a workaround</title>
+
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/lumen.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<script src="site_libs/kePrint-0.0.1/kePrint.js"></script>
+<link href="site_libs/lightable-0.0.1/lightable.css" rel="stylesheet" />
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css" data-origin="pandoc">
+a.sourceLine { display: inline-block; line-height: 1.25; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
+}
+pre.numberSource a.sourceLine
+  { position: relative; left: -4em; }
+pre.numberSource a.sourceLine::before
+  { content: attr(title);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; pointer-events: all; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  { background-color: #f8f8f8; }
+@media screen {
+a.sourceLine::before { text-decoration: underline; }
+}
+code span.al { color: #ef2929; } /* Alert */
+code span.an { color: #8f5902; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #c4a000; } /* Attribute */
+code span.bn { color: #0000cf; } /* BaseN */
+code span.cf { color: #204a87; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4e9a06; } /* Char */
+code span.cn { color: #000000; } /* Constant */
+code span.co { color: #8f5902; font-style: italic; } /* Comment */
+code span.cv { color: #8f5902; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #8f5902; font-weight: bold; font-style: italic; } /* Documentation */
+code span.dt { color: #204a87; } /* DataType */
+code span.dv { color: #0000cf; } /* DecVal */
+code span.er { color: #a40000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #0000cf; } /* Float */
+code span.fu { color: #000000; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #8f5902; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #204a87; font-weight: bold; } /* Keyword */
+code span.op { color: #ce5c00; font-weight: bold; } /* Operator */
+code span.ot { color: #8f5902; } /* Other */
+code span.pp { color: #8f5902; font-style: italic; } /* Preprocessor */
+code span.sc { color: #000000; } /* SpecialChar */
+code span.ss { color: #4e9a06; } /* SpecialString */
+code span.st { color: #4e9a06; } /* String */
+code span.va { color: #000000; } /* Variable */
+code span.vs { color: #4e9a06; } /* VerbatimString */
+code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warning */
+
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    for (var j = 0; j < rules.length; j++) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+
+<link rel="stylesheet" href="styles.css" type="text/css" />
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+</style>
+
+
+<style type="text/css">
+/* padding for bootstrap navbar */
+body {
+  padding-top: 54px;
+  padding-bottom: 40px;
+}
+/* offset scroll position for anchor links (for fixed navbar)  */
+.section h1 {
+  padding-top: 59px;
+  margin-top: -59px;
+}
+.section h2 {
+  padding-top: 59px;
+  margin-top: -59px;
+}
+.section h3 {
+  padding-top: 59px;
+  margin-top: -59px;
+}
+.section h4 {
+  padding-top: 59px;
+  margin-top: -59px;
+}
+.section h5 {
+  padding-top: 59px;
+  margin-top: -59px;
+}
+.section h6 {
+  padding-top: 59px;
+  margin-top: -59px;
+}
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #ffffff;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script>
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.parent().addClass('active');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row-fluid">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">MMFAIR</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Chapters
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="heterogeneous_error_variance.html">Heterogeneous error variance</a>
+    </li>
+    <li>
+      <a href="autoregressive_time_series.html">First-order autoregressive</a>
+    </li>
+    <li>
+      <a href="weighted_two_stage.html">Weighted two-stage analyses</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Summaries
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="variance_structures.html">Variance Structures</a>
+    </li>
+    <li>
+      <a href="model_selection.html">Model Selection</a>
+    </li>
+    <li>
+      <a href="glmmtmbdispformula0.html">Error varcov struct with glmmTMB</a>
+    </li>
+  </ul>
+</li>
+<li>
+  <a href="sources.html">Sources</a>
+</li>
+<li>
+  <a href="0contactinfo.html">Contact</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div class="fluid-row" id="header">
+
+
+
+<h1 class="title toc-ignore">Covariance structures for the error term with glmmTMB - a workaround</h1>
+
+</div>
+
+
+<p><br> <br></p>
+<div id="what" class="section level1">
+<h1>What?</h1>
+<table>
+<colgroup>
+<col width="4%" />
+<col width="95%" />
+</colgroup>
+<tbody>
+<tr class="odd">
+<td>🙂 <br> <br></td>
+<td>When fitting linear mixed models, the <code>glmmTMB</code> package is nice, because it feels like <code>lme4</code> but additionally allows for <a href="https://cran.r-project.org/web/packages/glmmTMB/vignettes/covstruct.html" target="_blank">several covariance structures</a> for the random effects. <br> <br></td>
+</tr>
+<tr class="even">
+<td>😞 <br> <br></td>
+<td>However, this only works for random terms on the <a href="https://documentation.sas.com/?cdcId=pgmsascdc&amp;cdcVersion=9.4_3.4&amp;docsetId=statug&amp;docsetTarget=statug_glimmix_overview05.htm&amp;locale=en" target="_blank"><strong><em>G</em></strong>-side</a> of the model and not for the error term (= <a href="https://documentation.sas.com/?cdcId=pgmsascdc&amp;cdcVersion=9.4_3.4&amp;docsetId=statug&amp;docsetTarget=statug_glimmix_overview05.htm&amp;locale=en" target="_blank"><strong><em>R</em></strong>-side</a>). <br> <br></td>
+</tr>
+<tr class="odd">
+<td>🤓 <br> <br></td>
+<td><strong>But</strong> there is a workaround! We can fix the error variance to be 0 and thus force all the variance into the <strong><em>G</em></strong>-side. If we do so and also add a random <strong><em>“pseudo error term”</em></strong> that mimics the original error term, we have created a model that essentially leads to identical results. <br> <br></td>
+</tr>
+<tr class="even">
+<td>😎 <br> <br></td>
+<td>Once this is clear, we can use all the available variance structures on our <em>pseudo error term</em>! <br> <br></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="how" class="section level1">
+<h1>How?</h1>
+<ol style="list-style-type: decimal">
+<li>Remove original error variance from <strong><em>R</em></strong>-side via <code>dispformula = ~ 0</code>.</li>
+<li>Add pseudo error variance to <strong><em>G</em></strong>-side via random term.
+<ul>
+<li>In the simple case, this can be done via <code>+ (1 | unit)</code> where <code>unit</code> is a factor with as many levels as there are observations in the dataset.</li>
+</ul></li>
+</ol>
+<div class="row">
+<div class="col-md-6">
+<p>Basically go from here…</p>
+</div>
+<div class="col-md-6">
+<p>…to here!</p>
+</div>
+</div>
+</div>
+<div id="really" class="section level1">
+<h1>Really?</h1>
+<p>Here are two examples for the <em>pseudo-error</em> approach based on this dataset:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" title="1">dat &lt;-<span class="st"> </span>agridat<span class="op">::</span>mcconway.turnip <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb1-2" title="2"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">unit =</span> <span class="dv">1</span><span class="op">:</span><span class="kw">n</span>()) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb1-3" title="3"><span class="st">  </span><span class="kw">mutate_at</span>(<span class="kw">vars</span>(density, unit), as.factor)</a></code></pre></div>
+<ul>
+<li><strong>Example 1</strong> We assume no special variance structure for the error term and thus <em>independent &amp; identically distributed</em> errors. We compare two <code>glmmTMB</code> models - one with a standard error term and one with a <em>pseudo-error</em> term.</li>
+<li><strong>Example 2</strong> We assume a diagonal variance structure for the factor <code>date</code> and thus allow for different heterogeneous error variances / heteroscedascity per group for the effect levels of <code>date</code>. We compare a <em>pseudo-error</em>-<code>glmmTMB</code> model with <code>nlme::lme()</code> model.</li>
+</ul>
+<div id="example-1-iid" class="section level2">
+<h2>Example 1: iid</h2>
+<div class="row">
+<div class="col-md-6">
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" title="1">StandErrMod &lt;-<span class="st"> </span><span class="kw">glmmTMB</span>(</a>
+<a class="sourceLine" id="cb2-2" title="2">  yield <span class="op">~</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb2-3" title="3"><span class="st">    </span>gen<span class="op">*</span>date<span class="op">*</span>density <span class="op">+</span></a>
+<a class="sourceLine" id="cb2-4" title="4"><span class="st">    </span>(<span class="dv">1</span> <span class="op">|</span><span class="st"> </span>block),</a>
+<a class="sourceLine" id="cb2-5" title="5">  </a>
+<a class="sourceLine" id="cb2-6" title="6"></a>
+<a class="sourceLine" id="cb2-7" title="7">  <span class="dt">REML =</span> <span class="ot">TRUE</span>,</a>
+<a class="sourceLine" id="cb2-8" title="8">  <span class="dt">data =</span> dat</a>
+<a class="sourceLine" id="cb2-9" title="9">)</a></code></pre></div>
+</div>
+<div class="col-md-6">
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" title="1">PseudErrMod &lt;-<span class="st"> </span><span class="kw">glmmTMB</span>(</a>
+<a class="sourceLine" id="cb3-2" title="2">  yield <span class="op">~</span></a>
+<a class="sourceLine" id="cb3-3" title="3"><span class="st">    </span>gen<span class="op">*</span>date<span class="op">*</span>density <span class="op">+</span></a>
+<a class="sourceLine" id="cb3-4" title="4"><span class="st">    </span>(<span class="dv">1</span> <span class="op">|</span><span class="st"> </span>block) <span class="op">+</span></a>
+<a class="sourceLine" id="cb3-5" title="5"><span class="st">    </span>(<span class="dv">1</span> <span class="op">|</span><span class="st"> </span>unit),      <span class="co"># Pseudo Err</span></a>
+<a class="sourceLine" id="cb3-6" title="6">  <span class="dt">dispformula =</span> <span class="op">~</span><span class="st"> </span><span class="dv">0</span>, <span class="co"># ErrVar = 0</span></a>
+<a class="sourceLine" id="cb3-7" title="7">  <span class="dt">REML =</span> <span class="ot">TRUE</span>,</a>
+<a class="sourceLine" id="cb3-8" title="8">  <span class="dt">data =</span> dat</a>
+<a class="sourceLine" id="cb3-9" title="9">)</a></code></pre></div>
+<pre><code>## Warning in fitTMB(TMBStruc): Model convergence problem; false convergence (8). See vignette(&#39;troubleshooting&#39;)</code></pre>
+</div>
+</div>
+<p>The <strong>variance component estimates</strong> of both models are very similar. As expected the Residual variance in the <em>pseudo-error model</em> is 0 and instead there is an additional variance for the random <code>unit</code> term.</p>
+<div class = "row">
+<div class = "col-md-6">
+
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" title="1">mixedup<span class="op">::</span><span class="kw">extract_vc</span>(StandErrMod)</a></code></pre></div>
+<table class=" lightable-paper" style="font-size: 12px; font-family: arial; width: auto !important; margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+group
+</th>
+<th style="text-align:right;">
+variance
+</th>
+<th style="text-align:right;">
+sd
+</th>
+<th style="text-align:right;">
+sd_2.5
+</th>
+<th style="text-align:right;">
+sd_97.5
+</th>
+<th style="text-align:right;">
+var_prop
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+block
+</td>
+<td style="text-align:right;">
+2.812
+</td>
+<td style="text-align:right;">
+1.677
+</td>
+<td style="text-align:right;">
+0.635
+</td>
+<td style="text-align:right;">
+4.431
+</td>
+<td style="text-align:right;">
+0.227
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Residual
+</td>
+<td style="text-align:right;">
+9.591
+</td>
+<td style="text-align:right;">
+3.097
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;">
+0.773
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class = "col-md-6">
+
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" title="1">mixedup<span class="op">::</span><span class="kw">extract_vc</span>(PseudErrMod)</a></code></pre></div>
+<table class=" lightable-paper" style="font-size: 12px; font-family: arial; width: auto !important; margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+group
+</th>
+<th style="text-align:right;">
+variance
+</th>
+<th style="text-align:right;">
+sd
+</th>
+<th style="text-align:right;">
+sd_2.5
+</th>
+<th style="text-align:right;">
+sd_97.5
+</th>
+<th style="text-align:right;">
+var_prop
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+block
+</td>
+<td style="text-align:right;">
+2.810
+</td>
+<td style="text-align:right;">
+1.676
+</td>
+<td style="text-align:right;">
+0.634
+</td>
+<td style="text-align:right;">
+4.430
+</td>
+<td style="text-align:right;">
+0.227
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+unit
+</td>
+<td style="text-align:right;">
+9.592
+</td>
+<td style="text-align:right;">
+3.097
+</td>
+<td style="text-align:right;">
+2.519
+</td>
+<td style="text-align:right;">
+3.808
+</td>
+<td style="text-align:right;">
+0.773
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Residual
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>The <strong>Likelihood</strong>/<strong>AIC</strong> values are identical for both models.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" title="1">AICcmodavg<span class="op">::</span><span class="kw">aictab</span>(<span class="kw">list</span>(StandErrMod, PseudErrMod), </a>
+<a class="sourceLine" id="cb7-2" title="2">                   <span class="kw">c</span>(<span class="st">&quot;StandErrMod&quot;</span>, <span class="st">&quot;PseudErrMod&quot;</span>), </a>
+<a class="sourceLine" id="cb7-3" title="3">                   <span class="dt">second.ord =</span> <span class="ot">FALSE</span>)</a></code></pre></div>
+<table class=" lightable-paper" style="font-size: 12px; font-family: arial; width: auto !important; margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Modnames
+</th>
+<th style="text-align:right;">
+K
+</th>
+<th style="text-align:right;">
+AIC
+</th>
+<th style="text-align:right;">
+Delta_AIC
+</th>
+<th style="text-align:right;">
+LL
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+StandErrMod
+</td>
+<td style="text-align:right;">
+18
+</td>
+<td style="text-align:right;">
+308.1365
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+-136.0683
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+PseudErrMod
+</td>
+<td style="text-align:right;">
+18
+</td>
+<td style="text-align:right;">
+308.1365
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+-136.0683
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="example-2-diag" class="section level2">
+<h2>Example 2: diag</h2>
+<div class="row">
+<div class="col-md-6">
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" title="1">diag_glmmTMB &lt;-<span class="st"> </span><span class="kw">glmmTMB</span>(</a>
+<a class="sourceLine" id="cb8-2" title="2">  yield <span class="op">~</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb8-3" title="3"><span class="st">    </span>gen<span class="op">*</span>date<span class="op">*</span>density <span class="op">+</span></a>
+<a class="sourceLine" id="cb8-4" title="4"><span class="st">    </span>(<span class="dv">1</span> <span class="op">|</span><span class="st"> </span>block) <span class="op">+</span></a>
+<a class="sourceLine" id="cb8-5" title="5"><span class="st">    </span><span class="kw">diag</span>(date <span class="op">+</span><span class="st"> </span><span class="dv">0</span> <span class="op">|</span><span class="st"> </span>unit),</a>
+<a class="sourceLine" id="cb8-6" title="6">  <span class="dt">dispformula =</span> <span class="op">~</span><span class="st"> </span><span class="dv">0</span>,</a>
+<a class="sourceLine" id="cb8-7" title="7">  <span class="dt">REML =</span> <span class="ot">TRUE</span>,</a>
+<a class="sourceLine" id="cb8-8" title="8">  <span class="dt">data =</span> dat</a>
+<a class="sourceLine" id="cb8-9" title="9">)</a></code></pre></div>
+</div>
+<div class="col-md-6">
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" title="1">diag_lme &lt;-<span class="st"> </span><span class="kw">lme</span>(</a>
+<a class="sourceLine" id="cb9-2" title="2">  yield <span class="op">~</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb9-3" title="3"><span class="st">    </span>gen<span class="op">*</span>date<span class="op">*</span>density, </a>
+<a class="sourceLine" id="cb9-4" title="4">  <span class="dt">random  =</span> <span class="op">~</span><span class="st"> </span><span class="dv">1</span> <span class="op">|</span><span class="st"> </span>block,</a>
+<a class="sourceLine" id="cb9-5" title="5">  <span class="dt">weights =</span> <span class="kw">varIdent</span>(<span class="dt">form =</span>  <span class="op">~</span><span class="st"> </span><span class="dv">1</span> <span class="op">|</span><span class="st"> </span>date),</a>
+<a class="sourceLine" id="cb9-6" title="6">  </a>
+<a class="sourceLine" id="cb9-7" title="7">  </a>
+<a class="sourceLine" id="cb9-8" title="8">  <span class="dt">data    =</span> dat</a>
+<a class="sourceLine" id="cb9-9" title="9">)</a></code></pre></div>
+</div>
+</div>
+<p>The <strong>variance component estimates</strong> are similar enough.</p>
+<div class = "row">
+<div class = "col-md-6">
+
+
+<table class=" lightable-paper" style="font-size: 12px; font-family: arial; width: auto !important; margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+effect
+</th>
+<th style="text-align:left;">
+grp
+</th>
+<th style="text-align:right;">
+variance
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+block
+</td>
+<td style="text-align:left;">
+(Intercept)
+</td>
+<td style="text-align:right;">
+1.596600
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+unit
+</td>
+<td style="text-align:left;">
+date21Aug1990
+</td>
+<td style="text-align:right;">
+4.305625
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+unit
+</td>
+<td style="text-align:left;">
+date28Aug1990
+</td>
+<td style="text-align:right;">
+15.507844
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Residual
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:right;">
+0.000000
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class = "col-md-6">
+
+
+<table class=" lightable-paper" style="font-size: 12px; font-family: arial; width: auto !important; margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+effect
+</th>
+<th style="text-align:left;">
+grp
+</th>
+<th style="text-align:right;">
+variance
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+block
+</td>
+<td style="text-align:left;">
+(Intercept)
+</td>
+<td style="text-align:right;">
+1.596602
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Residual
+</td>
+<td style="text-align:left;">
+21Aug1990
+</td>
+<td style="text-align:right;">
+4.306075
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Residual
+</td>
+<td style="text-align:left;">
+28Aug1990
+</td>
+<td style="text-align:right;">
+15.505124
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>Furthermore, even though we are comparing across different model classes, we also get similar model fit statistics.</p>
+<div class = "row">
+<div class = "col-md-6">
+
+
+<table class=" lightable-paper" style="font-size: 12px; font-family: arial; width: auto !important; margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:right;">
+logLik
+</th>
+<th style="text-align:right;">
+AIC
+</th>
+<th style="text-align:right;">
+BIC
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:right;">
+-131.9636
+</td>
+<td style="text-align:right;">
+301.9272
+</td>
+<td style="text-align:right;">
+342.9459
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class = "col-md-6">
+
+
+<table class=" lightable-paper" style="font-size: 12px; font-family: arial; width: auto !important; margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:right;">
+logLik
+</th>
+<th style="text-align:right;">
+AIC
+</th>
+<th style="text-align:right;">
+BIC
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:right;">
+-131.9636
+</td>
+<td style="text-align:right;">
+301.9271
+</td>
+<td style="text-align:right;">
+337.48
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+<div id="more-details" class="section level1">
+<h1>More Details!</h1>
+<p>Check out <a href="https://github.com/glmmTMB/glmmTMB/issues/653" target="_blank">the GitHub issue</a> I’ve written on this topic at the <code>glmmTMB</code> repository, where <a href="https://ms.mcmaster.ca/~bolker/" target="_blank">Ben Bolker</a> - the author of this R-package - replied. Here are some key points:</p>
+<ul>
+<li>This works <strong>only for gaussian mixed models</strong> and thus not for generalized mixed models!</li>
+<li>As is the case in Example 1, we <strong>sometimes get a <code>false convergence</code> warning</strong> for the pseudo-error-model but not for the standard model.</li>
+<li>Actually, <code>dispformula=~0</code> does not fix the residual variance to be 0, but to be a small non-zero value.
+<ul>
+<li>Because of this, the <strong>variance component estimates will never be exactly identical</strong>.</li>
+<li>At present <a href="https://github.com/glmmTMB/glmmTMB/blob/2b14a42bd55cd0cfeebad1f4eb7a3b2313e5d359/glmmTMB/R/glmmTMB.R#L85" target="_blank">it is set to sqrt(.Machine$double.eps)</a>, which is the squareroot of the <a href="https://stat.ethz.ch/R-manual/R-devel/library/base/html/zMachine.html" target="_blank">smallest possible</a> positive floating-point number.</li>
+<li>Ben Bolker <a href="https://github.com/glmmTMB/glmmTMB/issues/653#issuecomment-749295844" target="_blank">commented</a> that “One piece of low-hanging fruit would be to allow the small non-zero value to be user-settable via <code>glmmTMBControl</code>”.</li>
+</ul></li>
+<li><strong>Possible covariance structures</strong>
+<ul>
+<li>Find all possible structures <a href="https://cran.r-project.org/web/packages/glmmTMB/vignettes/covstruct.html" target="_blank">here</a><br />
+</li>
+<li>Note that <code>cs</code> is <strong>heterogeneous</strong> compound symmetry and there is no homogeneous compound symmetry!</li>
+<li>As can be seen in example 2, we need a <code>+ 0</code> in the <code>diag(date + 0 | unit)</code>, since leaving it out would by default lead to estimating not only the desired heterogeneous variances, but an additional overall variance.</li>
+<li>Currently, we <strong>cannot have Kronecker product / direct product / varComb()</strong> as variance structure, as confirmed in <a href="https://github.com/glmmTMB/glmmTMB/issues/592" target="_blank">this GitHub issue</a>.</li>
+</ul></li>
+</ul>
+</div>
+<div id="mooore-details" class="section level1">
+<h1>Mooore Details!</h1>
+<ul>
+<li>If you are wondering how to <strong>extract the variance component estimates</strong> as I did for example 2 and you are mad that I did not show the code, click there to find the R-code of this document.</li>
+<li>Check out the chapters on this website to see more/other uses of this approach.</li>
+</ul>
+</div>
+
+&nbsp;
+<hr />
+<p style="text-align: center;">Please feel free to contact us about any of this! </p>
+<p style="text-align: center;"><span style="color: #003f75ff;"><em>schmidtpaul1989@outlook.com</em></span></p>
+
+<!-- Add icon library -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+<!-- Add font awesome icons -->
+<p style="text-align: center;">
+    <a href="https://www.researchgate.net/project/MMFAIR-Mixed-Models-for-Agriculture-in-R" class="fa fa-pencil" style="color: #003f75ff;"></a>
+    <a href="https://www.linkedin.com/in/schmidtpaul1989/" class="fa fa-linkedin" style="color: #003f75ff;"></a>
+    <a href="https://www.xing.com/profile/Paul_Schmidt393/cv" class="fa fa-xing" style="color: #003f75ff;"></a>
+    <a href="https://github.com/SchmidtPaul/" class="fa fa-github" style="color: #003f75ff;"></a>
+</p>
+
+<a href="https://hits.seeyoufarm.com"><img src="https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fschmidtpaul.github.io%2FMMFAIR%2F&count_bg=%23003F75&title_bg=%23555555&icon=&icon_color=%23E7E7E7&title=hits&edge_flat=false" class="center"/></a>
+
+&nbsp;
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open')
+  });
+});
+</script>
+
+<!-- code folding -->
+
+<script>
+$(document).ready(function ()  {
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

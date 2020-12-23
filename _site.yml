@@ -21,6 +21,8 @@ navbar:
         href: variance_structures.html
       - text: "Model Selection"
         href: model_selection.html
+      - text: "Error varcov struct with glmmTMB"
+        href: glmmtmbdispformula0.html
     - text: "Sources"
       href: sources.html
     - text: "Contact"
@@ -29,7 +31,7 @@ navbar:
 output:
   html_document:
     theme: lumen
-    code_folding: show
+    # code_folding: show
     highlight: tango
     toc: true
     toc_float: true

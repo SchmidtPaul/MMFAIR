@@ -2,10 +2,14 @@ params <-
 list(hilang = "sas")
 
 # packages
-pacman::p_load(dplyr, purrr, tibble, tidyr, stringr, # data handling
+pacman::p_load(conflicted, # package function conflicts
+               dplyr, purrr, tibble, tidyr, stringr, # data handling
                gganimate, ggplot2, gifski, viridis,  # plot
                nlme, lme4, glmmTMB, sommer, # mixed modelling
                AICcmodavg, mixedup)         # mixed model extractions
+
+# package function conflicts
+conflict_prefer("filter", "dplyr")
 
 # data
 dat <- agriTutorial::sorghum %>%

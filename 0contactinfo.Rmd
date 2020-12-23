@@ -11,7 +11,8 @@ output:
 # formatting tables for html output
 options(knitr.kable.NA = '')
 pacman::p_load(kableExtra, formattable ,htmltools)
-pacman::p_load(tidyverse)
+pacman::p_load(tidyverse, conflicted)
+conflict_prefer("select", "dplyr")
 ```
 
 ```{r import, echo=FALSE, warning=FALSE, message=FALSE}

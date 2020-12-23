@@ -17,15 +17,18 @@ pacman::p_load(kableExtra, formattable, htmltools) # packages for better formatt
 ```
 
 ```{r, child="_hilang_setup.Rmd", purl=FALSE}
-# required for sas syntax highlighting
 ```
 
-```{r}
+```{r, message=F, error=F}
 # packages
-pacman::p_load(dplyr, purrr, tibble, tidyr, stringr, # data handling
+pacman::p_load(conflicted, # package function conflicts
+               dplyr, purrr, tibble, tidyr, stringr, # data handling
                gganimate, ggplot2, gifski, viridis,  # plot
                nlme, lme4, glmmTMB, sommer, # mixed modelling
                AICcmodavg, mixedup)         # mixed model extractions
+
+# package function conflicts
+conflict_prefer("filter", "dplyr")
 
 # data
 dat <- agriTutorial::sorghum %>%

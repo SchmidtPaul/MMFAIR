@@ -1,0 +1,322 @@
+---
+title: "Covariance structures for the error term with glmmTMB - a workaround"
+output: 
+  html_document:
+    includes:
+      after_body: footer.html						 
+---
+```{r, echo=F, purl=T, message=F, error=F}
+pacman::p_load(conflicted,
+               tidyverse, 
+               nlme, glmmTMB,
+               broom.mixed,
+               emo, flair)
+
+# package function conflicts
+conflict_prefer("filter", "dplyr")
+```
+
+```{r, echo=F, purl=F}
+pacman::p_load(kableExtra)
+options(knitr.kable.NA = '')
+```
+
+
+<br> <br>
+
+# What?
+
+ | 
+-|-----------------------
+`r emo::ji("slightly_smiling_face")` <br> <br> | When fitting linear mixed models, the `glmmTMB` package is nice, because it feels like `lme4` but additionally allows for [several covariance structures](https://cran.r-project.org/web/packages/glmmTMB/vignettes/covstruct.html){target="_blank"} for the random effects. <br> <br>
+`r emo::ji("disappointed")` <br> <br> | However, this only works for random terms on the [***G***-side](https://documentation.sas.com/?cdcId=pgmsascdc&cdcVersion=9.4_3.4&docsetId=statug&docsetTarget=statug_glimmix_overview05.htm&locale=en){target="_blank"} of the model and not for the error term (= [***R***-side](https://documentation.sas.com/?cdcId=pgmsascdc&cdcVersion=9.4_3.4&docsetId=statug&docsetTarget=statug_glimmix_overview05.htm&locale=en){target="_blank"}). <br> <br>
+`r emo::ji("nerd_face")` <br> <br> | **But** there is a workaround! We can fix the error variance to be 0 and thus force all the variance into the ***G***-side. If we do so and also add a random ***"pseudo error term"*** that mimics the original error term, we have created a model that essentially leads to identical results. <br> <br>
+`r emo::ji("sunglasses")` <br> <br> | Once this is clear, we can use all the available variance structures on our *pseudo error term*! <br> <br>
+
+# How?
+
+```{r hideme, echo=FALSE, purl=F}
+# this is never seen but needed for code below
+dat <- iris %>% 
+  mutate(unit = 1:n() %>% as.factor()) %>% 
+  rename(y=Sepal.Length,
+         fixedeffects=Species,
+         randomeffects=Sepal.Width) %>% 
+  as_tibble()
+```
+
+ 1. Remove original error variance from ***R***-side via `dispformula = ~ 0`.
+ 2. Add pseudo error variance to ***G***-side via random term.
+    + In the simple case, this can be done via `+ (1 | unit)` where `unit` is a factor with as many levels as there are observations in the dataset.
+
+<div class = "row"> <div class = "col-md-6">
+Basically go from here...
+```{r StandErrMod, include=F, purl=F}
+#
+#
+  
+StandErrMod <- glmmTMB(
+  y ~ 
+    fixedeffects +
+    (1 | randomeffects),
+  
+
+  REML = TRUE,
+  data = dat
+)
+```
+```{r, echo=F, error=F, warning=F, purl=F}
+decorate("StandErrMod")
+```
+</div> <div class = "col-md-6">
+...to here!
+```{r PseudErrMod, include=F, purl=F}
+dat <- dat %>%
+  mutate(unit = as.factor(1:n()))
+
+PseudErrMod <- glmmTMB(
+  y ~
+    fixedeffects +
+    (1 | randomeffects) +
+    (1 | unit),      # Pseudo Err
+  dispformula = ~ 0, # ErrVar = 0
+  REML = TRUE,
+  data = dat
+)
+```
+```{r, echo=F, error=F, warning=F, purl=F}
+decorate("PseudErrMod") %>% flair_lines(c(1,2,8,9))
+```
+</div> </div>
+
+# Really?
+
+Here are two examples for the *pseudo-error* approach based on this dataset:
+
+```{r, purl=T}
+dat <- agridat::mcconway.turnip %>% 
+  mutate(unit = 1:n()) %>% 
+  mutate_at(vars(density, unit), as.factor)
+```
+
+ * **Example 1** We assume no special variance structure for the error term and thus *independent & identically distributed* errors. We compare two `glmmTMB` models - one with a standard error term and one with a *pseudo-error* term.
+ * **Example 2** We assume a diagonal variance structure for the factor `date` and thus allow for different heterogeneous error variances / heteroscedascity per group for the effect levels of `date`. We compare a *pseudo-error*-`glmmTMB` model with `nlme::lme()` model.
+ 
+## Example 1: iid
+
+<div class = "row"> <div class = "col-md-6">
+```{r, purl=T}
+StandErrMod <- glmmTMB(
+  yield ~ 
+    gen*date*density +
+    (1 | block),
+  
+
+  REML = TRUE,
+  data = dat
+)
+```
+</div> <div class = "col-md-6">
+```{r, purl=T}
+PseudErrMod <- glmmTMB(
+  yield ~
+    gen*date*density +
+    (1 | block) +
+    (1 | unit),      # Pseudo Err
+  dispformula = ~ 0, # ErrVar = 0
+  REML = TRUE,
+  data = dat
+)
+```
+</div> </div>
+
+The **variance component estimates** of both models are very similar. As expected the Residual variance in the *pseudo-error model* is 0 and instead there is an additional variance for the random `unit` term.   
+
+<div class = "row"> <div class = "col-md-6">
+```{r eval=FALSE, purl=T}
+mixedup::extract_vc(StandErrMod)
+```
+```{r echo=FALSE, purl=F}
+mixedup::extract_vc(StandErrMod) %>% 
+  select(-effect) %>%
+  kbl() %>% 
+  kable_paper(full_width = F, html_font = "arial", font_size = 12)
+```
+</div> <div class = "col-md-6">
+```{r eval=FALSE, purl=T}
+mixedup::extract_vc(PseudErrMod)
+```
+```{r echo=FALSE, purl=F}
+mixedup::extract_vc(PseudErrMod) %>% 
+  select(-effect) %>% 
+  kbl() %>% 
+  kable_paper(full_width = F, html_font = "arial", font_size = 12)
+```
+</div> </div>
+
+The **Likelihood**/**AIC** values are identical for both models.
+
+```{r eval=FALSE, purl=T}
+AICcmodavg::aictab(list(StandErrMod, PseudErrMod), 
+                   c("StandErrMod", "PseudErrMod"), 
+                   second.ord = FALSE)
+```
+```{r echo=FALSE, purl=F}
+AICcmodavg::aictab(list(StandErrMod, PseudErrMod), 
+                   c("StandErrMod", "PseudErrMod"), 
+                   second.ord = FALSE) %>% 
+  mutate_at(vars(Delta_AIC:LL), ~ round(., 5)) %>% 
+  as_tibble() %>% 
+  select(Modnames:Delta_AIC, LL) %>% 
+  kbl() %>% 
+  kable_paper(full_width = F, html_font = "arial", font_size = 12)
+```
+
+## Example 2: diag
+
+<div class = "row"> <div class = "col-md-6">
+```{r, purl=T}
+diag_glmmTMB <- glmmTMB(
+  yield ~ 
+    gen*date*density +
+    (1 | block) +
+    diag(date + 0 | unit),
+  dispformula = ~ 0,
+  REML = TRUE,
+  data = dat
+)
+```
+</div> <div class = "col-md-6">
+```{r, purl=T}
+diag_lme <- lme(
+  yield ~ 
+    gen*date*density, 
+  random  = ~ 1 | block,
+  weights = varIdent(form =  ~ 1 | date),
+  
+  
+  data    = dat
+)
+```
+</div> </div>
+
+The **variance component estimates** are similar enough.
+
+<div class = "row"> <div class = "col-md-6">
+```{r, echo=FALSE, purl=T}
+glmmTMB_vc <- bind_rows(
+
+diag_glmmTMB %>%
+  tidy(effects = "ran_pars", scales = "vcov") %>%
+  filter(group == "block") %>% 
+  mutate(grp = str_remove(term, "var__")) %>% 
+  select(group, grp, estimate) %>% 
+  rename(variance = estimate,
+         effect = group)
+
+,
+
+diag_glmmTMB %>% 
+  mixedup::extract_cor_structure(which_cor="diag") %>% 
+  pivot_longer( cols = 2:3, values_to ="variance", names_to="grp") %>% 
+  mutate(variance = variance ^ 2) %>% 
+  rename(effect = group)
+
+,
+
+tibble(effect = "Residual",
+       grp = NA_character_,
+       variance = glance(diag_glmmTMB) %>% pull(sigma) %>% `^`(2))
+
+)
+```
+
+```{r, echo=FALSE, purl=F}
+glmmTMB_vc %>% 
+  kbl() %>% 
+  kable_paper(full_width = F, html_font = "arial", font_size = 12)
+```
+</div> <div class = "col-md-6">
+```{r, echo=FALSE, purl=T}
+lme_vc <- bind_rows(
+
+diag_lme %>% 
+  tidy(effects = "ran_pars", scales = "vcov") %>% 
+  filter(group=="block") %>% 
+  mutate(grp = str_remove(term, "var_")) %>% 
+  select(group, grp, estimate) %>% 
+  rename(variance = estimate,
+         effect = group)
+
+,
+
+diag_lme$modelStruct$varStruct %>%
+  coef(unconstrained = FALSE, allCoef = TRUE) %>%
+  enframe(name = "grp", value = "varStruct") %>%
+  mutate(sigma         = diag_lme$sigma) %>%
+  mutate(StandardError = sigma * varStruct) %>%
+  mutate(variance      = StandardError ^ 2) %>% 
+  mutate(effect = "Residual") %>% 
+  select(effect, grp, variance)
+
+) 
+```
+
+```{r, echo=FALSE, purl=F}
+lme_vc %>% 
+  kbl() %>% 
+  kable_paper(full_width = F, html_font = "arial", font_size = 12)
+```
+</div> </div>
+
+Furthermore, even though we are comparing across different model classes, we also get similar model fit statistics.
+
+<div class = "row"> <div class = "col-md-6">
+```{r, echo=F, purl=TRUE}
+glmmTMB_fit <- diag_glmmTMB %>% 
+  glance() %>% select(logLik:BIC)
+```
+
+```{r, echo=F, purl=FALSE}
+glmmTMB_fit %>% 
+  kbl() %>% 
+  kable_paper(full_width = F, html_font = "arial", font_size = 12)
+```
+</div> <div class = "col-md-6">
+```{r, echo=F, purl=TRUE}
+lme_fit <- diag_lme %>%   
+  glance() %>% select(logLik:BIC) 
+```
+
+```{r, echo=F, purl=FALSE}
+lme_fit %>% 
+  kbl() %>% 
+  kable_paper(full_width = F, html_font = "arial", font_size = 12)
+```
+</div> </div>
+
+
+
+# More Details!
+
+Check out [the GitHub issue](https://github.com/glmmTMB/glmmTMB/issues/653){target="_blank"} I've written on this topic at the `glmmTMB` repository, where [Ben Bolker](https://ms.mcmaster.ca/~bolker/){target="_blank"} - the author of this R-package - replied. Here are some key points:
+
+* This works **only for gaussian mixed models** and thus not for generalized mixed models!
+* As is the case in Example 1, we **sometimes get a `false convergence` warning** for the pseudo-error-model but not for the standard model.
+* Actually, `dispformula=~0` does not fix the residual variance to be 0, but to be a small non-zero value.
+    + Because of this, the **variance component estimates will never be exactly identical**.
+    + At present [it is set to sqrt(.Machine$double.eps)](https://github.com/glmmTMB/glmmTMB/blob/2b14a42bd55cd0cfeebad1f4eb7a3b2313e5d359/glmmTMB/R/glmmTMB.R#L85){target="_blank"}, which is the squareroot of the [smallest possible](https://stat.ethz.ch/R-manual/R-devel/library/base/html/zMachine.html){target="_blank"} positive floating-point number.
+    + Ben Bolker [commented](https://github.com/glmmTMB/glmmTMB/issues/653#issuecomment-749295844){target="_blank"} that "One piece of low-hanging fruit would be to allow the small non-zero value to be user-settable via `glmmTMBControl`".
+* **Possible covariance structures**
+    + Find all possible structures [here](https://cran.r-project.org/web/packages/glmmTMB/vignettes/covstruct.html){target="_blank"}  
+    + Note that `cs` is **heterogeneous** compound symmetry and there is no homogeneous compound symmetry!
+    + As can be seen in example 2, we need a `+ 0` in the `diag(date + 0 | unit)`, since leaving it out would by default lead to estimating not only the desired heterogeneous variances, but an additional overall variance.
+    + Currently, we **cannot have Kronecker product / direct product / varComb()** as variance structure, as confirmed in [this GitHub issue](https://github.com/glmmTMB/glmmTMB/issues/592){target="_blank"}.
+
+# Mooore Details!
+
+ * If you are wondering how to **extract the variance component estimates** as I did for example 2 and you are mad that I did not show the code, click there to find the R-code of this document. 
+ * Check out the chapters on this website to see more/other uses of this approach.
+
+
+
