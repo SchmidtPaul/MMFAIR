@@ -65,7 +65,7 @@ StandErrMod <- glmmTMB(
   data = dat
 )
 ```
-```{r, echo=F, error=F, warning=F, purl=F}
+```{r, echo=F, purl=F}
 decorate("StandErrMod")
 ```
 </div> <div class = "col-md-6">
@@ -84,7 +84,7 @@ PseudErrMod <- glmmTMB(
   data = dat
 )
 ```
-```{r, echo=F, error=F, warning=F, purl=F}
+```{r, echo=F, purl=F}
 decorate("PseudErrMod") %>% flair_lines(c(1,2,8,9))
 ```
 </div> </div>

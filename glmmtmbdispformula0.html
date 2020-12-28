@@ -535,9 +535,11 @@ div.tocify {
 <div class="row">
 <div class="col-md-6">
 <p>Basically go from here…</p>
+<pre class='prettyprint'><code>#<br>#<br>&nbsp;&nbsp;<br>StandErrMod <- glmmTMB(<br>&nbsp;&nbsp;y ~ <br>&nbsp;&nbsp;&nbsp;&nbsp;fixedeffects +<br>&nbsp;&nbsp;&nbsp;&nbsp;(1 | randomeffects),<br>&nbsp;&nbsp;<br><br>&nbsp;&nbsp;REML = TRUE,<br>&nbsp;&nbsp;data = dat<br>)</code></pre>
 </div>
 <div class="col-md-6">
 <p>…to here!</p>
+<pre class='prettyprint'><code><span style="background-color:#ffff7f">dat <- dat %>%</span><br><span style="background-color:#ffff7f"> &nbsp;mutate(unit = as.factor(1:n()))</span><br><br>PseudErrMod <- glmmTMB(<br> &nbsp;y ~<br> &nbsp;&nbsp;&nbsp;fixedeffects +<br> &nbsp;&nbsp;&nbsp;(1 | randomeffects) +<br><span style="background-color:#ffff7f"> &nbsp;&nbsp;&nbsp;(1 | unit), &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# Pseudo Err</span><br><span style="background-color:#ffff7f"> &nbsp;dispformula = ~ 0, # ErrVar = 0</span><br> &nbsp;REML = TRUE,<br> &nbsp;data = dat<br>)</code></pre>
 </div>
 </div>
 </div>
@@ -575,7 +577,8 @@ div.tocify {
 <a class="sourceLine" id="cb3-7" title="7">  <span class="dt">REML =</span> <span class="ot">TRUE</span>,</a>
 <a class="sourceLine" id="cb3-8" title="8">  <span class="dt">data =</span> dat</a>
 <a class="sourceLine" id="cb3-9" title="9">)</a></code></pre></div>
-<pre><code>## Warning in fitTMB(TMBStruc): Model convergence problem; false convergence (8). See vignette(&#39;troubleshooting&#39;)</code></pre>
+<pre><code>## Warning in fitTMB(TMBStruc): Model convergence problem; false convergence (8).
+## See vignette(&#39;troubleshooting&#39;)</code></pre>
 </div>
 </div>
 <p>The <strong>variance component estimates</strong> of both models are very similar. As expected the Residual variance in the <em>pseudo-error model</em> is 0 and instead there is an additional variance for the random <code>unit</code> term.</p>
