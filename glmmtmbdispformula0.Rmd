@@ -3,6 +3,7 @@ title: "Covariance structures for the error term with glmmTMB - a workaround"
 output: 
   html_document:
     includes:
+      in_header: header.html
       after_body: footer.html						 
 ---
 ```{r, echo=F, purl=T, message=F, error=F}
@@ -315,7 +316,7 @@ Check out [the GitHub issue](https://github.com/glmmTMB/glmmTMB/issues/653){targ
 
 # Mooore Details!
 
- * If you are wondering how to **extract the variance component estimates** as I did for example 2 and you are mad that I did not show the code, click there to find the R-code of this document. 
+ * If you are wondering how to **extract the variance component estimates** as I did for example 2 and you are mad that I did not show the code,  [click here](https://github.com/SchmidtPaul/MMFAIR/blob/master/Rpurl/glmmtmbdispformula0.R){target="_blank"} to find the R-code of this document. 
  * Check out the chapters on this website to see more/other uses of this approach.
 
 
