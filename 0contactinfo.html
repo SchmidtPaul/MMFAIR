@@ -13,12 +13,22 @@
 
 <title>Dr. Paul Schmidt</title>
 
+<script src="site_libs/header-attrs-2.7/header-attrs.js"></script>
 <script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link href="site_libs/bootstrap-3.3.5/css/lumen.min.css" rel="stylesheet" />
 <script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
 <script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
 <script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
 <script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
 <link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
 <script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
@@ -70,6 +80,8 @@
 <meta property="twitter:description" content="Our aim is to provide a cookbook with mixed model analyses of typical examples in life sciences (focus on agriculture/biology) and compare the possibilities or rather limitations of the R-packages nlme, lme4, glmmTMB and sommer to each other, but also to SAS’ PROC MIXED.">
 <meta property="twitter:image" content="img/logo/ScreenshotIndex.PNG">
 
+
+
 <style type="text/css">
   code{white-space: pre-wrap;}
   span.smallcaps{font-variant: small-caps;}
@@ -82,32 +94,6 @@
 
 
 
-<style type="text/css">
-h1 {
-  font-size: 34px;
-}
-h1.title {
-  font-size: 38px;
-}
-h2 {
-  font-size: 30px;
-}
-h3 {
-  font-size: 24px;
-}
-h4 {
-  font-size: 18px;
-}
-h5 {
-  font-size: 16px;
-}
-h6 {
-  font-size: 12px;
-}
-.table th:not([align]) {
-  text-align: left;
-}
-</style>
 
 
 <link rel="stylesheet" href="styles.css" type="text/css" />
@@ -119,10 +105,6 @@ h6 {
   max-width: 940px;
   margin-left: auto;
   margin-right: auto;
-}
-code {
-  color: inherit;
-  background-color: rgba(0, 0, 0, 0.04);
 }
 img {
   max-width:100%;
@@ -139,40 +121,13 @@ button.code-folding-btn:focus {
 summary {
   display: list-item;
 }
+pre code {
+  padding: 0;
+}
 </style>
 
 
 <style type="text/css">
-/* padding for bootstrap navbar */
-body {
-  padding-top: 54px;
-  padding-bottom: 40px;
-}
-/* offset scroll position for anchor links (for fixed navbar)  */
-.section h1 {
-  padding-top: 59px;
-  margin-top: -59px;
-}
-.section h2 {
-  padding-top: 59px;
-  margin-top: -59px;
-}
-.section h3 {
-  padding-top: 59px;
-  margin-top: -59px;
-}
-.section h4 {
-  padding-top: 59px;
-  margin-top: -59px;
-}
-.section h5 {
-  padding-top: 59px;
-  margin-top: -59px;
-}
-.section h6 {
-  padding-top: 59px;
-  margin-top: -59px;
-}
 .dropdown-submenu {
   position: relative;
 }
@@ -200,7 +155,7 @@ body {
   margin-right: -10px;
 }
 .dropdown-submenu:hover>a:after {
-  border-left-color: #ffffff;
+  border-left-color: #adb5bd;
 }
 .dropdown-submenu.pull-left {
   float: none;
@@ -212,7 +167,7 @@ body {
 }
 </style>
 
-<script>
+<script type="text/javascript">
 // manage active state of menu based on current page
 $(document).ready(function () {
   // active menu anchor
@@ -223,10 +178,23 @@ $(document).ready(function () {
   var menuAnchor = $('a[href="' + href + '"]');
 
   // mark it active
-  menuAnchor.parent().addClass('active');
+  menuAnchor.tab('show');
 
   // if it's got a parent navbar menu mark it active as well
   menuAnchor.closest('li.dropdown').addClass('active');
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
 });
 </script>
 
@@ -238,7 +206,6 @@ $(document).ready(function () {
   max-height: 500px;
   min-height: 44px;
   overflow-y: auto;
-  background: white;
   border: 1px solid #ddd;
   border-radius: 4px;
 }
@@ -364,13 +331,13 @@ div.tocify {
 
 
 <!-- setup 3col/9col grid for toc_float and main content  -->
-<div class="row-fluid">
-<div class="col-xs-12 col-sm-4 col-md-3">
+<div class="row">
+<div class="col-sm-12 col-md-4 col-lg-3">
 <div id="TOC" class="tocify">
 </div>
 </div>
 
-<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+<div class="toc-content col-sm-12 col-md-8 col-lg-9">
 
 
 
@@ -440,7 +407,7 @@ div.tocify {
   </div><!--/.container -->
 </div><!--/.navbar -->
 
-<div class="fluid-row" id="header">
+<div id="header">
 
 
 
@@ -485,6 +452,7 @@ p.small {line-height: 1;}
 <p><i class="fa fa-home" style="color: #003f75ff;"> </i> Hamburg, Germany </br></p>
 <p>Contact </br> <a href="mailto:schmidtpaul1989@outlook.com"> <i class="fa fa-envelope" style="color: #003f75ff;"> </i> schmidtpaul1989@outlook.com </a> </br> <a href="https://github.com/SchmidtPaul/"> <i class="fa fa-github" style="color: #003f75ff;"> </i> GitHub </a> </br> <a href="https://www.linkedin.com/in/schmidtpaul1989/"> <i class="fa fa-linkedin" style="color: #003f75ff;"> </i> LinkedIn </a> </br> <a href="https://www.researchgate.net/profile/Paul_Schmidt17"> <i class="fa fa-pencil" style="color: #003f75ff;"> </i> ResearchGate </a> </br> <a href="https://www.xing.com/profile/Paul_Schmidt393/cv"> <i class="fa fa-xing" style="color: #003f75ff;"> </i> Xing </a></p>
 <p>Websites </br> <a href="https://schmidtpaul.github.io/DSFAIR/"> <img src="https://raw.githubusercontent.com/SchmidtPaul/DSFAIR/master/img/logo/favicon-32x32.png" width=16 height=16/> </i> DSFAIR: Data Science for Agriculture in R </a> </br> <a href="https://schmidtpaul.github.io/MMFAIR/"> <img src="https://raw.githubusercontent.com/SchmidtPaul/MMFAIR/master/img/logo/favicon-32x32.png" width=16 height=16/> </i> MMFAIR: Mixed Models for Agriculture in R </a> </br> <a href="https://schmidtpaul.github.io/crashcouRse/"> <i class="fa fa-window-maximize" style="color: #003f75ff;"> </i> CrashcouRse: R für Bio- und Agrarwissenschaftler </a> </br></p>
+<p>R-packages </br> <a href="https://schmidtpaul.github.io/CitaviR/"> <img src="https://raw.githubusercontent.com/SchmidtPaul/CitaviR/master/docs/favicon-32x32.png" width=16 height=16/> </i> CitaviR: A set of tools for dealing with Citavi data </a> </br></p>
 </p>
 <table class="table" style="margin-left: auto; margin-right: auto;">
 <thead>
@@ -508,7 +476,7 @@ Ich habe 2019 meine <strong>Promotion</strong> im Fachgebiet Biostatistik an der
 </tr>
 </tbody>
 </table>
-<table class=" lightable-minimal" style='font-size: 10px; font-family: "Trebuchet MS", verdana, sans-serif; margin-left: auto; margin-right: auto;'>
+<table class=" lightable-minimal" style="font-size: 10px; font-family: &quot;Trebuchet MS&quot;, verdana, sans-serif; margin-left: auto; margin-right: auto;">
 <thead>
 <tr>
 <th style="text-align:right;">
@@ -529,6 +497,57 @@ Duration
 </tr>
 </thead>
 <tbody>
+<tr>
+<td style="text-align:right;width: 5em; ">
+Jul 2021
+</td>
+<td style="text-align:left;">
+Data science for life sciences with R (part 2)
+</td>
+<td style="text-align:right;width: 5em; ">
+Ger <img src="https://cdn.countryflags.com/thumbs/germany/flag-round-250.png" width="16" height="16">
+</td>
+<td style="text-align:right;width: 20em; ">
+Thünen-Institut, Braunschweig via <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/7b/Zoom_Communications_Logo.svg/1200px-Zoom_Communications_Logo.svg.png" width="32" height="6.4">
+</td>
+<td style="text-align:right;width: 5em; ">
+3d
+</td>
+</tr>
+<tr>
+<td style="text-align:right;width: 5em; ">
+May 2021
+</td>
+<td style="text-align:left;">
+Data science for life sciences with R (part 1)
+</td>
+<td style="text-align:right;width: 5em; ">
+Ger <img src="https://cdn.countryflags.com/thumbs/germany/flag-round-250.png" width="16" height="16">
+</td>
+<td style="text-align:right;width: 20em; ">
+Thünen-Institut, Braunschweig via <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/7b/Zoom_Communications_Logo.svg/1200px-Zoom_Communications_Logo.svg.png" width="32" height="6.4">
+</td>
+<td style="text-align:right;width: 5em; ">
+3d
+</td>
+</tr>
+<tr>
+<td style="text-align:right;width: 5em; ">
+Mar 2021
+</td>
+<td style="text-align:left;">
+Data science for life sciences with R (part 1)
+</td>
+<td style="text-align:right;width: 5em; ">
+Ger <img src="https://cdn.countryflags.com/thumbs/germany/flag-round-250.png" width="16" height="16">
+</td>
+<td style="text-align:right;width: 20em; ">
+Thünen-Institut, Braunschweig via <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/7b/Zoom_Communications_Logo.svg/1200px-Zoom_Communications_Logo.svg.png" width="32" height="6.4">
+</td>
+<td style="text-align:right;width: 5em; ">
+3d
+</td>
+</tr>
 <tr>
 <td style="text-align:right;width: 5em; ">
 Nov 2020
@@ -784,7 +803,7 @@ $(document).ready(function () {
 
 $(document).ready(function () {
   $('.tabset-dropdown > .nav-tabs > li').click(function () {
-    $(this).parent().toggleClass('nav-tabs-open')
+    $(this).parent().toggleClass('nav-tabs-open');
   });
 });
 </script>

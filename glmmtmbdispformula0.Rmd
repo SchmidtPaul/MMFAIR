@@ -6,7 +6,7 @@ output:
       in_header: header.html
       after_body: footer.html						 
 ---
-```{r, echo=F, purl=T, message=F, error=F}
+```{r, echo=F, message=F, error=F, purl=T}
 pacman::p_load(conflicted,
                tidyverse, 
                nlme, glmmTMB,
@@ -273,23 +273,23 @@ lme_vc %>%
 Furthermore, even though we are comparing across different model classes, we also get similar model fit statistics.
 
 <div class = "row"> <div class = "col-md-6">
-```{r, echo=F, purl=TRUE}
+```{r, echo=F, purl=T}
 glmmTMB_fit <- diag_glmmTMB %>% 
   glance() %>% select(logLik:BIC)
 ```
 
-```{r, echo=F, purl=FALSE}
+```{r, echo=F, purl=F}
 glmmTMB_fit %>% 
   kbl() %>% 
   kable_paper(full_width = F, html_font = "arial", font_size = 12)
 ```
 </div> <div class = "col-md-6">
-```{r, echo=F, purl=TRUE}
+```{r, echo=F, purl=T}
 lme_fit <- diag_lme %>%   
   glance() %>% select(logLik:BIC) 
 ```
 
-```{r, echo=F, purl=FALSE}
+```{r, echo=F, purl=F}
 lme_fit %>% 
   kbl() %>% 
   kable_paper(full_width = F, html_font = "arial", font_size = 12)
