@@ -19,7 +19,7 @@ pacman::p_load(kableExtra, formattable, htmltools) # packages for better formatt
 ```{r, child="_hilang_setup.Rmd", purl=FALSE}
 ```
 
-```{r, message=F, error=F}
+```{r, message = FALSE, error = FALSE, warning = FALSE}
 # packages
 pacman::p_load(conflicted, # package function conflicts
                dplyr, purrr, tibble, tidyr, stringr, # data handling
@@ -53,7 +53,7 @@ The example in this chapter is taken from [*Example 4* in Piepho & Edmondson (20
 As [Piepho & Edmondson (2018)](https://onlinelibrary.wiley.com/doi/full/10.1111/jac.12267){target="_blank"} put it: *"the week factor is not a treatment factor that can be randomized. Instead, repeated measurements are taken on each plot on five consecutive occasions. Successive measurements on the same plot are likely to be serially correlated, and this means that for a reliable and efficient analysis of repeated-measures data we need to take proper account of the serial correlations between the repeated measures ([Piepho, Büchse & Richter, 2004](https://onlinelibrary.wiley.com/doi/abs/10.1111/j.1439-037X.2004.00097.x){target="_blank"}; [Pinheiro & Bates, 2000](http://library.mpib-berlin.mpg.de/toc/z2008_18.pdf){target="_blank"})."*
 
 
-```{r, echo=FALSE, purl=FALSE, message=FALSE, warning=FALSE}
+```{r, class.source = "fold-hide", purl = FALSE, message = FALSE, warning = FALSE}
 gganimate_plot <- ggplot(data = dat, aes(
   y = y,
   x = varweek,
@@ -77,7 +77,7 @@ gganimate_plot <- ggplot(data = dat, aes(
   transition_time(varweek) +
   shadow_mark(exclude_layer = 2)
 
-animate(gganimate_plot, renderer = gifski_renderer())
+animate(gganimate_plot, renderer = gifski_renderer()) # render gif
 ```
 
 # Modelling
