@@ -13,12 +13,22 @@
 
 <title>Repeated Measures in Time</title>
 
+<script src="site_libs/header-attrs-2.7/header-attrs.js"></script>
 <script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link href="site_libs/bootstrap-3.3.5/css/lumen.min.css" rel="stylesheet" />
 <script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
 <script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
 <script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
 <script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
 <link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
 <script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
@@ -70,6 +80,8 @@
 <meta property="twitter:description" content="Our aim is to provide a cookbook with mixed model analyses of typical examples in life sciences (focus on agriculture/biology) and compare the possibilities or rather limitations of the R-packages nlme, lme4, glmmTMB and sommer to each other, but also to SAS’ PROC MIXED.">
 <meta property="twitter:image" content="img/logo/ScreenshotIndex.PNG">
 
+
+
 <style type="text/css">
   code{white-space: pre-wrap;}
   span.smallcaps{font-variant: small-caps;}
@@ -80,28 +92,37 @@
     </style>
 
 
-<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+  code {
+    white-space: pre;
+  }
+  .sourceCode {
+    overflow: visible;
+  }
+</style>
 <style type="text/css" data-origin="pandoc">
-a.sourceLine { display: inline-block; line-height: 1.25; }
-a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
-a.sourceLine:empty { height: 1.2em; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
 .sourceCode { overflow: visible; }
-code.sourceCode { white-space: pre; position: relative; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
 div.sourceCode { margin: 1em 0; }
 pre.sourceCode { margin: 0; }
 @media screen {
 div.sourceCode { overflow: auto; }
 }
 @media print {
-code.sourceCode { white-space: pre-wrap; }
-a.sourceLine { text-indent: -1em; padding-left: 1em; }
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
 }
-pre.numberSource a.sourceLine
-  { position: relative; left: -4em; }
-pre.numberSource a.sourceLine::before
-  { content: attr(title);
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
     position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; pointer-events: all; display: inline-block;
+    border: none; display: inline-block;
     -webkit-touch-callout: none; -webkit-user-select: none;
     -khtml-user-select: none; -moz-user-select: none;
     -ms-user-select: none; user-select: none;
@@ -110,9 +131,9 @@ pre.numberSource a.sourceLine::before
   }
 pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
 div.sourceCode
-  { background-color: #f8f8f8; }
+  {  background-color: #f8f8f8; }
 @media screen {
-a.sourceLine::before { text-decoration: underline; }
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
 code span.al { color: #ef2929; } /* Alert */
 code span.an { color: #8f5902; font-weight: bold; font-style: italic; } /* Annotation */
@@ -165,39 +186,8 @@ code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warni
   }
 })();
 </script>
-<style type="text/css">
-  pre:not([class]) {
-    background-color: white;
-  }
-</style>
 
 
-<style type="text/css">
-h1 {
-  font-size: 34px;
-}
-h1.title {
-  font-size: 38px;
-}
-h2 {
-  font-size: 30px;
-}
-h3 {
-  font-size: 24px;
-}
-h4 {
-  font-size: 18px;
-}
-h5 {
-  font-size: 16px;
-}
-h6 {
-  font-size: 12px;
-}
-.table th:not([align]) {
-  text-align: left;
-}
-</style>
 
 
 <link rel="stylesheet" href="styles.css" type="text/css" />
@@ -209,10 +199,6 @@ h6 {
   max-width: 940px;
   margin-left: auto;
   margin-right: auto;
-}
-code {
-  color: inherit;
-  background-color: rgba(0, 0, 0, 0.04);
 }
 img {
   max-width:100%;
@@ -229,40 +215,13 @@ button.code-folding-btn:focus {
 summary {
   display: list-item;
 }
+pre code {
+  padding: 0;
+}
 </style>
 
 
 <style type="text/css">
-/* padding for bootstrap navbar */
-body {
-  padding-top: 54px;
-  padding-bottom: 40px;
-}
-/* offset scroll position for anchor links (for fixed navbar)  */
-.section h1 {
-  padding-top: 59px;
-  margin-top: -59px;
-}
-.section h2 {
-  padding-top: 59px;
-  margin-top: -59px;
-}
-.section h3 {
-  padding-top: 59px;
-  margin-top: -59px;
-}
-.section h4 {
-  padding-top: 59px;
-  margin-top: -59px;
-}
-.section h5 {
-  padding-top: 59px;
-  margin-top: -59px;
-}
-.section h6 {
-  padding-top: 59px;
-  margin-top: -59px;
-}
 .dropdown-submenu {
   position: relative;
 }
@@ -290,7 +249,7 @@ body {
   margin-right: -10px;
 }
 .dropdown-submenu:hover>a:after {
-  border-left-color: #ffffff;
+  border-left-color: #adb5bd;
 }
 .dropdown-submenu.pull-left {
   float: none;
@@ -302,7 +261,7 @@ body {
 }
 </style>
 
-<script>
+<script type="text/javascript">
 // manage active state of menu based on current page
 $(document).ready(function () {
   // active menu anchor
@@ -313,10 +272,23 @@ $(document).ready(function () {
   var menuAnchor = $('a[href="' + href + '"]');
 
   // mark it active
-  menuAnchor.parent().addClass('active');
+  menuAnchor.tab('show');
 
   // if it's got a parent navbar menu mark it active as well
   menuAnchor.closest('li.dropdown').addClass('active');
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
 });
 </script>
 
@@ -328,7 +300,6 @@ $(document).ready(function () {
   max-height: 500px;
   min-height: 44px;
   overflow-y: auto;
-  background: white;
   border: 1px solid #ddd;
   border-radius: 4px;
 }
@@ -454,13 +425,13 @@ div.tocify {
 
 
 <!-- setup 3col/9col grid for toc_float and main content  -->
-<div class="row-fluid">
-<div class="col-xs-12 col-sm-4 col-md-3">
+<div class="row">
+<div class="col-sm-12 col-md-4 col-lg-3">
 <div id="TOC" class="tocify">
 </div>
 </div>
 
-<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+<div class="toc-content col-sm-12 col-md-8 col-lg-9">
 
 
 
@@ -530,7 +501,7 @@ div.tocify {
   </div><!--/.container -->
 </div><!--/.navbar -->
 
-<div class="fluid-row" id="header">
+<div id="header">
 
 
 
@@ -542,21 +513,21 @@ div.tocify {
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.31.0/mode/sas/sas.min.js"></script>
 
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" title="1"><span class="co"># packages</span></a>
-<a class="sourceLine" id="cb1-2" title="2">pacman<span class="op">::</span><span class="kw">p_load</span>(conflicted, <span class="co"># package function conflicts</span></a>
-<a class="sourceLine" id="cb1-3" title="3">               dplyr, purrr, tibble, tidyr, stringr, <span class="co"># data handling</span></a>
-<a class="sourceLine" id="cb1-4" title="4">               gganimate, ggplot2, gifski, viridis,  <span class="co"># plot</span></a>
-<a class="sourceLine" id="cb1-5" title="5">               nlme, lme4, glmmTMB, sommer, <span class="co"># mixed modelling</span></a>
-<a class="sourceLine" id="cb1-6" title="6">               AICcmodavg, mixedup)         <span class="co"># mixed model extractions</span></a>
-<a class="sourceLine" id="cb1-7" title="7"></a>
-<a class="sourceLine" id="cb1-8" title="8"><span class="co"># package function conflicts</span></a>
-<a class="sourceLine" id="cb1-9" title="9"><span class="kw">conflict_prefer</span>(<span class="st">&quot;filter&quot;</span>, <span class="st">&quot;dplyr&quot;</span>)</a>
-<a class="sourceLine" id="cb1-10" title="10"></a>
-<a class="sourceLine" id="cb1-11" title="11"><span class="co"># data</span></a>
-<a class="sourceLine" id="cb1-12" title="12">dat &lt;-<span class="st"> </span>agriTutorial<span class="op">::</span>sorghum <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb1-13" title="13"><span class="st">  </span><span class="kw">rename</span>(<span class="dt">block =</span> Replicate, <span class="dt">plot =</span> factplot) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb1-14" title="14"><span class="st">  </span>dplyr<span class="op">::</span><span class="kw">select</span>(y, variety, block, plot, factweek, varweek) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb1-15" title="15"><span class="st">  </span><span class="kw">as_tibble</span>()</a></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># packages</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>pacman<span class="sc">::</span><span class="fu">p_load</span>(conflicted, <span class="co"># package function conflicts</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>               dplyr, purrr, tibble, tidyr, stringr, <span class="co"># data handling</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>               gganimate, ggplot2, gifski, viridis,  <span class="co"># plot</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>               nlme, lme4, glmmTMB, sommer, <span class="co"># mixed modelling</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>               AICcmodavg, mixedup)         <span class="co"># mixed model extractions</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="co"># package function conflicts</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="fu">conflict_prefer</span>(<span class="st">&quot;filter&quot;</span>, <span class="st">&quot;dplyr&quot;</span>)</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="co"># data</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>dat <span class="ot">&lt;-</span> agriTutorial<span class="sc">::</span>sorghum <span class="sc">%&gt;%</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">block =</span> Replicate, <span class="at">plot =</span> factplot) <span class="sc">%&gt;%</span> </span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(y, variety, block, plot, factweek, varweek) <span class="sc">%&gt;%</span> </span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as_tibble</span>()</span></code></pre></div>
 <div style="border: 1px solid #ddd; padding: 0px; overflow-y: scroll; height:200px; ">
 <table class="table table-bordered table-hover table-condensed table-responsive" style="width: auto !important; margin-left: auto; margin-right: auto;">
 <thead>
@@ -2590,138 +2561,36 @@ varweek
 <h1>Motivation</h1>
 <p>The example in this chapter is taken from <a href="https://onlinelibrary.wiley.com/doi/full/10.1111/jac.12267" target="_blank"><em>Example 4</em> in Piepho &amp; Edmondson (2018)</a> (see also the <a href="https://cran.r-project.org/web/packages/agriTutorial/vignettes/agriTutorialVignette.pdf#%5B%7B%22num%22%3A81%2C%22gen%22%3A0%7D%2C%7B%22name%22%3A%22XYZ%22%7D%2C28.346%2C813.543%2Cnull%5D" target="_blank">Agritutorial vigniette</a>). It considers data from a sorghum trial laid out as a randomized complete <code>block</code> design (5 blocks) with <code>variety</code> (4 sorghum varities) being the only treatment factor. Thus, we have a total of 20 <code>plot</code>s. It is important to note that our response variable (<code>y</code>), <strong>the leaf area index, was assessed in five consecutive weeks on each plot</strong> starting 2 weeks after emergence. Therefore, the dataset contains a total of 100 values and what we have here is longitudinal data, <em>a.k.a.</em> repeated measurements over time, <em>a.k.a.</em> a time series analysis.</p>
 <p>As <a href="https://onlinelibrary.wiley.com/doi/full/10.1111/jac.12267" target="_blank">Piepho &amp; Edmondson (2018)</a> put it: <em>“the week factor is not a treatment factor that can be randomized. Instead, repeated measurements are taken on each plot on five consecutive occasions. Successive measurements on the same plot are likely to be serially correlated, and this means that for a reliable and efficient analysis of repeated-measures data we need to take proper account of the serial correlations between the repeated measures (<a href="https://onlinelibrary.wiley.com/doi/abs/10.1111/j.1439-037X.2004.00097.x" target="_blank">Piepho, Büchse &amp; Richter, 2004</a>; <a href="http://library.mpib-berlin.mpg.de/toc/z2008_18.pdf" target="_blank">Pinheiro &amp; Bates, 2000</a>).”</em></p>
-<pre><code>## 
-Frame 1 (1%)
-Frame 2 (2%)
-Frame 3 (3%)
-Frame 4 (4%)
-Frame 5 (5%)
-Frame 6 (6%)
-Frame 7 (7%)
-Frame 8 (8%)
-Frame 9 (9%)
-Frame 10 (10%)
-Frame 11 (11%)
-Frame 12 (12%)
-Frame 13 (13%)
-Frame 14 (14%)
-Frame 15 (15%)
-Frame 16 (16%)
-Frame 17 (17%)
-Frame 18 (18%)
-Frame 19 (19%)
-Frame 20 (20%)
-Frame 21 (21%)
-Frame 22 (22%)
-Frame 23 (23%)
-Frame 24 (24%)
-Frame 25 (25%)
-Frame 26 (26%)
-Frame 27 (27%)
-Frame 28 (28%)
-Frame 29 (29%)
-Frame 30 (30%)
-Frame 31 (31%)
-Frame 32 (32%)
-Frame 33 (33%)
-Frame 34 (34%)
-Frame 35 (35%)
-Frame 36 (36%)
-Frame 37 (37%)
-Frame 38 (38%)
-Frame 39 (39%)
-Frame 40 (40%)
-Frame 41 (41%)
-Frame 42 (42%)
-Frame 43 (43%)
-Frame 44 (44%)
-Frame 45 (45%)
-Frame 46 (46%)
-Frame 47 (47%)
-Frame 48 (48%)
-Frame 49 (49%)
-Frame 50 (50%)
-Frame 51 (51%)
-Frame 52 (52%)
-Frame 53 (53%)
-Frame 54 (54%)
-Frame 55 (55%)
-Frame 56 (56%)
-Frame 57 (57%)
-Frame 58 (58%)
-Frame 59 (59%)
-Frame 60 (60%)
-Frame 61 (61%)
-Frame 62 (62%)
-Frame 63 (63%)
-Frame 64 (64%)
-Frame 65 (65%)
-Frame 66 (66%)
-Frame 67 (67%)
-Frame 68 (68%)
-Frame 69 (69%)
-Frame 70 (70%)
-Frame 71 (71%)
-Frame 72 (72%)
-Frame 73 (73%)
-Frame 74 (74%)
-Frame 75 (75%)
-Frame 76 (76%)
-Frame 77 (77%)
-Frame 78 (78%)
-Frame 79 (79%)
-Frame 80 (80%)
-Frame 81 (81%)
-Frame 82 (82%)
-Frame 83 (83%)
-Frame 84 (84%)
-Frame 85 (85%)
-Frame 86 (86%)
-Frame 87 (87%)
-Frame 88 (88%)
-Frame 89 (89%)
-Frame 90 (90%)
-Frame 91 (91%)
-Frame 92 (92%)
-Frame 93 (93%)
-Frame 94 (94%)
-Frame 95 (95%)
-Frame 96 (96%)
-Frame 97 (97%)
-Frame 98 (98%)
-Frame 99 (99%)
-Frame 100 (100%)
-## Finalizing encoding... done!</code></pre>
 <p><img src="autoregressive_time_series_files/figure-html/unnamed-chunk-5-1.gif" /><!-- --></p>
 </div>
 <div id="modelling" class="section level1">
 <h1>Modelling</h1>
 <p>Our goal is therefore to build a suitable model taking serial correlation into account. In order to do this, we will initially consider the model for a single time point. Then, we extend this model to account for multiple weeks by allowing for week-speficic effects. Finally, we further allow for serially correlated error terms.</p>
 </div>
-<div id="sinlge-week" class="section level1">
-<h1>Sinlge week</h1>
+<div id="single-week" class="section level1">
+<h1>Single week</h1>
 <p>When looking at data from a single time point (<em>e.g.</em> the first week), we merely have 20 observations from a randomized complete block design with a single treatment factor. It can therefore be analyzed with a simple one-way ANOVA (fixed <code>variety</code> effect) for randomized complete block designs (fixed <code>block</code> effect):</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" title="1">dat.wk1 &lt;-<span class="st"> </span>dat <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">filter</span>(factweek <span class="op">==</span><span class="st"> &quot;1&quot;</span>) <span class="co"># subset data from first week only</span></a>
-<a class="sourceLine" id="cb3-2" title="2"></a>
-<a class="sourceLine" id="cb3-3" title="3">mod.wk1 &lt;-<span class="st"> </span><span class="kw">lm</span>(<span class="dt">formula =</span> y <span class="op">~</span><span class="st"> </span>variety <span class="op">+</span><span class="st"> </span>block,</a>
-<a class="sourceLine" id="cb3-4" title="4">              <span class="dt">data =</span> dat.wk1)</a></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>dat.wk1 <span class="ot">&lt;-</span> dat <span class="sc">%&gt;%</span> <span class="fu">filter</span>(factweek <span class="sc">==</span> <span class="st">&quot;1&quot;</span>) <span class="co"># subset data from first week only</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>mod.wk1 <span class="ot">&lt;-</span> <span class="fu">lm</span>(<span class="at">formula =</span> y <span class="sc">~</span> variety <span class="sc">+</span> block,</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>              <span class="at">data =</span> dat.wk1)</span></code></pre></div>
 <p>We could now go on and look at the ANOVA via <code>anova(mod.wk1)</code> and it would indeed not be <em>wrong</em> to simply repeat this for each week. Yet, one may not be satisfied with obtaining multiple ANOVA results - namely one per week. This is especially likeliy in case the results contradict each other, because <em>e.g.</em> the variety effects are found to be significant in only two out of five weeks. Therefore, one may want to analyze the entire dataset <em>i.e.</em> the multiple weeks jointly.</p>
 </div>
 <div id="multiple-weeks---independent-errors" class="section level1 tabset tabset-fade tabset-pills">
-<h1>Multiple weeks - independent errors</h1>
+<h1 class="tabset tabset-fade tabset-pills">Multiple weeks - independent errors</h1>
 <p>Going from the single-week-analysis to jointly analyzing the entire dataset is more than just changing the <code>data =</code> statement in the model. This is because <em>“it is realistic to assume that the treatment effects evolve over time and thus are week-specific. Importantly, we must also allow for the block effects to change over time in an individual manner. For example, there could be fertility or soil type differences between blocks and these could have a smooth progressive or cumulative time-based effect on differences between the blocks dependent on factors such as temperature or rainfall”</em> <a href="https://onlinelibrary.wiley.com/doi/full/10.1111/jac.12267" target="_blank">(Piepho &amp; Edmondson, 2018)</a>. We implement this by taking the model in <code>mod.wk1</code> and multipyling each effect with <code>factweek</code>. Note that this is also true for the general interecept (µ) in <code>mod.wk1</code>, meaning that we would like to include one intercept per week, which can be achieved by simply adding <code>factweek</code> as a main effect as well. This leaves us with fixed main effects for <code>factweek</code>, <code>variety</code>, and <code>block</code>, as well as the week-specific effects of the latter two <code>factweek:variety</code> and <code>factweek:block</code>.</p>
 <p>Finally, note that we are not doing anything about the model’s error term at this point. More specifically this means that its variance structure is still the default <strong>iid</strong> (independent and identically distributed) - see <a href="variance_structures.html" target="_blank">our summary on correlation/variance strucutres here</a>.</p>
 <div id="nlme" class="section level2">
 <h2>nlme</h2>
 <p>Since the models in this chapter do not contain any random effects, we make use of <code>gls()</code> instead of <code>lme()</code>. Furthermore, the above named model <code>factweek + variety + block + factweek:variety + factweek:block</code> can be written in a shorter syntax as:</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" title="1">mod.iid.nlme &lt;-<span class="st"> </span>nlme<span class="op">::</span><span class="kw">gls</span>(<span class="dt">model =</span> y <span class="op">~</span><span class="st"> </span>factweek <span class="op">*</span><span class="st"> </span>(variety <span class="op">+</span><span class="st"> </span>block),</a>
-<a class="sourceLine" id="cb4-2" title="2">                          <span class="dt">correlation =</span> <span class="ot">NULL</span>, <span class="co"># default, i.e. homoscedastic, independent errors</span></a>
-<a class="sourceLine" id="cb4-3" title="3">                          <span class="dt">data =</span> dat)</a>
-<a class="sourceLine" id="cb4-4" title="4"></a>
-<a class="sourceLine" id="cb4-5" title="5"><span class="co"># Extract variance component estimates</span></a>
-<a class="sourceLine" id="cb4-6" title="6">mod.iid.nlme.VC &lt;-<span class="st"> </span><span class="kw">tibble</span>(<span class="dt">varstruct =</span> <span class="st">&quot;iid&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb4-7" title="7"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">sigma    =</span> mod.iid.nlme<span class="op">$</span>sigma) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb4-8" title="8"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">Variance =</span> sigma<span class="op">^</span><span class="dv">2</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>mod.iid.nlme <span class="ot">&lt;-</span> nlme<span class="sc">::</span><span class="fu">gls</span>(<span class="at">model =</span> y <span class="sc">~</span> factweek <span class="sc">*</span> (variety <span class="sc">+</span> block),</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>                          <span class="at">correlation =</span> <span class="cn">NULL</span>, <span class="co"># default, i.e. homoscedastic, independent errors</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>                          <span class="at">data =</span> dat)</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Extract variance component estimates</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>mod.iid.nlme.VC <span class="ot">&lt;-</span> <span class="fu">tibble</span>(<span class="at">varstruct =</span> <span class="st">&quot;iid&quot;</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">sigma    =</span> mod.iid.nlme<span class="sc">$</span>sigma) <span class="sc">%&gt;%</span> </span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Variance =</span> sigma<span class="sc">^</span><span class="dv">2</span>)</span></code></pre></div>
 <table class="table table-bordered table-hover table-condensed table-responsive" style="width: auto !important; margin-left: auto; margin-right: auto;">
 <thead>
 <tr>
@@ -2770,21 +2639,23 @@ iid
 <p>We can, however, “<em>fix the residual variance to be 0 (actually a small non-zero value)</em>” and therefore “<em>force variance into the random effects</em>” <a href="https://cran.r-project.org/web/packages/glmmTMB/glmmTMB.pdf#Rfn.glmmTMB.1" target="_blank">(glmmTMB RefMan)</a> via adding the <code>dispformula = ~ 0</code> argument. Thus, when doing so, we need to make sure to also add a random term to the model with the desired variance structure. By taking both of these actions, we are essentially mimicing the error (variance) as a random effect (variance). We achieve this by first creating a <code>unit</code> column in the data with different entries for each data point.</p>
 <p>Note that doing this may not be necessary for <code>mod.iid.glmm</code> with the default homoscedastic, independent error variance structure, but since it will be necessary for the following model with a more sophisticated variance structure, we will apply it here, too.</p>
 <p>Finally, for extracting the variance component estimates from <code>glmmTMB</code> objects in this chapter, we use the <code>extract_vc</code> function from the <a href="https://github.com/m-clark/mixedup" target="_blank"><code>mixedup</code> helper package</a>.</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" title="1">dat &lt;-<span class="st"> </span>dat <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb5-2" title="2"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">unit =</span> <span class="dv">1</span><span class="op">:</span><span class="kw">n</span>() <span class="op">%&gt;%</span><span class="st"> </span>as.factor) <span class="co"># new column with running number</span></a>
-<a class="sourceLine" id="cb5-3" title="3"></a>
-<a class="sourceLine" id="cb5-4" title="4">mod.iid.glmm &lt;-<span class="st"> </span><span class="kw">glmmTMB</span>(<span class="dt">formula =</span> y <span class="op">~</span><span class="st"> </span>factweek <span class="op">*</span><span class="st"> </span>(variety <span class="op">+</span><span class="st"> </span>block) </a>
-<a class="sourceLine" id="cb5-5" title="5">                        <span class="op">+</span><span class="st"> </span>(<span class="dv">1</span> <span class="op">|</span><span class="st"> </span>unit),      <span class="co"># add random unit term to mimic error variance</span></a>
-<a class="sourceLine" id="cb5-6" title="6">                        <span class="dt">dispformula =</span> <span class="op">~</span><span class="st"> </span><span class="dv">0</span>, <span class="co"># fix original error variance to 0</span></a>
-<a class="sourceLine" id="cb5-7" title="7">                        <span class="dt">REML =</span> <span class="ot">TRUE</span>,       <span class="co"># needs to be stated since default = ML</span></a>
-<a class="sourceLine" id="cb5-8" title="8">                        <span class="dt">data =</span> dat) </a>
-<a class="sourceLine" id="cb5-9" title="9"></a>
-<a class="sourceLine" id="cb5-10" title="10"><span class="co"># Extract variance component estimates</span></a>
-<a class="sourceLine" id="cb5-11" title="11">mod.iid.glmm.VC &lt;-<span class="st"> </span>mod.iid.glmm <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb5-12" title="12"><span class="st">  </span><span class="kw">extract_vc</span>(<span class="dt">ci_scale =</span> <span class="st">&quot;var&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>dat <span class="ot">&lt;-</span> dat <span class="sc">%&gt;%</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">unit =</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">n</span>() <span class="sc">%&gt;%</span> as.factor) <span class="co"># new column with running number</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>mod.iid.glmm <span class="ot">&lt;-</span> <span class="fu">glmmTMB</span>(<span class="at">formula =</span> y <span class="sc">~</span> factweek <span class="sc">*</span> (variety <span class="sc">+</span> block) </span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>                        <span class="sc">+</span> (<span class="dv">1</span> <span class="sc">|</span> unit),      <span class="co"># add random unit term to mimic error variance</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>                        <span class="at">dispformula =</span> <span class="sc">~</span> <span class="dv">0</span>, <span class="co"># fix original error variance to 0</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>                        <span class="at">REML =</span> <span class="cn">TRUE</span>,       <span class="co"># needs to be stated since default = ML</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>                        <span class="at">data =</span> dat) </span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Extract variance component estimates</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>mod.iid.glmm.VC <span class="ot">&lt;-</span> mod.iid.glmm <span class="sc">%&gt;%</span></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">extract_vc</span>(<span class="at">ci_scale =</span> <span class="st">&quot;var&quot;</span>)</span></code></pre></div>
 <table class="table table-bordered table-hover table-condensed table-responsive" style="width: auto !important; margin-left: auto; margin-right: auto;">
 <thead>
 <tr>
+<th style="text-align:left;">
+</th>
 <th style="text-align:left;">
 group
 </th>
@@ -2808,6 +2679,9 @@ var_97.5
 unit
 </td>
 <td style="text-align:left;">
+unit
+</td>
+<td style="text-align:left;">
 Intercept
 </td>
 <td style="text-align:right;">
@@ -2821,6 +2695,9 @@ Intercept
 </td>
 </tr>
 <tr>
+<td style="text-align:left;">
+1
+</td>
 <td style="text-align:left;">
 Residual
 </td>
@@ -2840,12 +2717,14 @@ Residual
 <div id="sommer" class="section level2">
 <h2>sommer</h2>
 <p>It is quite easy to extract variance component estimates from <code>sommer</code> objects in a table format we are used to:</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" title="1">mod.iid.somm &lt;-<span class="st"> </span><span class="kw">mmer</span>(<span class="dt">fixed =</span> y <span class="op">~</span><span class="st"> </span>factweek <span class="op">+</span><span class="st"> </span>variety <span class="op">+</span><span class="st"> </span>block <span class="op">+</span><span class="st"> </span>factweek<span class="op">:</span>variety <span class="op">+</span><span class="st"> </span>factweek<span class="op">:</span>block, </a>
-<a class="sourceLine" id="cb6-2" title="2">                     <span class="dt">rcov  =</span> <span class="op">~</span><span class="st"> </span>units, <span class="co"># default = iid</span></a>
-<a class="sourceLine" id="cb6-3" title="3">                     <span class="dt">data  =</span> dat, <span class="dt">verbose=</span>F)</a>
-<a class="sourceLine" id="cb6-4" title="4"></a>
-<a class="sourceLine" id="cb6-5" title="5"><span class="co"># Extract variance component estimates</span></a>
-<a class="sourceLine" id="cb6-6" title="6">mod.iid.somm.VC &lt;-<span class="st"> </span><span class="kw">summary</span>(mod.iid.somm)<span class="op">$</span>varcomp </a></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>mod.iid.somm <span class="ot">&lt;-</span> <span class="fu">mmer</span>(<span class="at">fixed =</span> y <span class="sc">~</span> factweek <span class="sc">+</span> variety <span class="sc">+</span> block <span class="sc">+</span> factweek<span class="sc">:</span>variety <span class="sc">+</span> factweek<span class="sc">:</span>block, </span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>                     <span class="at">rcov  =</span> <span class="sc">~</span> units, <span class="co"># default = iid</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>                     <span class="at">data  =</span> dat, <span class="at">verbose=</span>F)</span></code></pre></div>
+<pre><code>## Version out of date. Please update sommer to the newest version using:
+## install.packages(&#39;sommer&#39;) in a new session
+##  Use the &#39;date.warning&#39; argument to disable the warning message.</code></pre>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Extract variance component estimates</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>mod.iid.somm.VC <span class="ot">&lt;-</span> <span class="fu">summary</span>(mod.iid.somm)<span class="sc">$</span>varcomp </span></code></pre></div>
 <table class="table table-bordered table-hover table-condensed table-responsive" style="width: auto !important; margin-left: auto; margin-right: auto;">
 <thead>
 <tr>
@@ -2892,7 +2771,7 @@ Positive
 <p>In SAS, there is an actual <code>subject=</code> statement that is used to identify the subjects on which repeated measurements are taken. This may not be necessary for the <code>iid</code> with the default homoscedastic, independent error variance structure, but since it will be necessary for the following model with a more sophisticated variance structure, we will apply it here, too. In the end, the entire <code>repeated</code> line below could also be left out as it simply explicitly states the default setting.</p>
 
 
-<textarea id="TMYEU">
+<textarea id="EGJKY">
 proc mixed data=dat;
 class variety block factweek plot;
 model y=block variety factweek block*factweek variety*factweek /ddfm=kr2;
@@ -2903,7 +2782,7 @@ run;
 proc print data=modiidsasVC;
 run;
 </textarea>
-<script> var codeElement = document.getElementById("TMYEU"); var editor = null; if (null != codeElement) { editor = CodeMirror.fromTextArea(codeElement, { lineNumbers: true, readOnly: true, viewportMargin: Infinity, mode: 'text/x-sas' }); } </script>
+<script> var codeElement = document.getElementById("EGJKY"); var editor = null; if (null != codeElement) { editor = CodeMirror.fromTextArea(codeElement, { lineNumbers: true, readOnly: true, viewportMargin: Infinity, mode: 'text/x-sas' }); } </script>
 
 <p><br/></p>
 <table class="table table-bordered table-hover table-condensed table-responsive" style="width: auto !important; margin-left: auto; margin-right: auto;">
@@ -2943,7 +2822,7 @@ plot
 </div>
 </div>
 <div id="multiple-weeks---autocorrelated-errors" class="section level1 tabset tabset-fade tabset-pills">
-<h1>Multiple weeks - autocorrelated errors</h1>
+<h1 class="tabset tabset-fade tabset-pills">Multiple weeks - autocorrelated errors</h1>
 <p>Note that at this point of the analysis, the model above with an independent, homogeneous error term above is neither the right, nor the wrong choice. It must be clear that <em>“measurements on the same plot are <strong>likely</strong> to be serially correlated”</em>. Thus, it should be investigated whether any covariance structure for the error term (instead of the default independence between errors) is more appropriate to model this dataset. It could theoretically be the case that this <code>mod.iid</code> is the best choice here, but we cannot confirm this yet, as we have not looked at any alternatives. This is what we will do in the next step.</p>
 <blockquote>
 <p>One may ask <strong>at what step of the analysis it is best to compare and find the appropriate covariance structure for the error term</strong> in such a scenario. It is indeed here, at this step. As <a href="https://onlinelibrary.wiley.com/doi/full/10.1111/jac.12267" target="_blank">Piepho &amp; Edmondson (2018)</a> write: <em>“<strong>Before modelling the treatment effect</strong>, a variance–covariance model needs to be identified for these correlations. This is best done by using a saturated model for treatments and time, i.e., a model that considers all treatment factors and time as qualitative.”</em></p>
@@ -2960,19 +2839,19 @@ plot
 <div id="nlme-1" class="section level2">
 <h2>nlme</h2>
 <p>In <code>nlme</code> we make use of the <code>correlation =</code> argument and use the <code>corAR1</code> <a href="https://cran.r-project.org/web/packages/nlme/nlme.pdf#Rfn.corClasses.1" target="_blank">correlation strucutre class</a>. In its syntax, subjects are identified after the <code>|</code>.</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" title="1">mod.ar1.nlme &lt;-<span class="st"> </span>nlme<span class="op">::</span><span class="kw">gls</span>(<span class="dt">model =</span> y <span class="op">~</span><span class="st"> </span>factweek <span class="op">*</span><span class="st"> </span>(variety <span class="op">+</span><span class="st"> </span>block),</a>
-<a class="sourceLine" id="cb7-2" title="2">                          <span class="dt">correlation =</span> <span class="kw">corAR1</span>(<span class="dt">form =</span> <span class="op">~</span><span class="st"> </span>varweek <span class="op">|</span><span class="st"> </span>plot),</a>
-<a class="sourceLine" id="cb7-3" title="3">                          <span class="dt">data =</span> dat)</a>
-<a class="sourceLine" id="cb7-4" title="4"></a>
-<a class="sourceLine" id="cb7-5" title="5"><span class="co"># Extract variance component estimates</span></a>
-<a class="sourceLine" id="cb7-6" title="6">mod.ar1.nlme.VC &lt;-<span class="st"> </span><span class="kw">tibble</span>(<span class="dt">varstruct =</span> <span class="st">&quot;ar(1)&quot;</span>) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb7-7" title="7"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">sigma    =</span> mod.ar1.nlme<span class="op">$</span>sigma,</a>
-<a class="sourceLine" id="cb7-8" title="8">         <span class="dt">rho      =</span> <span class="kw">coef</span>(mod.ar1.nlme<span class="op">$</span>modelStruct<span class="op">$</span>corStruct, <span class="dt">unconstrained =</span> <span class="ot">FALSE</span>)) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb7-9" title="9"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">Variance =</span> sigma<span class="op">^</span><span class="dv">2</span>,</a>
-<a class="sourceLine" id="cb7-10" title="10">         <span class="dt">Corr1wk  =</span> rho,</a>
-<a class="sourceLine" id="cb7-11" title="11">         <span class="dt">Corr2wks =</span> rho<span class="op">^</span><span class="dv">2</span>,</a>
-<a class="sourceLine" id="cb7-12" title="12">         <span class="dt">Corr3wks =</span> rho<span class="op">^</span><span class="dv">3</span>,</a>
-<a class="sourceLine" id="cb7-13" title="13">         <span class="dt">Corr4wks =</span> rho<span class="op">^</span><span class="dv">4</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>mod.ar1.nlme <span class="ot">&lt;-</span> nlme<span class="sc">::</span><span class="fu">gls</span>(<span class="at">model =</span> y <span class="sc">~</span> factweek <span class="sc">*</span> (variety <span class="sc">+</span> block),</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>                          <span class="at">correlation =</span> <span class="fu">corAR1</span>(<span class="at">form =</span> <span class="sc">~</span> varweek <span class="sc">|</span> plot),</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>                          <span class="at">data =</span> dat)</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Extract variance component estimates</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>mod.ar1.nlme.VC <span class="ot">&lt;-</span> <span class="fu">tibble</span>(<span class="at">varstruct =</span> <span class="st">&quot;ar(1)&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">sigma    =</span> mod.ar1.nlme<span class="sc">$</span>sigma,</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>         <span class="at">rho      =</span> <span class="fu">coef</span>(mod.ar1.nlme<span class="sc">$</span>modelStruct<span class="sc">$</span>corStruct, <span class="at">unconstrained =</span> <span class="cn">FALSE</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Variance =</span> sigma<span class="sc">^</span><span class="dv">2</span>,</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>         <span class="at">Corr1wk  =</span> rho,</span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>         <span class="at">Corr2wks =</span> rho<span class="sc">^</span><span class="dv">2</span>,</span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>         <span class="at">Corr3wks =</span> rho<span class="sc">^</span><span class="dv">3</span>,</span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>         <span class="at">Corr4wks =</span> rho<span class="sc">^</span><span class="dv">4</span>)</span></code></pre></div>
 <table class="table table-bordered table-hover table-condensed table-responsive" style="width: auto !important; margin-left: auto; margin-right: auto;">
 <thead>
 <tr>
@@ -3040,18 +2919,20 @@ ar(1)
 <h2>glmmTMB</h2>
 <p>To model the variance structure of our mimiced error term as first order autoregressive, we replace the <code>(1 | unit)</code> from the <code>iid</code> model with <code>ar1(factweek + 0 | plot)</code>. As can be seen, subjects are identified after the <code>|</code> and the variance structure in this syntax. Further notice that leaving out the <code>+ 0</code> would by default lead to estimating an additional overall variance (see <em>Details</em> for <a href="https://cran.r-project.org/web/packages/glmmTMB/glmmTMB.pdf#Rfn.glmmTMB.1" target="_blank"><code>glmmTMB</code> topic in the RefMan</a>).</p>
 <p>Note that by adding the <code>show_cor = TRUE</code> argument to the <code>extract_vc</code> function, we obtain two outputs: The variance component estimates, as seen above for the <code>iid</code> model, as well as the correlation matrix / variance structure for a single plot.</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" title="1">mod.ar1.glmm &lt;-<span class="st"> </span><span class="kw">glmmTMB</span>(<span class="dt">formula =</span> y <span class="op">~</span><span class="st"> </span>factweek <span class="op">*</span><span class="st"> </span>(variety <span class="op">+</span><span class="st"> </span>block)</a>
-<a class="sourceLine" id="cb8-2" title="2">                        <span class="op">+</span><span class="st"> </span><span class="kw">ar1</span>(factweek <span class="op">+</span><span class="st"> </span><span class="dv">0</span> <span class="op">|</span><span class="st"> </span>plot), <span class="co"># add ar1 structure as random term to mimic error variance</span></a>
-<a class="sourceLine" id="cb8-3" title="3">                        <span class="dt">dispformula =</span> <span class="op">~</span><span class="st"> </span><span class="dv">0</span>, <span class="co"># fix original error variance to 0</span></a>
-<a class="sourceLine" id="cb8-4" title="4">                        <span class="dt">REML =</span> <span class="ot">TRUE</span>,       <span class="co"># needs to be stated since default = ML</span></a>
-<a class="sourceLine" id="cb8-5" title="5">                        <span class="dt">data =</span> dat) </a>
-<a class="sourceLine" id="cb8-6" title="6"></a>
-<a class="sourceLine" id="cb8-7" title="7"><span class="co"># Extract variance component estimates</span></a>
-<a class="sourceLine" id="cb8-8" title="8">mod.ar1.glmm.VC &lt;-<span class="st"> </span>mod.ar1.glmm <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb8-9" title="9"><span class="st">  </span><span class="kw">extract_vc</span>(<span class="dt">ci_scale =</span> <span class="st">&quot;var&quot;</span>, <span class="dt">show_cor =</span> <span class="ot">TRUE</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>mod.ar1.glmm <span class="ot">&lt;-</span> <span class="fu">glmmTMB</span>(<span class="at">formula =</span> y <span class="sc">~</span> factweek <span class="sc">*</span> (variety <span class="sc">+</span> block)</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>                        <span class="sc">+</span> <span class="fu">ar1</span>(factweek <span class="sc">+</span> <span class="dv">0</span> <span class="sc">|</span> plot), <span class="co"># add ar1 structure as random term to mimic error variance</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>                        <span class="at">dispformula =</span> <span class="sc">~</span> <span class="dv">0</span>, <span class="co"># fix original error variance to 0</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>                        <span class="at">REML =</span> <span class="cn">TRUE</span>,       <span class="co"># needs to be stated since default = ML</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>                        <span class="at">data =</span> dat) </span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Extract variance component estimates</span></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>mod.ar1.glmm.VC <span class="ot">&lt;-</span> mod.ar1.glmm <span class="sc">%&gt;%</span></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">extract_vc</span>(<span class="at">ci_scale =</span> <span class="st">&quot;var&quot;</span>, <span class="at">show_cor =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
 <table class="table table-bordered table-hover table-condensed table-responsive" style="width: auto !important; margin-left: auto; margin-right: auto;">
 <thead>
 <tr>
+<th style="text-align:left;">
+</th>
 <th style="text-align:left;">
 group
 </th>
@@ -3072,6 +2953,9 @@ var_97.5
 <tbody>
 <tr>
 <td style="text-align:left;">
+plot1
+</td>
+<td style="text-align:left;">
 plot
 </td>
 <td style="text-align:left;">
@@ -3088,6 +2972,9 @@ factweek1
 </td>
 </tr>
 <tr>
+<td style="text-align:left;">
+plot2
+</td>
 <td style="text-align:left;">
 plot
 </td>
@@ -3106,6 +2993,9 @@ factweek2
 </tr>
 <tr>
 <td style="text-align:left;">
+plot3
+</td>
+<td style="text-align:left;">
 plot
 </td>
 <td style="text-align:left;">
@@ -3122,6 +3012,9 @@ factweek3
 </td>
 </tr>
 <tr>
+<td style="text-align:left;">
+plot4
+</td>
 <td style="text-align:left;">
 plot
 </td>
@@ -3140,6 +3033,9 @@ factweek4
 </tr>
 <tr>
 <td style="text-align:left;">
+plot5
+</td>
+<td style="text-align:left;">
 plot
 </td>
 <td style="text-align:left;">
@@ -3156,6 +3052,9 @@ factweek5
 </td>
 </tr>
 <tr>
+<td style="text-align:left;">
+1
+</td>
 <td style="text-align:left;">
 Residual
 </td>
@@ -3307,15 +3206,17 @@ factweek5
 </ul>
 <p>The first point would not be such a big deal, if we could force the error variance to be 0. Then, the random term with the desired ar1-structure would simply mimic the error term, which is exactly what we do with <code>glmmTMB</code> in this chapter! However, since <code>sommer</code> does not allow us to force the error variance to be 0, we get an iid error variance <strong>and</strong> the desired ar1-structure for plots across weeks. Interestingly, <a href="https://onlinelibrary.wiley.com/doi/full/10.1111/jac.12267" target="_blank">Piepho &amp; Edmondson (2018)</a> actually fit this model as well in addition to the ar1 model and refer to it as “ar1 + nugget”. Strictly speaking, however, it simply is not the variance structure we were aiming for here.</p>
 <p>The second point is simply a limitation in terms of finding the optimal parameters. Since rho is fixed to a value that we as the user must provide before the model iterates, the fitted model can only be as good as our provided rho.</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" title="1">fixed.rho &lt;-<span class="st"> </span><span class="fl">0.7</span> <span class="co"># random guess</span></a>
-<a class="sourceLine" id="cb9-2" title="2"></a>
-<a class="sourceLine" id="cb9-3" title="3">mod.ar1.somm &lt;-<span class="st"> </span><span class="kw">mmer</span>(<span class="dt">fixed  =</span> y <span class="op">~</span><span class="st"> </span>factweek <span class="op">+</span><span class="st"> </span>variety <span class="op">+</span><span class="st"> </span>block <span class="op">+</span><span class="st"> </span>factweek<span class="op">:</span>variety <span class="op">+</span><span class="st"> </span>factweek<span class="op">:</span>block, </a>
-<a class="sourceLine" id="cb9-4" title="4">                     <span class="dt">random =</span> <span class="op">~</span><span class="st"> </span><span class="kw">vs</span>(factweek, <span class="dt">Gu =</span> <span class="kw">AR1</span>(factweek, <span class="dt">rho =</span> fixed.rho)),</a>
-<a class="sourceLine" id="cb9-5" title="5">                     <span class="dt">rcov   =</span> <span class="op">~</span><span class="st"> </span>units, <span class="co"># default = iid</span></a>
-<a class="sourceLine" id="cb9-6" title="6">                     <span class="dt">data   =</span> dat, <span class="dt">verbose=</span>F)</a>
-<a class="sourceLine" id="cb9-7" title="7"></a>
-<a class="sourceLine" id="cb9-8" title="8"><span class="co"># Extract variance component estimates</span></a>
-<a class="sourceLine" id="cb9-9" title="9">mod.ar1.somm.VC &lt;-<span class="st"> </span><span class="kw">summary</span>(mod.ar1.somm)<span class="op">$</span>varcomp </a></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>fixed.rho <span class="ot">&lt;-</span> <span class="fl">0.7</span> <span class="co"># random guess</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>mod.ar1.somm <span class="ot">&lt;-</span> <span class="fu">mmer</span>(<span class="at">fixed  =</span> y <span class="sc">~</span> factweek <span class="sc">+</span> variety <span class="sc">+</span> block <span class="sc">+</span> factweek<span class="sc">:</span>variety <span class="sc">+</span> factweek<span class="sc">:</span>block, </span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>                     <span class="at">random =</span> <span class="sc">~</span> <span class="fu">vs</span>(factweek, <span class="at">Gu =</span> <span class="fu">AR1</span>(factweek, <span class="at">rho =</span> fixed.rho)),</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>                     <span class="at">rcov   =</span> <span class="sc">~</span> units, <span class="co"># default = iid</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>                     <span class="at">data   =</span> dat, <span class="at">verbose=</span>F)</span></code></pre></div>
+<pre><code>## Version out of date. Please update sommer to the newest version using:
+## install.packages(&#39;sommer&#39;) in a new session
+##  Use the &#39;date.warning&#39; argument to disable the warning message.</code></pre>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Extract variance component estimates</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>mod.ar1.somm.VC <span class="ot">&lt;-</span> <span class="fu">summary</span>(mod.ar1.somm)<span class="sc">$</span>varcomp </span></code></pre></div>
 <table class="table table-bordered table-hover table-condensed table-responsive" style="width: auto !important; margin-left: auto; margin-right: auto;">
 <thead>
 <tr>
@@ -3380,7 +3281,7 @@ Positive
 <p>Here, we write <code>type=ar(1)</code> in the <code>repeated</code> statement in order to get the desired variance structure for the error term.</p>
 
 
-<textarea id="SNTWA">
+<textarea id="AJTFK">
 proc mixed data=dat;
 class variety block factweek plot;
 model y=block variety factweek block*factweek variety*factweek /ddfm=kr2;
@@ -3391,7 +3292,7 @@ run;
 proc print data=modar1sasVC;
 run;
 </textarea>
-<script> var codeElement = document.getElementById("SNTWA"); var editor = null; if (null != codeElement) { editor = CodeMirror.fromTextArea(codeElement, { lineNumbers: true, readOnly: true, viewportMargin: Infinity, mode: 'text/x-sas' }); } </script>
+<script> var codeElement = document.getElementById("AJTFK"); var editor = null; if (null != codeElement) { editor = CodeMirror.fromTextArea(codeElement, { lineNumbers: true, readOnly: true, viewportMargin: Infinity, mode: 'text/x-sas' }); } </script>
 
 <p><br/></p>
 <table class="table table-bordered table-hover table-condensed table-responsive" style="width: auto !important; margin-left: auto; margin-right: auto;">
@@ -3444,15 +3345,17 @@ Residual
 </div>
 </div>
 <div id="model-fit" class="section level1 tabset tabset-fade tabset-pills">
-<h1>Model fit</h1>
+<h1 class="tabset tabset-fade tabset-pills">Model fit</h1>
 <p>After all, a decision must be made on whether the <code>ar1</code> variance structure for the error term was a good choice for modelling this dataset. More broadly speaking, it must be decided which of the models should be used for further investigations such as a test of fixed effects <em>etc</em>. As is standard procedure, we can do a model selection based on goodness-of-fit statistics such as the <a href="https://www.wikiwand.com/en/Akaike_information_criterion#" target="_blank">AIC</a> (Akaike information criterion).</p>
 <p>For <code>nlme</code> and <code>glmmTMB</code>, we make use of the <a href="https://cran.r-project.org/web/packages/AICcmodavg/AICcmodavg.pdf#Rfn.aictab.1" target="_blank"><code>aictab()</code> function</a> from the helper package <a href="https://CRAN.R-project.org/package=AICcmodavg" target="_blank">AICcmodavg</a>.</p>
 <div id="nlme-2" class="section level2">
 <h2>nlme</h2>
-<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" title="1">AIC.nlme &lt;-<span class="st"> </span><span class="kw">aictab</span>(<span class="kw">list</span>(mod.iid.nlme, mod.ar1.nlme), <span class="dt">modnames =</span> <span class="kw">c</span>(<span class="st">&quot;iid&quot;</span>, <span class="st">&quot;ar1&quot;</span>))</a></code></pre></div>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>AIC.nlme <span class="ot">&lt;-</span> <span class="fu">aictab</span>(<span class="fu">list</span>(mod.iid.nlme, mod.ar1.nlme), <span class="at">modnames =</span> <span class="fu">c</span>(<span class="st">&quot;iid&quot;</span>, <span class="st">&quot;ar1&quot;</span>))</span></code></pre></div>
 <table class="table table-bordered table-hover table-condensed table-responsive" style="width: auto !important; margin-left: auto; margin-right: auto;">
 <thead>
 <tr>
+<th style="text-align:left;">
+</th>
 <th style="text-align:left;">
 Modnames
 </th>
@@ -3473,6 +3376,9 @@ Res.LL
 <tbody>
 <tr>
 <td style="text-align:left;">
+2
+</td>
+<td style="text-align:left;">
 ar1
 </td>
 <td style="text-align:right;">
@@ -3489,6 +3395,9 @@ ar1
 </td>
 </tr>
 <tr>
+<td style="text-align:left;">
+1
+</td>
 <td style="text-align:left;">
 iid
 </td>
@@ -3514,10 +3423,12 @@ iid
 </div>
 <div id="glmmtmb-2" class="section level2">
 <h2>glmmTMB</h2>
-<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" title="1">AIC.glmm &lt;-<span class="st"> </span><span class="kw">aictab</span>(<span class="kw">list</span>(mod.iid.glmm, mod.ar1.glmm), <span class="dt">modnames =</span> <span class="kw">c</span>(<span class="st">&quot;iid&quot;</span>, <span class="st">&quot;ar1&quot;</span>))</a></code></pre></div>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>AIC.glmm <span class="ot">&lt;-</span> <span class="fu">aictab</span>(<span class="fu">list</span>(mod.iid.glmm, mod.ar1.glmm), <span class="at">modnames =</span> <span class="fu">c</span>(<span class="st">&quot;iid&quot;</span>, <span class="st">&quot;ar1&quot;</span>))</span></code></pre></div>
 <table class="table table-bordered table-hover table-condensed table-responsive" style="width: auto !important; margin-left: auto; margin-right: auto;">
 <thead>
 <tr>
+<th style="text-align:left;">
+</th>
 <th style="text-align:left;">
 Modnames
 </th>
@@ -3538,6 +3449,9 @@ LL
 <tbody>
 <tr>
 <td style="text-align:left;">
+2
+</td>
+<td style="text-align:left;">
 ar1
 </td>
 <td style="text-align:right;">
@@ -3554,6 +3468,9 @@ ar1
 </td>
 </tr>
 <tr>
+<td style="text-align:left;">
+1
+</td>
 <td style="text-align:left;">
 iid
 </td>
@@ -3577,13 +3494,13 @@ iid
 <h2>sommer</h2>
 <p>Comparing AIC values from the two models once again shows that <code>sommer</code> does not really do what we are aiming for in this example. The AIC values for the two models are identical. The main reason for this is that they do not actually differ in the number of estimated parameters, since <em>rho</em> as the potentially second parameter here, was not estimated, but fixed by us.</p>
 <p>[ Is this the whole story? …in progress… ]</p>
-<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb12-1" title="1">somm.mods &lt;-<span class="st"> </span><span class="kw">list</span>(mod.iid.somm, mod.ar1.somm)</a>
-<a class="sourceLine" id="cb12-2" title="2"></a>
-<a class="sourceLine" id="cb12-3" title="3">AIC.somm &lt;-<span class="st"> </span><span class="kw">tibble</span>(</a>
-<a class="sourceLine" id="cb12-4" title="4">  <span class="dt">Modnames =</span> <span class="kw">c</span>(<span class="st">&quot;iid&quot;</span>, <span class="st">&quot;ar1&quot;</span>),</a>
-<a class="sourceLine" id="cb12-5" title="5">  <span class="dt">AIC =</span> somm.mods <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">map</span>(<span class="st">&quot;AIC&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span>unlist,</a>
-<a class="sourceLine" id="cb12-6" title="6">  <span class="dt">LL  =</span> somm.mods <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">map</span>(<span class="st">&quot;monitor&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">lapply</span>(. <span class="op">%&gt;%</span><span class="st"> `</span><span class="dt">[</span><span class="st">`</span>(<span class="dv">1</span>, <span class="kw">ncol</span>(.))) <span class="op">%&gt;%</span><span class="st"> </span>unlist) <span class="op">%&gt;%</span><span class="st"> </span><span class="co"># last element in first row of &quot;monitor&quot;</span></a>
-<a class="sourceLine" id="cb12-7" title="7"><span class="st">  </span><span class="kw">arrange</span>(AIC)</a></code></pre></div>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>somm.mods <span class="ot">&lt;-</span> <span class="fu">list</span>(mod.iid.somm, mod.ar1.somm)</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>AIC.somm <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">Modnames =</span> <span class="fu">c</span>(<span class="st">&quot;iid&quot;</span>, <span class="st">&quot;ar1&quot;</span>),</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">AIC =</span> somm.mods <span class="sc">%&gt;%</span> <span class="fu">map</span>(<span class="st">&quot;AIC&quot;</span>) <span class="sc">%&gt;%</span> unlist,</span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">LL  =</span> somm.mods <span class="sc">%&gt;%</span> <span class="fu">map</span>(<span class="st">&quot;monitor&quot;</span>) <span class="sc">%&gt;%</span> <span class="fu">lapply</span>(. <span class="sc">%&gt;%</span> <span class="st">`</span><span class="at">[</span><span class="st">`</span>(<span class="dv">1</span>, <span class="fu">ncol</span>(.))) <span class="sc">%&gt;%</span> unlist) <span class="sc">%&gt;%</span> <span class="co"># last element in first row of &quot;monitor&quot;</span></span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(AIC)</span></code></pre></div>
 <table class="table table-bordered table-hover table-condensed table-responsive" style="width: auto !important; margin-left: auto; margin-right: auto;">
 <thead>
 <tr>
@@ -3692,7 +3609,7 @@ ar1
 <p>Notice that this outcome satisfies the aim of this chapter (<em>i.e.</em> having an <code>ar1</code> variance structure for the error term) but regarding the analysis of the underlying dataset, more steps can be taken in order to get concluding results. You can find further steps in <a href="https://onlinelibrary.wiley.com/doi/full/10.1111/jac.12267" target="_blank"><em>Example 4</em> in Piepho &amp; Edmondson (2018)</a> (see also the <a href="https://cran.r-project.org/web/packages/agriTutorial/vignettes/agriTutorialVignette.pdf#%5B%7B%22num%22%3A81%2C%22gen%22%3A0%7D%2C%7B%22name%22%3A%22XYZ%22%7D%2C28.346%2C813.543%2Cnull%5D" target="_blank">Agritutorial vigniette</a>). On one hand, they investigate more variance structure alternatives to <code>iid</code> and on the other hand, they continue selecting a suitable regression model for the time trend after selecting a sutiable variance structure.</p>
 </div>
 <div id="summary" class="section level1 tabset tabset-fade">
-<h1>Summary</h1>
+<h1 class="tabset tabset-fade">Summary</h1>
 <div id="syntax" class="section level2">
 <h2>Syntax</h2>
 <table>
@@ -3990,7 +3907,7 @@ $(document).ready(function () {
 
 $(document).ready(function () {
   $('.tabset-dropdown > .nav-tabs > li').click(function () {
-    $(this).parent().toggleClass('nav-tabs-open')
+    $(this).parent().toggleClass('nav-tabs-open');
   });
 });
 </script>
