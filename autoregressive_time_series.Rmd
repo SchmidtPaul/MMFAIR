@@ -84,7 +84,7 @@ animate(gganimate_plot, renderer = gifski_renderer())
 
 Our goal is therefore to build a suitable model taking serial correlation into account. In order to do this, we will initially consider the model for a single time point. Then, we extend this model to account for multiple weeks by allowing for week-speficic effects. Finally, we further allow for serially correlated error terms. 
 
-# Sinlge week
+# Single week
 
 When looking at data from a single time point (*e.g.* the first week), we merely have 20 observations from a randomized complete block design with a single treatment factor. It can therefore be analyzed with a simple one-way ANOVA (fixed `variety` effect) for randomized complete block designs (fixed `block` effect):
 
