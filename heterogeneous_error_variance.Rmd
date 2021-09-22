@@ -69,8 +69,8 @@ The different variance structures in the error term of the 5 models are summaris
 MODTAB <- tibble(Model = paste0("mod", 1:5) %>% cell_spec(bold=T),
        Block    = "Identity",
        Genotype = "Identity",
-       Date     = c("Identity", "Identity", "Diagonal", "Diagonal", "Diag-"),
-       Density  = c("Identity", "Diagonal", "Identity", "Diagonal", "onal"),
+       Date     = c("Identity", "Diagonal", "Identity", "Diagonal", "Diag-"),
+       Density  = c("Identity", "Identity", "Diagonal", "Diagonal", "onal"),
        parameters = c(1,2,4,5,8),
        estimates  = c(1,2,4,8,8)) %>% 
   mutate(Date    = ifelse(Date    %in% c("Diagonal", "Diag-"), cell_spec(Date,    bold=T), Date),
