@@ -325,6 +325,97 @@ div.tocify {
 </head>
 
 <body>
+<!-- DEPRECATION-BANNER-START -->
+<style>
+/* ===== DEPRECATION BANNER ===== */
+.deprecation-banner {
+    background: linear-gradient(135deg, #c62828, #e53935);
+    color: white;
+    padding: 24px 24px 18px;
+    font-size: 15px;
+    line-height: 1.6;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    position: relative;
+    z-index: 9999;
+}
+.deprecation-banner strong {
+    font-size: 17px;
+}
+.deprecation-banner .lang-block {
+    display: inline-block;
+    text-align: center;
+    max-width: 600px;
+    vertical-align: top;
+}
+.deprecation-banner .banner-divider {
+    display: inline-block;
+    width: 1px;
+    height: 80px;
+    background: rgba(255,255,255,0.4);
+    margin: 0 30px;
+    vertical-align: middle;
+}
+.deprecation-banner a.banner-link {
+    color: white;
+    background: rgba(255,255,255,0.2);
+    padding: 6px 16px;
+    border-radius: 4px;
+    text-decoration: none;
+    font-weight: bold;
+    border: 1px solid rgba(255,255,255,0.5);
+    display: inline-block;
+    margin-top: 6px;
+    transition: background 0.2s;
+}
+.deprecation-banner a.banner-link:hover {
+    background: rgba(255,255,255,0.35);
+}
+.deprecation-banner .banner-signature {
+    display: block;
+    margin-top: 10px;
+    font-style: italic;
+    font-weight: bold;
+    font-size: 17px;
+    opacity: 0.9;
+}
+@media (max-width: 800px) {
+    .deprecation-banner .lang-block {
+        display: block;
+        max-width: 100%;
+        margin-bottom: 12px;
+    }
+    .deprecation-banner .banner-divider {
+        display: block;
+        width: 60%;
+        height: 1px;
+        margin: 12px auto;
+    }
+}
+</style>
+<div class="deprecation-banner">
+    <div class="lang-block">
+        <strong>&#9888; Hey, nice that you're here! BUT...</strong><br>
+        This site is no longer maintained and may contain outdated information.
+        I'm keeping it online because I once promised to never take it down &ndash;
+        but I've since built a much better, up-to-date resource. I'd really
+        appreciate if you checked it out and found the corresponding chapter there:<br>
+        <a class="banner-link" href="https://biomathcontent.netlify.app/">&#10132; biomathcontent.netlify.app</a>
+    </div>
+    <span class="banner-divider"></span>
+    <div class="lang-block">
+        <strong>&#9888; Hi, sch&ouml;n, dass du hier bist, ABER...</strong><br>
+        Diese Seite wird nicht mehr gepflegt und enth&auml;lt m&ouml;glicherweise
+        veraltete Informationen. Ich habe versprochen sie online zu lassen,
+        also bleibt sie stehen &ndash; aber alle Inhalte wurden &uuml;berarbeitet,
+        verbessert und auf einer neuen Seite zusammengef&uuml;hrt.
+        Schau bitte stattdessen dort vorbei:<br>
+        <a class="banner-link" href="https://biomathcontent.netlify.app/">&#10132; biomathcontent.netlify.app</a>
+    </div>
+    <span class="banner-signature">- Cheers, <a href="https://schmidtpaul.github.io/" style="color:white;text-decoration:underline;">Paul</a></span>
+</div>
+<!-- DEPRECATION-BANNER-END -->
+
 
 
 <div class="container-fluid main-container">
